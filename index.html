@@ -42,16 +42,36 @@ h1{font-family:var(--display);font-weight:400;font-size:clamp(28px,6vw,44px);mar
 .games a:hover{background:color-mix(in srgb,var(--c) 45%,var(--cell))}
 .games a:focus-visible{outline:3px solid #3E7BD6;outline-offset:2px}
 .empty{margin:12px 16px 16px;padding:14px;border:2px dashed var(--muted);border-radius:10px;color:var(--muted);text-align:center}
+.top{position:relative;padding-right:100px}
+.qr-thumb{position:absolute;top:0;right:0;width:84px;padding:6px 6px 2px;background:#fff;border:2px solid var(--ink);border-radius:12px;
+  cursor:zoom-in;font:inherit;color:#1F2A44;text-align:center;box-shadow:0 3px 0 var(--ink)}
+.qr-thumb:focus-visible{outline:3px solid #3E7BD6;outline-offset:3px}
+.qr-thumb .qr img,.qr-thumb .qr canvas{width:100%!important;height:auto!important;display:block}
+.qr-thumb span{display:block;font-size:11px;font-weight:700;line-height:1.6}
+.qr-overlay{position:fixed;inset:0;z-index:50;background:rgba(20,30,45,.75);display:none;align-items:center;justify-content:center;padding:20px;cursor:zoom-out}
+.qr-overlay.open{display:flex}
+.qr-big{background:#fff;color:#1F2A44;border:3px solid #1F2A44;border-radius:20px;padding:24px;text-align:center;width:min(90vw,460px)}
+.qr-big .qr img,.qr-big .qr canvas{width:100%!important;height:auto!important;display:block}
+.qr-big h2{font-family:var(--display);font-weight:400;font-size:clamp(22px,5vw,32px);margin:0 0 12px}
+.qr-big p{margin:12px 0 0;font-size:14px;word-break:break-all;color:#5A6680}
+@media (max-width:480px){.top{padding-right:86px}.qr-thumb{width:72px}}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>
 <main>
-  <h1>段考複習遊戲大廳</h1>
-  <p class="sub">115 學年度期中定期評量　11/5（四）、11/6（五）</p>
-  <div class="count" id="count"></div>
+  <div class="top">
+    <h1>段考複習遊戲大廳</h1>
+    <p class="sub">115 學年度期中定期評量　11/5（四）、11/6（五）</p>
+    <div class="count" id="count"></div>
+    <button class="qr-thumb" id="qrThumb" aria-label="放大 QR Code"><div class="qr" id="qrSmall"></div><span>掃我進來</span></button>
+  </div>
   <p class="lead">所有複習遊戲都在這裡，點一下就能開始玩</p>
   <div class="grid" id="grid"></div>
 </main>
+<div class="qr-overlay" id="qrOverlay" role="dialog" aria-modal="true" aria-label="QR Code">
+  <div class="qr-big"><h2>掃描進入遊戲大廳</h2><div class="qr" id="qrBig"></div><p id="qrUrl"></p></div>
+</div>
 <script>
 const SUBJ = [
   {name:"國語", pub:"南一", color:"var(--ch)", scope:"第一課～第六課＋語文天地一、二",
@@ -73,6 +93,19 @@ SUBJ.forEach(S=>{
     : `<p class="empty">遊戲準備中</p>`);
   grid.appendChild(d);
 });
+/* QR Code：留空會自動使用目前網頁的網址；也可以填入固定網址 */
+const PAGE_URL = "";
+(function(){
+  const url = PAGE_URL || location.href.split("#")[0];
+  document.getElementById("qrUrl").textContent = url;
+  if(typeof QRCode === "undefined"){ document.getElementById("qrThumb").style.display="none"; return; }
+  new QRCode(document.getElementById("qrSmall"), {text:url, width:160, height:160, correctLevel:QRCode.CorrectLevel.M});
+  new QRCode(document.getElementById("qrBig"), {text:url, width:512, height:512, correctLevel:QRCode.CorrectLevel.M});
+  const ov = document.getElementById("qrOverlay"), th = document.getElementById("qrThumb");
+  th.onclick = ()=>ov.classList.add("open");
+  ov.onclick = ()=>{ ov.classList.remove("open"); th.focus(); };
+  document.addEventListener("keydown", e=>{ if(e.key==="Escape") ov.classList.remove("open"); });
+})();
 (function(){
   const exam = new Date(2026,10,5), t = new Date(); t.setHours(0,0,0,0);
   const d = Math.round((exam - t)/864e5), el = document.getElementById("count");
