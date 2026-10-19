@@ -32,6 +32,7 @@ h1{font-family:var(--display);font-weight:400;font-size:clamp(28px,6vw,44px);mar
 .count b{font-size:1.4em;color:#E0413A;margin:0 2px}
 .lead{margin:0 0 14px}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+.subj.wide{grid-column:1/-1}
 .subj{background:var(--cell);border:2px solid var(--ink);border-radius:14px;overflow:hidden}
 .subj header{background:var(--c);color:#1F2A44;font-family:var(--display);font-size:22px;padding:8px 18px;border-bottom:2px solid var(--ink)}
 .subj header small{font-family:var(--body);font-size:14px;margin-left:8px;font-weight:500}
@@ -55,6 +56,18 @@ h1{font-family:var(--display);font-weight:400;font-size:clamp(28px,6vw,44px);mar
 .qr-big h2{font-family:var(--display);font-weight:400;font-size:clamp(22px,5vw,32px);margin:0 0 12px}
 .qr-big p{margin:12px 0 0;font-size:14px;word-break:break-all;color:#5A6680}
 @media (max-width:480px){.top{padding-right:86px}.qr-thumb{width:72px}}
+.lessons{margin:0 16px 16px;border-top:2px dashed color-mix(in srgb,var(--ink) 25%,transparent);padding-top:12px}
+.lessons h3{margin:0 0 4px;font-size:15px}
+.lessons .hint{margin:0 0 10px;font-size:13px;color:var(--muted)}
+.lesson{display:grid;grid-template-columns:3.6em 1fr;gap:8px;align-items:start;padding:6px 0}
+.lesson+.lesson{border-top:1px solid color-mix(in srgb,var(--ink) 12%,transparent)}
+.lesson b{font-family:var(--display);font-weight:400;font-size:17px;line-height:32px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips a{font-size:14px;font-weight:700;padding:3px 10px;border:2px solid var(--ink);border-radius:999px;color:var(--ink);text-decoration:none;
+  background:color-mix(in srgb,var(--c) 22%,var(--cell))}
+.chips a:hover{background:color-mix(in srgb,var(--c) 45%,var(--cell))}
+.chips a:focus-visible{outline:3px solid #3E7BD6;outline-offset:2px}
+.chips a.ww{border-style:dashed}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
@@ -75,8 +88,42 @@ h1{font-family:var(--display);font-weight:400;font-size:clamp(28px,6vw,44px);mar
 <script>
 const SUBJ = [
   {name:"國語", pub:"南一", color:"var(--ch)", scope:"第一課～第六課＋語文天地一、二",
+   lessons:[
+    {label:"第一課", links:[
+      {name:"國字注音", url:"https://quizlet.com/_bkmdvm?x=1qqt&i=1f8cn1"},
+      {name:"注釋", url:"https://quizlet.com/_bi54hd?x=1qqt&i=1f8cn1"},
+      {name:"字字珠璣", url:"https://wordwall.net/tc/resource/34235973"},
+      {name:"成語對對碰", url:"https://wordwall.net/tc/resource/34559318"}]},
+    {label:"第二課", links:[
+      {name:"國字注音", url:"https://quizlet.com/_bkme6m?x=1qqt&i=1f8cn1"},
+      {name:"注釋", url:"https://quizlet.com/_bi55yy?x=1qqt&i=1f8cn1"},
+      {name:"字字珠璣", url:"https://wordwall.net/tc/resource/34425576"},
+      {name:"成語對對碰", url:"https://wordwall.net/tc/resource/34559353"}]},
+    {label:"第三課", links:[
+      {name:"國字注音", url:"https://quizlet.com/_bkmemy?x=1qqt&i=1f8cn1"},
+      {name:"注釋", url:"https://quizlet.com/_bi57ka?x=1qqt&i=1f8cn1"},
+      {name:"字字珠璣", url:"https://wordwall.net/tc/resource/34425719"},
+      {name:"成語對對碰", url:"https://wordwall.net/tc/resource/34559404"}]},
+    {label:"第四課", links:[
+      {name:"國字注音", url:"https://quizlet.com/_bkmez6?x=1qqt&i=1f8cn1"},
+      {name:"注釋", url:"https://quizlet.com/_bi58dc?x=1qqt&i=1f8cn1"},
+      {name:"字字珠璣", url:"https://wordwall.net/tc/resource/34425834"},
+      {name:"成語對對碰", url:"https://wordwall.net/tc/resource/34559433"}]},
+    {label:"第五課", links:[
+      {name:"國字注音", url:"https://quizlet.com/_bkmfh8?x=1qqt&i=1f8cn1"},
+      {name:"注釋", url:"https://quizlet.com/_bi598a?x=1qqt&i=1f8cn1"},
+      {name:"字字珠璣", url:"https://wordwall.net/tc/resource/34425965"},
+      {name:"成語對對碰", url:"https://wordwall.net/tc/resource/34559457"}]},
+    {label:"第六課", links:[
+      {name:"國字注音", url:"https://quizlet.com/_bkmful?x=1qqt&i=1f8cn1"},
+      {name:"注釋", url:"https://quizlet.com/_bi5a9u?x=1qqt&i=1f8cn1"},
+      {name:"字字珠璣", url:"https://wordwall.net/tc/resource/34426060"},
+      {name:"成語對對碰", url:"https://wordwall.net/tc/resource/34559478"}]}
+   ],
    games:[{name:"成語練功房", url:"https://teacher-liujikan.github.io/idiompractice/", icon:"📜"},
-          {name:"修辭小偵探", url:"https://teacher-liujikan.github.io/rhetoric-detective/", icon:"🔍"}]},
+          {name:"修辭小偵探", url:"https://teacher-liujikan.github.io/rhetoric-detective/", icon:"🔍"},
+          {name:"形音義小遊戲（第一～三課）", url:"https://onebook-release.oneclass.com.tw/data/2cb8784acbee7bdd/%E5%BD%A2%E9%9F%B3%E7%BE%A9%E5%B0%8F%E9%81%8A%E6%88%B2/%E5%96%AE%E5%85%83%E4%B8%80/index.html", icon:"✏️"},
+          {name:"形音義小遊戲（第四～六課）", url:"https://onebook-release.oneclass.com.tw/data/2cb8784acbee7bdd/%E5%BD%A2%E9%9F%B3%E7%BE%A9%E5%B0%8F%E9%81%8A%E6%88%B2/%E5%96%AE%E5%85%83%E4%BA%8C/index.html", icon:"✏️"}]},
   {name:"英語", pub:"康軒", color:"var(--en)", scope:"Classroom English (P8)～Review 1 (P46)",
    games:[{name:"1～10 練習", url:"https://teacher-liujikan.github.io/spellgame/", icon:"🔤"},
           {name:"第二課單字練習", url:"https://teacher-liujikan.github.io/Vocabulary-Practice/", icon:"📝"}]},
@@ -90,11 +137,13 @@ const SUBJ = [
 ];
 const grid = document.getElementById("grid");
 SUBJ.forEach(S=>{
-  const d = document.createElement("section"); d.className="subj"; d.style.setProperty("--c",S.color);
+  const d = document.createElement("section"); d.className="subj"+(S.lessons?" wide":""); d.style.setProperty("--c",S.color);
   d.innerHTML = `<header>${S.name}<small>${S.games.length} 個遊戲</small></header>
     <p class="scope">範圍：${S.scope}（${S.pub}版）</p>` + (S.games.length
     ? `<ul class="games">${S.games.map(g=>`<li><a href="${g.url}" target="_blank" rel="noopener">${g.icon} ${g.name}</a></li>`).join("")}</ul>`
-    : `<p class="empty">遊戲準備中</p>`);
+    : `<p class="empty">遊戲準備中</p>`) + (S.lessons ? `<div class="lessons"><h3>各課練習（Quizlet 單字卡＋Wordwall 小遊戲）</h3>
+    <p class="hint">實線框是 Quizlet，虛線框是 Wordwall</p>` + S.lessons.map(L=>`<div class="lesson"><b>${L.label}</b><div class="chips">${
+      L.links.map(k=>`<a href="${k.url}" target="_blank" rel="noopener"${k.url.includes("wordwall")?' class="ww"':''}>${k.name}</a>`).join("")}</div></div>`).join("") + `</div>` : "");
   grid.appendChild(d);
 });
 /* QR Code：留空會自動使用目前網頁的網址；也可以填入固定網址 */
