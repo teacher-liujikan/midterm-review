@@ -1,0 +1,472 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>語氣與劇本小劇場</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@400;700&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<style>
+@font-face{font-family:"EduKai";src:local("TW-MOE-Std-Kai"),local("教育部標準楷書"),url("fonts/edukai-4.0.woff2") format("woff2");font-display:swap}
+/* Layout: 綠格稿紙底；三個分頁：說出不同的語氣／用對話演故事／小測驗。語氣用「字的高低大小」畫出聲音線；劇本用四色標出角色、動作、表情、對話 */
+:root{
+  --bg:#f5f9f6; --paper:#ffffff; --ink:#1c2925; --muted:#5b6d66; --line:#d3e4da; --grid:#e4efe8;
+  --accent:#23744f; --accent-ink:#ffffff; --accent-soft:#e2f1e8;
+  --ok:#1f7a45; --ok-soft:#e1f4e7; --bad:#b4362c; --bad-soft:#fbe7e4;
+  --happy:#e8710a; --happy-s:#fdebd9; --angry:#c62828; --angry-s:#fbe3e1; --sad:#3b6fd1; --sad-s:#e2eafb; --ask:#7a4fb0; --ask-s:#eee5f8;
+  --role:#7a4fb0; --role-s:#eee5f8; --act:#1f6fb5; --act-s:#e0edf9; --face:#1f8a5b; --face-s:#dff3e8; --talk:#c62828; --talk-s:#fbe3e1;
+  --f-display:"EduKai","LXGW WenKai TC","BiauKai","DFKai-SB","KaiTi","Noto Serif TC",serif;
+  --f-body:"EduKai","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#111916; --paper:#18221e; --ink:#e4eee8; --muted:#9db1a8; --line:#2b3d35; --grid:#1c2924;
+  --accent:#5fc493; --accent-ink:#0d1512; --accent-soft:#1d3329;
+  --ok:#6fd398; --ok-soft:#173326; --bad:#ff8f84; --bad-soft:#3a1d1a;
+  --happy:#ffa45c; --happy-s:#3a2a1a; --angry:#ff8a80; --angry-s:#3a1c1a; --sad:#86a8f0; --sad-s:#1c2740; --ask:#b99ae6; --ask-s:#2a2140;
+  --role:#b99ae6; --role-s:#2a2140; --act:#7fb2ee; --act-s:#1a2a3e; --face:#5fd09a; --face-s:#173326; --talk:#ff8a80; --talk-s:#3a1c1a;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111916; --paper:#18221e; --ink:#e4eee8; --muted:#9db1a8; --line:#2b3d35; --grid:#1c2924;
+  --accent:#5fc493; --accent-ink:#0d1512; --accent-soft:#1d3329;
+  --ok:#6fd398; --ok-soft:#173326; --bad:#ff8f84; --bad-soft:#3a1d1a;
+  --happy:#ffa45c; --happy-s:#3a2a1a; --angry:#ff8a80; --angry-s:#3a1c1a; --sad:#86a8f0; --sad-s:#1c2740; --ask:#b99ae6; --ask-s:#2a2140;
+  --role:#b99ae6; --role-s:#2a2140; --act:#7fb2ee; --act-s:#1a2a3e; --face:#5fd09a; --face-s:#173326; --talk:#ff8a80; --talk-s:#3a1c1a;
+  color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.7;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:28px 28px}
+.wrap{max-width:900px;margin:0 auto;padding-block:20px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header.top{display:flex;gap:16px;align-items:flex-start;justify-content:space-between}
+.brand{min-width:0}
+.eyebrow{font-size:13px;letter-spacing:.12em;color:var(--accent);font-weight:700}
+h1{font-family:var(--f-display);font-size:clamp(28px,6vw,40px);line-height:1.2;margin:4px 0 6px;text-wrap:balance}
+.sub{color:var(--muted);margin:0;font-size:15px}
+.qr{flex:none;background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}
+.qr #qrSmall{width:76px;height:76px}
+.qr #qrSmall img,.qr #qrSmall canvas{width:76px!important;height:76px!important}
+.qr span{font-size:11px;color:#3d4f48}
+button:focus-visible,.qr:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.tabs{display:flex;gap:8px;margin:22px 0 14px;flex-wrap:wrap}
+.tab{font:inherit;font-weight:700;font-size:17px;border:2px solid var(--accent);background:var(--paper);color:var(--accent);border-radius:999px;padding:8px 20px;cursor:pointer}
+.tab[aria-selected="true"]{background:var(--accent);color:var(--accent-ink)}
+.panel{display:flex;flex-direction:column;gap:16px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+.card h2{font-family:var(--f-display);font-size:25px;margin:0 0 6px}
+.card h3{font-family:var(--f-display);font-size:20px;margin:0 0 6px}
+.card p{margin:6px 0}
+.key{background:#ffe27a;color:#1c2925;border-radius:4px;padding:0 4px;font-weight:700}
+.note{font-size:14px;color:var(--muted);background:var(--bg);border-radius:6px;padding:8px 12px}
+.btn{font:inherit;font-weight:700;font-size:16px;border:0;background:var(--accent);color:var(--accent-ink);border-radius:999px;padding:9px 22px;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--accent);border:2px solid var(--accent)}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+
+/* 語氣的四個工具 */
+.tools{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:10px}
+@media (max-width:640px){.tools{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.tool{border:1px solid var(--line);border-radius:8px;padding:10px;background:var(--bg);text-align:center}
+.tool b{display:block;font-size:17px}
+.tool span{font-size:13px;color:var(--muted)}
+.tool svg{width:56px;height:36px;display:block;margin:4px auto;color:var(--accent)}
+
+/* 語氣卡 */
+.moods{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:640px){.moods{grid-template-columns:1fr}}
+.mood{background:var(--paper);border:1px solid var(--line);border-top:6px solid var(--mc);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:8px}
+.mood .hd{display:flex;align-items:center;gap:10px}
+.mood .hd svg{width:46px;height:46px;flex:none;color:var(--mc)}
+.mood .hd b{font-size:19px;color:var(--mc)}
+.mood .how{font-size:15px}
+.wave{display:flex;align-items:flex-end;justify-content:center;gap:2px;height:96px;background:var(--ms);border-radius:8px;padding:8px;font-family:var(--f-display);color:var(--ink)}
+.wave span{display:inline-block;line-height:1;transition:transform .4s}
+.mood .play{align-self:flex-start;font:inherit;font-weight:700;font-size:15px;border:2px solid var(--mc);color:var(--mc);background:var(--paper);border-radius:999px;padding:4px 14px;cursor:pointer}
+.mood.on .wave span{animation:bob .5s both}
+@keyframes bob{0%{transform:translateY(8px);opacity:.3}100%{transform:none;opacity:1}}
+
+/* 情境挑戰 */
+.scene{font-family:var(--f-display);font-size:22px;line-height:1.7;background:var(--bg);border-radius:8px;padding:12px 14px}
+.say{font-family:var(--f-display);font-size:26px;text-align:center;margin:10px 0}
+.picks{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+@media (max-width:560px){.picks{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.pick{font:inherit;font-weight:700;font-size:16px;border:2px solid var(--mc);color:var(--mc);background:var(--paper);border-radius:10px;padding:10px 6px;cursor:pointer}
+.pick.right{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.pick.wrong{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.pick:disabled{cursor:default}
+
+/* 劇本 */
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:680px){.compare{grid-template-columns:1fr}}
+.box{border:1px solid var(--line);border-radius:8px;padding:12px 14px;background:var(--bg)}
+.box h4{margin:0 0 6px;font-size:15px;color:var(--muted)}
+.box p{font-family:var(--f-display);font-size:18px;line-height:1.85;margin:0 0 6px}
+.story p{text-indent:2em}
+.script p{margin:0 0 4px}
+.legend{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.lg{font-size:14px;font-weight:700;border-radius:6px;padding:1px 10px;color:var(--lc);background:var(--ls);border:1.5px solid var(--lc)}
+.t-role{color:var(--role);font-weight:700}
+.t-act,.t-face{border-radius:4px;padding:0 3px}
+.t-act{background:var(--act-s);color:var(--act)}
+.t-face{background:var(--face-s);color:var(--face)}
+.t-talk{color:var(--talk)}
+.t-scene{color:var(--muted)}
+.paints{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.paint{font:inherit;font-weight:700;font-size:16px;border:2px solid var(--lc);color:var(--lc);background:var(--paper);border-radius:999px;padding:6px 16px;cursor:pointer}
+.paint[aria-pressed="true"]{background:var(--lc);color:var(--paper)}
+.lab{font-family:var(--f-display);font-size:20px;line-height:2.2}
+.lab .ln{margin:0 0 6px;display:flex;flex-wrap:wrap;align-items:center;gap:4px}
+.pc{font:inherit;font-family:var(--f-display);font-size:20px;border:2px dashed var(--line);background:var(--paper);color:var(--ink);border-radius:8px;padding:2px 10px;cursor:pointer;line-height:1.6}
+.pc[data-got]{border-style:solid;border-color:var(--lc);background:var(--ls);color:var(--lc)}
+.pc.bad{outline:3px solid var(--bad);outline-offset:1px}
+.colon{font-family:var(--f-display);font-size:20px}
+.result{margin-top:10px;border-radius:8px;padding:10px 14px;font-size:15px}
+.result.ok{background:var(--ok-soft);color:var(--ok)}
+.result.bad{background:var(--bad-soft);color:var(--bad)}
+
+/* 讀劇 */
+.stage{text-align:center}
+.stage .who{display:inline-block;font-size:18px;font-weight:700;color:var(--paper);background:var(--role);border-radius:999px;padding:2px 16px}
+.stage .line{font-family:var(--f-display);font-size:clamp(24px,5vw,34px);line-height:1.6;margin:12px 0}
+.stage .cue{font-size:16px;color:var(--muted)}
+.cast{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:8px}
+.cast span{font-size:14px;border:1.5px solid var(--line);border-radius:999px;padding:0 10px;color:var(--muted)}
+.cast span.on{border-color:var(--role);color:var(--role);font-weight:700}
+
+/* 測驗 */
+.qhead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.progress{display:flex;gap:4px;flex-wrap:wrap}
+.dot{width:22px;height:8px;border-radius:4px;background:var(--line)}
+.dot.ok{background:var(--ok)}.dot.bad{background:var(--bad)}.dot.now{background:var(--accent);opacity:.5}
+.qtype{font-size:13px;font-weight:700;color:var(--accent);letter-spacing:.08em}
+.qtext{font-family:var(--f-display);font-size:22px;line-height:1.8;margin:8px 0 14px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:520px){.opts{grid-template-columns:1fr}}
+.opt{font:inherit;font-size:18px;font-family:var(--f-display);text-align:left;border:2px solid var(--line);background:var(--paper);color:var(--ink);border-radius:10px;padding:12px 14px;cursor:pointer;display:flex;gap:10px;align-items:center}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt .k{flex:none;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--bg);font-family:var(--f-body);font-size:14px;font-weight:700}
+.opt.right{border-color:var(--ok);background:var(--ok-soft)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.opt:disabled{cursor:default}
+.feedback{margin-top:14px;border-radius:8px;padding:10px 14px;font-size:15px}
+.feedback.ok{background:var(--ok-soft);color:var(--ok)}
+.feedback.bad{background:var(--bad-soft);color:var(--bad)}
+.feedback .why{color:var(--ink);display:block;margin-top:4px}
+.score{font-family:var(--f-display);font-size:56px;color:var(--accent);line-height:1;margin:10px 0}
+.review .item{border-left:4px solid var(--bad);padding:6px 12px;background:var(--bg);border-radius:0 6px 6px 0;font-size:15px;margin-top:8px}
+.overlay{position:fixed;inset:0;background:rgba(10,20,16,.7);display:grid;place-items:center;z-index:50;padding:20px}
+.overlay .inner{background:#fff;border-radius:16px;padding:22px;text-align:center;color:#1c2925;max-width:92vw}
+.overlay #qrBig{width:min(320px,70vw);height:min(320px,70vw);margin:0 auto}
+.overlay #qrBig img,.overlay #qrBig canvas{width:100%!important;height:100%!important}
+.overlay p{font-family:var(--f-display);font-size:22px;margin:12px 0 0}
+footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <div class="eyebrow">國語三上・語文天地二</div>
+      <h1>語氣與劇本小劇場</h1>
+      <p class="sub">學會用不同的語氣說話，再用對話把故事演出來。</p>
+    </div>
+    <div class="qr" id="qrBtn" role="button" tabindex="0" aria-label="放大 QR code" hidden><div id="qrSmall"></div><span>掃我練習</span></div>
+  </header>
+
+  <nav class="tabs" role="tablist">
+    <button class="tab" role="tab" id="t1" aria-selected="true">說出不同的語氣</button>
+    <button class="tab" role="tab" id="t2" aria-selected="false">用對話演故事</button>
+    <button class="tab" role="tab" id="t3" aria-selected="false">小測驗</button>
+  </nav>
+
+  <!-- 語氣 -->
+  <section class="panel" id="p1">
+    <div class="card">
+      <h2>說出不同的語氣</h2>
+      <p>說話或朗讀時，除了讀音要正確，還可以搭配不同的<span class="key">語氣</span>，讓聽的人更明白你的心情。</p>
+      <p>調整聲音有四個小工具：</p>
+      <div class="tools">
+        <div class="tool"><svg viewBox="0 0 56 36"><path d="M6 28 L50 8" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/><path d="M40 6 L51 8 L46 18" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg><b>聲調</b><span>拉高或下降</span></div>
+        <div class="tool"><svg viewBox="0 0 56 36"><path d="M4 18 H22 M28 18 H52 M44 10 L52 18 L44 26" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg><b>語速</b><span>快一點或慢一點</span></div>
+        <div class="tool"><svg viewBox="0 0 56 36"><rect x="6" y="22" width="8" height="10" rx="2" fill="currentColor"/><rect x="20" y="14" width="8" height="18" rx="2" fill="currentColor"/><rect x="34" y="4" width="8" height="28" rx="2" fill="currentColor"/></svg><b>音量</b><span>大聲或小聲</span></div>
+        <div class="tool"><svg viewBox="0 0 56 36"><circle cx="16" cy="18" r="12" fill="currentColor"/><circle cx="42" cy="18" r="7" fill="none" stroke="currentColor" stroke-width="3"/></svg><b>輕重</b><span>加重或放輕</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>同一句「我知道了」，可以有四種心情</h3>
+      <p>看看每個字的高低和大小，就是聲音的樣子。按「聽一聽」，再跟著說一次。</p>
+      <div class="moods" id="moods"></div>
+      <p class="note" id="ttsNote" hidden>這台裝置沒有中文語音，請老師或同學示範說說看。</p>
+    </div>
+
+    <div class="card">
+      <h3>情境挑戰：這時候該用哪一種語氣？</h3>
+      <div id="scene"></div>
+    </div>
+  </section>
+
+  <!-- 劇本 -->
+  <section class="panel" id="p2" hidden>
+    <div class="card">
+      <h2>用對話演故事</h2>
+      <p>故事除了用「說」的，也可以用「演」的。把故事寫成<span class="key">劇本</span>，寫出每個人的<b>角色、動作、表情</b>和<b>對話</b>，大家就能輪流讀，分別扮演故事裡的人物。</p>
+      <div class="legend">
+        <span class="lg" style="--lc:var(--role);--ls:var(--role-s)">角色：誰在說話</span>
+        <span class="lg" style="--lc:var(--act);--ls:var(--act-s)">動作：手腳在做什麼</span>
+        <span class="lg" style="--lc:var(--face);--ls:var(--face-s)">表情：臉上的樣子</span>
+        <span class="lg" style="--lc:var(--talk);--ls:var(--talk-s)">對話：說出口的話</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>比一比：同一個故事，兩種寫法</h3>
+      <div class="compare">
+        <div class="box story"><h4>故事的寫法</h4><div id="storyBox"></div></div>
+        <div class="box script"><h4>劇本的寫法</h4><div id="scriptBox"></div></div>
+      </div>
+      <p class="note" style="margin-top:10px">劇本的格式：<b>角色：（動作或表情）對話</b>。最前面的 △ 是說明時間、地點和發生什麼事，不用唸出聲。</p>
+    </div>
+
+    <div class="card">
+      <h3>換你來分辨：幫劇本上色</h3>
+      <p>先選一種顏色，再點劇本裡的字，把它塗成那一類。全部塗好後按「檢查」。</p>
+      <div class="paints" id="paints"></div>
+      <div class="lab" id="lab"></div>
+      <div class="actions"><button class="btn ghost" id="labReset">重來</button><button class="btn" id="labCheck">檢查</button></div>
+      <div id="labRes"></div>
+    </div>
+
+    <div class="card stage">
+      <h3>讀劇時間</h3>
+      <p class="cue">分好角色，輪到誰，誰就用適合的語氣讀出來。</p>
+      <div class="cast" id="cast"></div>
+      <div class="who" id="who"></div>
+      <div class="line" id="line"></div>
+      <div class="cue" id="cue"></div>
+      <div class="actions" style="justify-content:center"><button class="btn ghost" id="rPrev">上一句</button><button class="btn" id="rNext">下一句</button></div>
+    </div>
+  </section>
+
+  <!-- 測驗 -->
+  <section class="panel" id="p3" hidden></section>
+
+  <footer>例句與故事皆為原創，搭配南一版三上語文天地二使用。<br>字型：教育部標準楷書（中華民國教育部，CC BY-ND 3.0 臺灣）<br><a href="../" style="color:var(--accent)">← 回段考複習大廳</a></footer>
+</div>
+
+<div class="overlay" id="overlay" hidden><div class="inner"><div id="qrBig"></div><p>用平板或手機掃描，一起來練習！</p></div></div>
+
+<script>window.QRCode=function(el){el.innerHTML='<img alt="QR code" style="image-rendering:pixelated" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAV4AAAFeAQAAAADlUEq3AAAC/UlEQVR4Xu1bW2rrQAw9iud/DHcBdynTpdtL6QICzmfBZi6SRs64D24oGJQgfaRNYlJljvU4OipVPGzb5eFLAcTFvZ13GqiT/aFal6Gi1HV/rT1tltfz3IhP/jXcqFOubCvkh/yGsgxVoK1TtjemQPBoju66jYhGADMlEI1DBfIHoSzm8UxEkRg/mxMEU+9XXlDnt7TWmYZKZVoTIXcXOPE53OjtgOAtrVS0tdkIM8ddmbb75XF0v65W5x0dI8hpEwyUxOB4TSjLyNEIeQo0VE9047wv+PKfnICb1DiNvCQRWOe/awLyVSO0vZ9f/zSeEe60B1hnVBZUAhIIWSJU8X3GL/jyPitfEBMqoR0os4nGDLt3gw96rIPM4xspNDLPVNBwk9cE1eCDTtlEm78IRl0MGreXOY0CWiIGncZgm8mwCYWX8MuST4XbV53OBIJuY1CsTdAYNy6GYjIh1RhsmfXlu4Jn/II9Rge0GENrZ2TkHZNtr1lUcqd2oNK18AOn0jbn7lvTZ7xFX97nFoPaxAh4mkAlsw5aG025CAR9soldXWpNjGhKAp5WxL2dCXXJJYIXlPcEzCM3LLekcqFMtlVxKstGKO+hLn01J/nZUmTj7K0iNg4hWVSbmGATjtmE0T4jgILWzjBUuYiZjGME9z2ZPdS6SYxURCuG0ck47WSk+bTh2Z0U6mBGws9Ga04yf7hxsLbLJHXQiES36STg2RJbHF1vTk7DNNxcWRX8w4RQZN4Pk33zKgovsVrvxOdw47sYVDJvLFDX1HaJSfNp1EGndfBuSgVFjFDwRFhqT0Mf/GxOUsFxZ9u03jaYaYFoa79RBz3WwYsGnWRRHswA+2Cmbfy21zCPXu46Jze/EzdsT4bFCJUB9T778h8UDLITn8ONn1tinoEqr9i0F6U3Q5XHpHF0Px/df+y8ozvsbJsRMKy6s418ZVRHqrFt6LUX7f93SXTd9nAnF7qDEVnULYLmmEm6XAJlEmNqve7OxK6aTwQ5Oz5qsbPtsQ7+AyAAXpAEFhGRAAAAAElFTkSuQmCC">'};QRCode.CorrectLevel={M:0};</script>
+<script>
+const SHARE_URL = "https://teacher-liujikan.github.io/midterm-review/tone-script/";
+const $ = id => document.getElementById(id);
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+
+/* 分頁 */
+const tabs=[["t1","p1"],["t2","p2"],["t3","p3"]];
+function show(t){ tabs.forEach(([a,b])=>{ const on=a===t; $(a).setAttribute("aria-selected",on); $(b).hidden=!on; }); if(t==="t3"&&!quiz) startQuiz(); window.scrollTo({top:0}); }
+tabs.forEach(([a])=>$(a).onclick=()=>show(a));
+
+/* ---------- 語氣 ---------- */
+const FACE = {
+  happy:'<circle cx="24" cy="24" r="21" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="16" cy="19" r="2.6" fill="currentColor"/><circle cx="32" cy="19" r="2.6" fill="currentColor"/><path d="M13 28 Q24 40 35 28" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>',
+  angry:'<circle cx="24" cy="24" r="21" fill="none" stroke="currentColor" stroke-width="3"/><path d="M11 14 L20 18 M37 14 L28 18" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><circle cx="17" cy="22" r="2.6" fill="currentColor"/><circle cx="31" cy="22" r="2.6" fill="currentColor"/><path d="M15 35 Q24 28 33 35" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>',
+  sad:'<circle cx="24" cy="24" r="21" fill="none" stroke="currentColor" stroke-width="3"/><path d="M12 17 L20 15 M36 17 L28 15" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><circle cx="17" cy="21" r="2.6" fill="currentColor"/><circle cx="31" cy="21" r="2.6" fill="currentColor"/><path d="M15 35 Q24 29 33 35" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="M34 25 q2 4 0 6 q-2-2 0-6z" fill="currentColor"/>',
+  ask:'<circle cx="24" cy="24" r="21" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="17" cy="20" r="2.6" fill="currentColor"/><circle cx="31" cy="20" r="2.6" fill="currentColor"/><path d="M17 33 H31" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="M36 4 q6 0 6 5 q0 4-5 5 v3" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><circle cx="37" cy="21" r="1.6" fill="currentColor"/>'
+};
+// 每個字：size(px)、上移(px)、粗細
+const MOODS = [
+  {id:"happy", name:"興奮、快樂", c:"happy", how:"聲調拉高，加大音量。", tts:{pitch:1.6,rate:1.15,volume:1},
+   w:[[26,10],[30,22],[34,34],[40,48,"!"]], end:"！"},
+  {id:"angry", name:"憤怒、命令", c:"angry", how:"加重語氣，加大音量。", tts:{pitch:.8,rate:.95,volume:1},
+   w:[[40,6],[40,6],[40,6],[44,6]], bold:true, end:"！"},
+  {id:"sad", name:"哀傷", c:"sad", how:"聲調下降，降低音量。", tts:{pitch:.6,rate:.7,volume:.45},
+   w:[[26,30],[23,20],[20,10],[18,0]], end:"……"},
+  {id:"ask", name:"疑惑", c:"ask", how:"最後一個字的聲音往上揚。", tts:{pitch:1.1,rate:.9,volume:.9,ask:true},
+   w:[[26,8],[26,8],[26,8],[34,40]], end:"？"}
+];
+const SENT=["我","知","道","了"];
+let zhVoice=null;
+function loadVoice(){ try{ const v=speechSynthesis.getVoices(); zhVoice=v.find(x=>/zh[-_]TW/i.test(x.lang))||v.find(x=>/^zh/i.test(x.lang))||null; }catch(e){} }
+try{ loadVoice(); speechSynthesis.onvoiceschanged=loadVoice; }catch(e){}
+function speak(text,o){
+  try{
+    if(!zhVoice){ loadVoice(); }
+    if(!zhVoice){ $("ttsNote").hidden=false; return; }
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(o.ask? text.replace(/。|！|……/g,"")+"？" : text);
+    u.voice=zhVoice; u.lang=zhVoice.lang; u.pitch=o.pitch; u.rate=o.rate; u.volume=o.volume;
+    speechSynthesis.speak(u);
+  }catch(e){ $("ttsNote").hidden=false; }
+}
+function waveHTML(m){
+  return SENT.map((ch,i)=>{const [sz,up]=m.w[i];return `<span style="font-size:${sz}px;transform:translateY(-${up}px);${m.bold?"font-weight:700;":""}animation-delay:${i*.12}s">${ch}</span>`;}).join("")+`<span style="font-size:${m.w[3][0]}px;transform:translateY(-${m.w[3][1]}px)">${m.end}</span>`;
+}
+$("moods").innerHTML = MOODS.map(m=>`<div class="mood" id="m-${m.id}" style="--mc:var(--${m.c});--ms:var(--${m.c}-s)">
+  <div class="hd"><svg viewBox="0 0 48 48" aria-hidden="true">${FACE[m.id]}</svg><div><b>${m.name}</b><div class="how">${m.how}</div></div></div>
+  <div class="wave" aria-label="${m.name}的聲音線">${waveHTML(m)}</div>
+  <button class="play" data-m="${m.id}">聽一聽</button></div>`).join("");
+$("moods").querySelectorAll("[data-m]").forEach(b=>b.onclick=()=>{
+  const m=MOODS.find(x=>x.id===b.dataset.m), el=$("m-"+m.id);
+  el.classList.remove("on"); void el.offsetWidth; el.classList.add("on");
+  speak("我知道了"+(m.end==="……"?"。":m.end), m.tts);
+});
+
+/* 情境挑戰 */
+const SCENES = [
+  {s:"媽媽說：「週末帶你去動物園！」你開心的回答——", say:"我知道了！", a:"happy", why:"聽到好消息很開心，聲調拉高、音量大一點。"},
+  {s:"弟弟一直不聽勸，把你的作業本畫花了。你生氣的說——", say:"不准再畫了！", a:"angry", why:"生氣、要對方停下來，要加重語氣、加大音量。"},
+  {s:"心愛的小金魚生病死掉了，你難過的說——", say:"牠再也不會游了……", a:"sad", why:"心裡很難過，聲調下降、音量放小、說得慢一點。"},
+  {s:"老師說明天不用帶課本，你覺得很奇怪，問——", say:"明天真的不用帶課本嗎？", a:"ask", why:"心裡有疑問，最後一個字的聲音要往上揚。"},
+  {s:"隊友說：「我們贏得接力賽冠軍了！」你大聲歡呼——", say:"太棒了！我們贏了！", a:"happy", why:"很興奮，聲調拉高、音量加大。"},
+  {s:"媽媽發現你又沒刷牙就要睡覺，她說——", say:"馬上去刷牙！", a:"angry", why:"這是命令，要加重語氣、音量大一點。"},
+  {s:"好朋友下個月要轉學了，你小聲的說——", say:"以後就不能一起玩了……", a:"sad", why:"捨不得、很難過，聲調下降、音量放小。"},
+  {s:"桌上的蛋糕突然不見了，你問家人——", say:"是誰把蛋糕吃掉了？", a:"ask", why:"想知道答案，句尾的聲音往上揚。"}
+];
+let sceneQ=shuffle(SCENES), sIdx=0;
+function renderScene(){
+  const q=sceneQ[sIdx%sceneQ.length];
+  $("scene").innerHTML=`<div class="scene">${q.s}</div><div class="say">「${q.say}」</div>
+   <div class="picks">${MOODS.map(m=>`<button class="pick" data-a="${m.id}" style="--mc:var(--${m.c})">${m.name}</button>`).join("")}</div>
+   <div id="sFb"></div>`;
+  $("scene").querySelectorAll(".pick").forEach(b=>b.onclick=()=>{
+    const ok=b.dataset.a===q.a, m=MOODS.find(x=>x.id===q.a);
+    $("scene").querySelectorAll(".pick").forEach(x=>{x.disabled=true; if(x.dataset.a===q.a) x.classList.add("right");});
+    if(!ok) b.classList.add("wrong");
+    $("sFb").innerHTML=`<div class="result ${ok?"ok":"bad"}"><b>${ok?"答對了！":"再想想，應該用「"+m.name+"」的語氣。"}</b> ${q.why}</div>
+      <div class="actions"><button class="btn ghost" id="sSay">聽一聽</button><button class="btn" id="sNext">下一題</button></div>`;
+    $("sSay").onclick=()=>speak(q.say,m.tts);
+    $("sNext").onclick=()=>{sIdx++;renderScene();};
+  });
+}
+renderScene();
+
+/* ---------- 劇本 ---------- */
+const STORY_TXT = [
+  "下課了，小兔、松鼠和烏龜在大樹下碰面。",
+  "小兔開心的揮揮手，說：「我們來玩捉迷藏吧！」",
+  "松鼠皺著眉頭說：「可是烏龜走得好慢，一定很快就被找到。」",
+  "烏龜笑咪咪的縮進殼裡，說：「你們看，我躲在這裡，誰也找不到我！」",
+  "大家看了，一起哈哈大笑的說：「哈哈哈，烏龜真聰明！」"
+];
+// 劇本：每行 [類別, 文字]；類別 s=場景 r=角色 a=動作 f=表情 t=對話
+const SCRIPT = [
+  [["s","△下課了，小兔、松鼠和烏龜在大樹下碰面。"]],
+  [["r","小兔"],["a","揮揮手"],["t","我們來玩捉迷藏吧！"]],
+  [["r","松鼠"],["f","皺著眉頭"],["t","可是烏龜走得好慢，一定很快就被找到。"]],
+  [["r","烏龜"],["f","笑咪咪"],["a","縮進殼裡"],["t","你們看，我躲在這裡，誰也找不到我！"]],
+  [["r","大家"],["a","一起說"],["t","哈哈哈，烏龜真聰明！"]]
+];
+const scriptLine = ln => ln.map(([k,t])=>k==="s"?`<span class="t-scene">${t}</span>`:k==="r"?`<span class="t-role">${t}</span>：`:k==="t"?`<span class="t-talk">${t}</span>`:`（<span class="t-${k==="a"?"act":"face"}">${t}</span>）`).join("");
+$("storyBox").innerHTML = STORY_TXT.map(t=>`<p>${t}</p>`).join("");
+$("scriptBox").innerHTML = SCRIPT.map(ln=>`<p>${scriptLine(ln)}</p>`).join("");
+
+/* 上色練習 */
+const PAINT = [["r","角色","role"],["a","動作","act"],["f","表情","face"],["t","對話","talk"]];
+const LAB = [
+  [["r","小熊"],["a","敲敲門"],["t","有人在家嗎？"]],
+  [["r","小豬"],["f","睡眼惺忪"],["t","誰呀？這麼早！"]],
+  [["r","小熊"],["f","笑嘻嘻"],["a","舉起籃子"],["t","我帶了剛烤好的蜂蜜餅乾來！"]],
+  [["r","小豬"],["f","眼睛一亮"],["t","哇！快進來吧！"]]
+];
+let brush="r", got={};
+function renderLab(){
+  $("paints").innerHTML = PAINT.map(([k,n,c])=>`<button class="paint" data-b="${k}" aria-pressed="${brush===k}" style="--lc:var(--${c})">${n}</button>`).join("");
+  $("paints").querySelectorAll("[data-b]").forEach(b=>b.onclick=()=>{brush=b.dataset.b;renderLab();});
+  $("lab").innerHTML = LAB.map((ln,i)=>`<div class="ln">${ln.map(([k,t],j)=>{
+    const id=i+"-"+j, g=got[id], P=g&&PAINT.find(p=>p[0]===g);
+    const piece=`<button class="pc" data-id="${id}" ${g?`data-got="${g}" style="--lc:var(--${P[2]});--ls:var(--${P[2]}-s)"`:""}>${t}</button>`;
+    return j===0? piece+`<span class="colon">：</span>` : (k==="a"||k==="f")? `<span class="colon">（</span>${piece}<span class="colon">）</span>` : piece;
+  }).join("")}</div>`).join("");
+  $("lab").querySelectorAll(".pc").forEach(b=>b.onclick=()=>{ got[b.dataset.id]=brush; $("labRes").innerHTML=""; renderLab(); });
+}
+$("labReset").onclick=()=>{got={};$("labRes").innerHTML="";renderLab();};
+$("labCheck").onclick=()=>{
+  let total=0,right=0,empty=0;
+  LAB.forEach((ln,i)=>ln.forEach(([k],j)=>{ total++; const g=got[i+"-"+j]; if(!g) empty++; else if(g===k) right++; else document.querySelector(`[data-id="${i}-${j}"]`).classList.add("bad"); }));
+  if(empty){ $("labRes").innerHTML=`<div class="result bad">還有 ${empty} 個地方沒有上色喔！</div>`; return; }
+  $("labRes").innerHTML = right===total? `<div class="result ok"><b>全部正確！</b> 冒號前面是角色，括號裡是動作或表情，最後是說出來的對話。</div>`
+    : `<div class="result bad"><b>答對 ${right}／${total} 個。</b> 紅框的地方再想想：括號裡如果是「臉上的樣子」是表情，「手腳在做的事」是動作。</div>`;
+};
+renderLab();
+
+/* 讀劇 */
+const READ = SCRIPT.slice(1);
+const CAST = ["小兔","松鼠","烏龜","大家"];
+let rIdx=0;
+function renderRead(){
+  const ln=READ[rIdx], who=ln[0][1];
+  const cues=ln.filter(([k])=>k==="a"||k==="f").map(([,t])=>t);
+  $("cast").innerHTML = CAST.map(c=>`<span class="${c===who?"on":""}">${c}</span>`).join("");
+  $("who").textContent = who;
+  $("line").textContent = "「"+ln.find(([k])=>k==="t")[1]+"」";
+  $("cue").textContent = cues.length? "邊讀邊做：（"+cues.join("、")+"）" : "";
+  $("rPrev").disabled = rIdx===0; $("rNext").textContent = rIdx===READ.length-1? "從頭再讀" : "下一句";
+}
+$("rPrev").onclick=()=>{ if(rIdx>0){rIdx--;renderRead();} };
+$("rNext").onclick=()=>{ rIdx = rIdx===READ.length-1? 0 : rIdx+1; renderRead(); };
+renderRead();
+
+/* ---------- 小測驗 ---------- */
+const QS = [
+  {q:"表示興奮、快樂的語氣時，聲調可以怎麼樣？",o:["拉高","下降","不變","越說越小聲"],a:0,why:"興奮、快樂時，聲調拉高，音量也可以加大。"},
+  {q:"表示哀傷的語氣時，該怎麼說？",o:["聲調下降，降低音量","聲調拉高，加大音量","說得又快又大聲","最後一個字往上揚"],a:0,why:"哀傷時聲調下降、音量放小。"},
+  {q:"表示疑惑的時候，哪裡的聲音要往上揚？",o:["最後的語音","第一個字","每一個字","都不用上揚"],a:0,why:"疑惑時，句子最後的語音上揚，聽起來就像在問問題。"},
+  {q:"表示憤怒或命令時，可以怎麼說？",o:["加重語氣，加大音量","放輕聲音，慢慢說","聲調下降，降低音量","最後的語音上揚"],a:0,why:"憤怒、命令時要加重語氣、加大音量。"},
+  {q:"考試考了一百分，跑回家告訴媽媽，應該用哪一種語氣？",o:["興奮、快樂","哀傷","憤怒","疑惑"],a:0,why:"開心的好消息，用興奮、快樂的語氣。"},
+  {q:"「我的小狗走丟了……」這句話適合用哪一種語氣？",o:["哀傷","興奮、快樂","憤怒、命令","疑惑"],a:0,why:"小狗走丟很難過，用哀傷的語氣。"},
+  {q:"「這真的是你自己做的嗎？」這句話適合用哪一種語氣？",o:["疑惑","哀傷","憤怒、命令","興奮、快樂"],a:0,why:"心裡有疑問，用疑惑的語氣，句尾上揚。"},
+  {q:"為什麼說話時要搭配不同的語氣？",o:["能表達自己的情感，讓聽的人更明白","可以說得比較快","可以不用把字讀正確","這樣比較不累"],a:0,why:"搭配不同語氣，能表達情感，也能讓聽的人更明白。"},
+  {q:"劇本「小熊：（揮手）大家早安！」裡，「小熊」是什麼？",o:["角色","動作","表情","對話"],a:0,why:"冒號前面寫的是角色，也就是誰在說話。"},
+  {q:"劇本「小羊：（微笑）今天天氣真好！」裡，「微笑」是什麼？",o:["表情","角色","對話","地點"],a:0,why:"微笑是臉上的樣子，是表情。"},
+  {q:"劇本「小猴：（遮住鼻子）哈啾！」裡，「遮住鼻子」是什麼？",o:["動作","表情","角色","對話"],a:0,why:"遮住鼻子是用手在做的事，是動作。"},
+  {q:"把故事寫成劇本，最大的好處是什麼？",o:["大家可以分別扮演故事中的人物","故事會變得比較短","不用寫對話","不用寫角色是誰"],a:0,why:"劇本寫出角色、動作、表情和對話，讀者可以輪流讀、分別扮演人物。"}
+];
+let quiz=null;
+function startQuiz(){ quiz={qs:shuffle(QS).slice(0,10).map(q=>({...q,opts:shuffle(q.o),ans:q.o[q.a]})),i:0,res:[]}; renderQuiz(); }
+function dots(){ return quiz.qs.map((_,k)=>`<span class="dot ${quiz.res[k]===true?"ok":quiz.res[k]===false?"bad":k===quiz.i?"now":""}"></span>`).join(""); }
+function renderQuiz(){
+  const P=$("p3"), {qs,i,res}=quiz;
+  if(i>=qs.length){
+    const n=res.filter(Boolean).length;
+    const msg=n===qs.length?"全對！你是語氣小演員！":n>=8?"很棒！再看一下錯的題目。":n>=6?"不錯喔！回去複習一下再來挑戰。":"別灰心，先回教學頁看一看，再來挑戰！";
+    const wr=qs.map((q,k)=>({q,k})).filter(x=>res[x.k]===false);
+    P.innerHTML=`<div class="card" style="text-align:center"><div class="qtype">測驗結果</div><div class="score">${n} / ${qs.length}</div><p>${msg}</p><div class="progress" style="justify-content:center">${dots()}</div>
+      ${wr.length?`<div class="review" style="text-align:left"><b>訂正一下：</b>${wr.map(({q})=>`<div class="item">${q.q}<br>正確答案：${q.ans}</div>`).join("")}</div>`:""}
+      <div class="actions" style="justify-content:center"><button class="btn ghost" id="back1">回去複習</button><button class="btn" id="again">再測一次</button></div></div>`;
+    $("again").onclick=startQuiz; $("back1").onclick=()=>show("t1"); return;
+  }
+  const q=qs[i];
+  P.innerHTML=`<div class="card"><div class="qhead"><span class="qtype">第 ${i+1} 題／共 ${qs.length} 題</span><div class="progress">${dots()}</div></div>
+    <div class="qtext">${q.q}</div>
+    <div class="opts">${q.opts.map((o,k)=>`<button class="opt" data-k="${k}"><span class="k">${"ABCD"[k]}</span><span>${o}</span></button>`).join("")}</div>
+    <div id="fb"></div><div class="actions" style="justify-content:flex-end"><button class="btn" id="next" hidden>${i===qs.length-1?"看結果":"下一題"}</button></div></div>`;
+  P.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{
+    if(quiz.res[i]!==undefined) return;
+    const pick=q.opts[+b.dataset.k], ok=pick===q.ans; quiz.res[i]=ok;
+    P.querySelectorAll(".opt").forEach(x=>{x.disabled=true; if(q.opts[+x.dataset.k]===q.ans) x.classList.add("right");});
+    if(!ok) b.classList.add("wrong");
+    $("fb").innerHTML=`<div class="feedback ${ok?"ok":"bad"}"><b>${ok?"答對了！":"再想想，正確答案是「"+q.ans+"」"}</b><span class="why">${q.why}</span></div>`;
+    P.querySelector(".progress").innerHTML=dots();
+    $("next").hidden=false; $("next").focus();
+  });
+  $("next").onclick=()=>{quiz.i++;renderQuiz();window.scrollTo({top:0});};
+}
+
+/* QR code */
+if(SHARE_URL.startsWith("http") && window.QRCode){
+  $("qrBtn").hidden=false;
+  new QRCode($("qrSmall"),{text:SHARE_URL,width:152,height:152,correctLevel:QRCode.CorrectLevel.M});
+  let big=false;
+  const open=()=>{ $("overlay").hidden=false; if(!big){ new QRCode($("qrBig"),{text:SHARE_URL,width:480,height:480,correctLevel:QRCode.CorrectLevel.M}); big=true; } };
+  $("qrBtn").onclick=open; $("qrBtn").onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();open();}};
+  $("overlay").onclick=()=>{$("overlay").hidden=true;};
+}
+</script>
+
+</body>
+</html>
