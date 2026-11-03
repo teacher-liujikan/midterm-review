@@ -200,7 +200,7 @@ fieldset{border:none;padding:0;margin:0;min-width:0}
   <header class="top"><button type="button" class="qrthumb" id="qrOpen" aria-label="放大 QR code，讓學生用平板掃描"><span id="qrSmall"></span><small>學生掃我</small></button>
     <div class="school">陽明國小・113 學年度第一學期・三年級</div>
     <h1>數學期中考 自己來訂正</h1>
-    <p class="lead">拿出老師改好的考卷，一大題一大題檢討。每題點「我寫對了」或「我寫錯了」，寫錯的題目看詳解、在考卷上訂正。一大題檢討好，先給老師批改，再做下一大題。六大題都完成後，會出現錯題測驗。</p>
+    <p class="lead">拿出老師改好的考卷，一大題一大題檢討。每題點「我寫對了」或「我寫錯了」，寫錯的題目看詳解、在考卷上訂正。一大題檢討好，先給老師批改，再做下一大題；全部寫對的大題不用給老師看，可以直接往下做。六大題都完成後，會出現錯題測驗。</p>
     <div class="tools">
       <button class="btn" id="bpmfBtn" type="button">注音：開</button>
       <span id="resetZone"><button class="btn" id="resetBtn" type="button">從頭開始</button></span>
@@ -515,6 +515,7 @@ function stepper(){
 function firstOpen(){const i=S.findIndex(s=>state.sec[s.id]!=='done');return i<0?S.length:i}
 
 /* ---------- views ---------- */
+const doneLabel=(left,wrong)=>(!left&&!wrong)?'全部寫對！直接做下一大題 →':'這一大題檢討好了';
 function renderReview(){
   const s=S[state.cur];const st=state.sec[s.id];const qs=secQs(s.id);
   const locked=st==='done';
@@ -534,10 +535,10 @@ function renderReview(){
   const wrong=qs.filter(q=>state.mark[q.id]==='wrong').length;
   $('#main').innerHTML=`<section class="sec">
     <div class="sec-h"><h2>${s.name}</h2><small>${s.note}・共 ${qs.length} 題</small></div>
-    ${locked?'<p class="muted">這一大題已經檢討完成，老師也確認過了。</p>':`<p class="muted">對照考卷，每一題點「我寫對了」或「我寫錯了」。寫錯的題目會出現詳解，看懂後在考卷上用訂正筆改好。</p><div class="allright"><button type="button" class="mk ok big2" id="allRight">○ 這一大題我全部寫對了</button><span class="muted">按了以後，每一題都會標成寫對，並顯示正確答案讓你再對一次。</span></div>`}
+    ${locked?'<p class="muted">這一大題已經檢討完成，老師也確認過了。</p>':`<p class="muted">對照考卷，每一題點「我寫對了」或「我寫錯了」。寫錯的題目會出現詳解，看懂後在考卷上用訂正筆改好。</p><div class="allright"><button type="button" class="mk ok big2" id="allRight">○ 這一大題我全部寫對了</button><span class="muted">按了以後，每一題都會標成寫對，並顯示正確答案讓你再對一次。對完就可以直接做下一大題。</span></div>`}
     <div class="cards">${qs.map(q=>reviewCard(q,locked)).join('')}</div>
     ${locked?`<div class="finish"><button type="button" class="btn primary" data-goto="${firstOpen()<S.length?firstOpen():'test'}">${firstOpen()<S.length?'到現在要檢討的大題':'去做錯題測驗'}</button></div>`
-    :`<div class="finish"><p id="leftMsg">${left?`還有 <b>${left}</b> 題還沒點喔。`:wrong?`有 ${wrong} 題寫錯，都在考卷上訂正好了嗎？`:'這一大題全部寫對，太棒了！'}</p><button type="button" class="btn primary big" id="secDone" ${left?'disabled':''}>這一大題檢討好了</button></div>`}
+    :`<div class="finish"><p id="leftMsg">${left?`還有 <b>${left}</b> 題還沒點喔。`:wrong?`有 ${wrong} 題寫錯，都在考卷上訂正好了嗎？`:'這一大題全部寫對，太棒了！不用給老師批改，可以直接做下一大題。'}</p><button type="button" class="btn primary big" id="secDone" ${left?'disabled':''}>${doneLabel(left,wrong)}</button></div>`}
   </section>`;
 }
 function pendingIds(){
@@ -659,10 +660,14 @@ document.addEventListener('click',e=>{
     const q=byId(t.dataset.q);state.mark[q.id]=t.dataset.mark;save();
     document.getElementById(q.id).outerHTML=reviewCard(q,false);
     const s=S[state.cur],qs=secQs(s.id),left=qs.filter(x=>!state.mark[x.id]).length,wrong=qs.filter(x=>state.mark[x.id]==='wrong').length;
-    $('#leftMsg').innerHTML=left?`還有 <b>${left}</b> 題還沒點喔。`:wrong?`有 ${wrong} 題寫錯，都在考卷上訂正好了嗎？`:'這一大題全部寫對，太棒了！';
-    $('#secDone').disabled=!!left;stepper();return}
+    $('#leftMsg').innerHTML=left?`還有 <b>${left}</b> 題還沒點喔。`:wrong?`有 ${wrong} 題寫錯，都在考卷上訂正好了嗎？`:'這一大題全部寫對，太棒了！不用給老師批改，可以直接做下一大題。';
+    $('#secDone').disabled=!!left;$('#secDone').textContent=doneLabel(left,wrong);stepper();return}
   if(t.id==='allRight'){secQs(S[state.cur].id).forEach(q=>state.mark[q.id]='right');save();render();const f=document.getElementById('secDone');if(f)f.scrollIntoView({block:'center'});return}
-  if(t.id==='secDone'){state.sec[S[state.cur].id]='teacher';save();render();window.scrollTo(0,0);return}
+  if(t.id==='secDone'){
+    const sid=S[state.cur].id;
+    if(secQs(sid).every(q=>state.mark[q.id]==='right')){state.sec[sid]='done';const n=firstOpen();if(n<S.length)state.cur=n;else state.view='test'}
+    else state.sec[sid]='teacher';
+    save();render();window.scrollTo(0,0);return}
   if(t.id==='submitTest'){
     const ids=pendingIds();const blank=ids.filter(id=>check(byId(id)).empty);
     if(blank.length&&!t.dataset.sure){t.dataset.sure='1';$('#testLeft').textContent=`還有 ${blank.length} 題沒寫，確定要交卷嗎？再按一次「交卷」。`;return}
