@@ -140,6 +140,9 @@ footer{margin-top:40px;color:var(--muted);font-size:14px;text-align:center}
 .step:disabled{opacity:.4;cursor:not-allowed}
 .step.test b{color:var(--red)}
 .muted{color:var(--muted)}
+.trap{display:inline-block;background:var(--red-soft);color:var(--red);border:1.5px solid var(--red);border-radius:8px;padding:2px 12px;margin:4px 0}
+.hrow{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin:4px 0}
+.hrow .lbl{font-family:var(--f-num);font-size:15px;color:var(--muted);min-width:3.4em}
 header.top{position:relative;padding-right:110px}
 .qrthumb{position:absolute;top:4px;right:0;display:flex;flex-direction:column;align-items:center;gap:2px;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:6px 6px 2px;cursor:zoom-in}
 .qrthumb small{font-size:12px;color:#1d2742;line-height:1.4}
@@ -359,7 +362,15 @@ const Q=[
  {s:'s1',n:'3',type:'choice',stem:'1 張 <span class="bill">1000 元</span> 可以換成幾張 <span class="bill">100 元</span>？',opts:['1000 張','100 張','10 張','1 張'],ans:2,
   hint:'1000 裡面有幾個 100？',ex:'<p>10 個 100 是 1000，所以 1 張千元鈔可以換 <b>10 張</b>百元鈔。</p>'},
  {s:'s1',n:'4',type:'choice',stem:`利用 ${ic.h}、${ic.t} 和 ${ic.o} 的圖示表示 1518，${ic.h} 最多可以畫多少個？`,opts:['1 個','5 個','15 個','151 個'],ans:2,
-  hint:'沒有 1000 可以用，所以 1500 全部都要用 100 來畫。',ex:'<p>1518 裡的 1500 是 15 個 100，剩下的 18 用 10 和 1 畫。所以 100 最多 <b>15 個</b>。</p>'},
+  hint:'小心！題目問的是「最多」。題目給的圖示裡沒有 1000，1000 要用什麼來畫？',
+  ex:'<p class="trap"><b>⚠ 陷阱題！注意「最多」兩個字</b></p>'
+   +'<p>平常看到 1518，我們會想到 1 個千、5 個百，所以很多人會選「5 個」。</p>'
+   +'<p>可是題目只給 100、10、1 這三種圖示，<b>沒有 1000</b>，而且問的是<b>最多</b>可以畫幾個 100。</p>'
+   +'<p>1000 可以換成 10 個 100：</p>'
+   +'<div class="hrow"><span class="lbl">1000 →</span>'+Array(10).fill(ic.h).join('')+'<span class="lbl">10 個</span></div>'
+   +'<div class="hrow"><span class="lbl">500 →</span>'+Array(5).fill(ic.h).join('')+'<span class="lbl">5 個</span></div>'
+   +'<p>10＋5＝<b>15 個</b> 100，剩下的 18 再用 10 和 1 來畫。所以 100 最多可以畫 <b>15 個</b>。</p>'
+   +'<p>下次看到「最多」「最少」，要停下來想一想喔！</p>'},
  {s:'s1',n:'5',type:'choice',stem:'在數線上，有一個數在 1500 的右邊和 1600 的左邊，這個數<u>不可能</u>是下面哪一個？',opts:['1501','1596','1526','1614'],ans:3,
   hint:'在 1500 右邊表示比 1500 大，在 1600 左邊表示比 1600 小。題目問的是「不可能」。',
   ex:'<p>這個數要比 1500 大、比 1600 小。1614 比 1600 大，在 1600 的右邊，所以<b>不可能</b>。</p><p>看數線動畫，拿出紙跟著畫一次：</p>'+nl5()},
