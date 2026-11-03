@@ -571,6 +571,25 @@ function svGo(t){
   box.dataset.i=i;box.innerHTML=svInner(id,i);
   const b=box.querySelector(`[data-svgo="${t.dataset.svgo}"]`);if(b&&!b.disabled)b.focus();
 }
+/* line-segment diagram for 六、(1) */
+function segDiagram(){
+  const x0=78,W=400,w1=Math.round(W*1696/3516),x1=x0+w1,x2=x0+W;
+  const brace=(a,b,y,up)=>{const m=(a+b)/2,d=up?-1:1,h=10*d;return `<path d="M${a} ${y} Q${a} ${y+h} ${a+10} ${y+h} L${m-10} ${y+h} Q${m} ${y+h} ${m} ${y+2*h} Q${m} ${y+h} ${m+10} ${y+h} L${b-10} ${y+h} Q${b} ${y+h} ${b} ${y}" fill="none" stroke="currentColor" stroke-width="2"/>`};
+  const tx=(x,y,t,c,sz)=>`<text x="${x}" y="${y}" text-anchor="middle" font-size="${sz||17}" font-weight="700" fill="${c}" style="font-family:var(--f-body)">${t}</text>`;
+  return `<div class="scroll"><svg class="fig" viewBox="0 0 520 236" width="500" role="img" aria-label="線段圖：上午 1696 張是一段；下午是同樣長的一段再加上多出來的 1820 張，下午合起來是問號張">
+  <text x="14" y="69" font-size="18" font-weight="700" fill="var(--ink)" style="font-family:var(--f-body)">上午</text>
+  <text x="14" y="149" font-size="18" font-weight="700" fill="var(--ink)" style="font-family:var(--f-body)">下午</text>
+  <g style="color:var(--pen)">${brace(x0,x1,44,true)}</g>${tx((x0+x1)/2,18,'1696 張','var(--pen)')}
+  <rect x="${x0}" y="50" width="${w1}" height="26" rx="3" fill="var(--pen-soft)" stroke="var(--pen)" stroke-width="2.5"/>
+  <line x1="${x1}" y1="76" x2="${x1}" y2="130" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <line x1="${x0}" y1="76" x2="${x0}" y2="130" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="5 4"/>
+  ${tx((x0+x1)/2,108,'和上午一樣多','var(--muted)',14)}
+  <g style="color:var(--red)">${brace(x1,x2,124,true)}</g>${tx((x1+x2)/2,93,'比上午多 1820 張','var(--red)')}
+  <rect x="${x0}" y="130" width="${w1}" height="26" rx="3" fill="var(--pen-soft)" stroke="var(--pen)" stroke-width="2.5"/>
+  <rect x="${x1}" y="130" width="${W-w1}" height="26" rx="3" fill="var(--red-soft)" stroke="var(--red)" stroke-width="2.5"/>
+  <g style="color:var(--ink)">${brace(x0,x2,162,false)}</g>${tx((x0+x2)/2,212,'下午合起來：？張','var(--ink)',18)}
+</svg></div>`;
+}
 /* ---------- questions ---------- */
 const S=[
  {id:'s1',name:'一、選擇題',note:'每題 2 分，共 20 分'},
@@ -672,7 +691,8 @@ const Q=[
  {s:'s5',n:'(6)',type:'fill',stem:'8cm5mm－68mm＝（[[n]]）mm',ans:['17'],hint:'先把 8cm5mm 換成毫米。',ex:'<p>按「下一步」，一步一步看怎麼算：</p>'+calcStepper([{html:'<p class="bigeq">8cm5mm ＝ 80mm＋5mm ＝ 85mm</p>',t:'單位不一樣，不能直接減。先把 8cm5mm 換成毫米：8cm＝80mm，再加 5mm，是 <b>85mm</b>。'}].concat(subSteps(85,68,'mm')))},
 
  {s:'s6',n:'(1)',type:'word',stem:'陽明電影院上午賣出 1696 張電影票，上午賣出的票比下午少了 1820 張，下午賣出幾張電影票？',unit:'張',ans:3516,
-  hint:'上午比下午「少」，就是下午比上午「多」。下午賣得比較多，要用加法喔！',ex:'<p>下午比上午多 1820 張。</p><p>橫式：1696＋1820＝3516</p>'+vert(1696,'＋',1820,3516)+'<p>答：下午賣出 3516 張電影票。</p>'},
+  hint:'上午比下午「少」，就是下午比上午「多」。下午賣得比較多，要用加法喔！',ex:'<p>「上午比下午少 1820 張」，換個方式說，就是「<b>下午比上午多 1820 張</b>」。</p><p>畫成線段圖看看：</p>'+segDiagram()
+   +'<p>下午的線段＝上午那一段＋多出來的 1820 張。下午比較多，要把兩段<b>合起來</b>，所以用<b>加法</b>。</p><p>橫式：1696＋1820＝3516</p>'+vert(1696,'＋',1820,3516)+'<p>答：下午賣出 3516 張電影票。</p>'},
  {s:'s6',n:'(2)',type:'word',stem:'善化農會原有 211 包米，進了一些貨後，現在有 2200 包，進了幾包米？',unit:'包',ans:1989,
   hint:'現在的包數減掉原來的包數，就是進了的包數。',ex:'<p>橫式：2200－211＝1989</p>'+vert(2200,'−',211,1989)+'<p>答：進了 1989 包米。</p>'},
  {s:'s6',n:'(3)',type:'word',stem:'1 年有 12 個月，5 年共是幾個月？',unit:'個月',ans:60,
