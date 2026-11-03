@@ -276,7 +276,7 @@ function barRulerSVG(a,b){
   return `<div class="scroll"><svg class="fig" viewBox="0 0 400 74" width="400" role="img" aria-label="尺上的灰色長條"><rect x="${x0+a*p}" y="14" width="${(b-a)*p}" height="18" fill="var(--shade)"/>${rulerH(x0,70,32,p)}</svg></div>`;
 }
 function sproutSVG(){
-  const p=6,base=320,top=base-41*p,rx=40;
+  const p=6,base=320,top=base-47*p,rx=40;
   let g=`<rect x="${rx-34}" y="${base-50*p-8}" width="34" height="${50*p+16}" fill="var(--card)" stroke="var(--ink)" stroke-width="1.2"/>`;
   for(let i=0;i<=50;i++){const y=base-i*p,l=i%10===0?16:i%5===0?11:7;g+=`<line x1="${rx}" y1="${y}" x2="${rx-l}" y2="${y}" stroke="var(--ink)" stroke-width="${i%10?0.8:1.4}"/>`;if(i%10===0)g+=`<text x="${rx-24}" y="${y+4}" text-anchor="middle" font-size="12" fill="var(--ink)">${i/10}</text>`}
   g+=`<text x="${rx-17}" y="${base+26}" text-anchor="middle" font-size="11" fill="var(--muted)">cm</text>`;
@@ -395,8 +395,8 @@ const Q=[
   ex:'<p>圖 1：下面兩個地方是直線碰直線，是角；上面是彎線碰直線，不是角。共 <b>2 個</b>。</p><p>圖 2：四個地方都是直線碰直線，共 <b>4 個</b>。</p><p>圖 3：愛心都是彎彎的線，<b>沒有角</b>。</p>'},
  {s:'s2',n:'(17)',type:'fill',stem:'看數線回答問題：',fig:numLineSVG(),after:'<span class="sub">① 從位置 1 移動到位置 11，移動（[[s]]）格。</span><span class="sub">② 從位置 13 開始往左走 5 格，會到數線上的位置（[[s]]）。</span>',ans:['10','8'],
   hint:'① 用 11 減 1。② 往左是變小，13 減 5。',ex:'<p>① 11－1＝<b>10</b> 格。</p><p>② 往左走是變小：13－5＝<b>8</b>。</p>'},
- {s:'s2',n:'(18)',type:'fill',stem:'量量看，小芽有多長。（看旁邊的尺，從下面的虛線量到上面的虛線）',fig:sproutSVG(),after:'答：（[[n]]）毫米',ans:['41'],
-  hint:'先看到了幾公分，再數多出來的小格子，1 小格是 1 毫米。',ex:'<p>上面的虛線在 4 公分再過 1 小格，4 公分＝40 毫米，40＋1＝<b>41 毫米</b>。</p>'},
+ {s:'s2',n:'(18)',type:'fill',stem:'量量看，小芽有多長。（看旁邊的尺，從下面的虛線量到上面的虛線）',fig:sproutSVG(),after:'答：（[[n]]）毫米',ans:['47'],
+  hint:'先看到了幾公分，再數多出來的小格子，1 小格是 1 毫米。',ex:'<p>上面的虛線在 4 公分再過 7 小格，4 公分＝40 毫米，40＋7＝<b>47 毫米</b>。</p>'},
  {s:'s2',n:'(19)',type:'fill',stem:'寫出灰色圖形的長度：',fig:'<span class="sub">①</span>'+barRulerSVG(10,64),after:'<span class="sub">答：（[[n]]）毫米</span><span class="sub">②</span>'+barRulerSVG(25,60)+'<span class="sub">答：（[[n]]）毫米</span>',ans:['54','35'],
   hint:'灰色長條不是從 0 開始喔！要用「結束的地方」減掉「開始的地方」。',
   ex:'<p>① 從 1 公分（10 毫米）到 6 公分 4 毫米（64 毫米）：64－10＝<b>54 毫米</b>。</p><p>② 從 2 公分 5 毫米（25 毫米）到 6 公分（60 毫米）：60－25＝<b>35 毫米</b>。</p>'},
