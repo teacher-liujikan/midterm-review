@@ -140,6 +140,13 @@ footer{margin-top:40px;color:var(--muted);font-size:14px;text-align:center}
 .step:disabled{opacity:.4;cursor:not-allowed}
 .step.test b{color:var(--red)}
 .muted{color:var(--muted)}
+.anglab{margin:10px 0;padding:12px;border:1.5px solid var(--line);border-radius:12px;background:var(--paper)}
+.anglab p{margin:4px 0}
+.anglab svg{background:var(--card);border-radius:10px;touch-action:manipulation}
+.adot{cursor:pointer}.adot:hover .dv{fill:var(--pen)}
+.adot:focus-visible{outline:none}.adot:focus-visible .dv{fill:var(--pen);r:8}
+.angstep{border-radius:8px;padding:2px 8px;background:var(--pen-soft)}
+.angstep.done{background:var(--ok-soft)}.angstep.warn{background:var(--red-soft)}
 .pvlab{margin:10px 0;padding:12px;border:1.5px solid var(--line);border-radius:12px;background:var(--paper)}
 .pvlab p{margin:4px 0}
 .pvpick{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0}
@@ -399,6 +406,44 @@ function pvAct(t){
     fb.innerHTML=d===4?'再想想：千位、百位都一樣，接著比十位：4 和 5 哪個大？':`再想想：千位都是 2，接著比百位：${d} 和 4 哪個大？`;
   }
 }
+/* draw-an-angle lab for 二、(12) */
+const ANG={cols:7,rows:5,gap:50,ox:30,oy:30};
+const angPt=(i,j)=>[ANG.ox+i*ANG.gap,ANG.oy+j*ANG.gap];
+function angLab(){
+  let dots='';
+  for(let j=0;j<ANG.rows;j++)for(let i=0;i<ANG.cols;i++){const [x,y]=angPt(i,j);dots+=`<g class="adot" tabindex="0" role="button" aria-label="第 ${j+1} 排第 ${i+1} 個點" data-ai="${i}" data-aj="${j}"><circle cx="${x}" cy="${y}" r="20" fill="transparent"/><circle class="dv" cx="${x}" cy="${y}" r="5" fill="var(--muted)"/></g>`}
+  const W=ANG.ox*2+(ANG.cols-1)*ANG.gap,H=ANG.oy*2+(ANG.rows-1)*ANG.gap;
+  return `<div class="anglab" data-anglab data-pts="[]">
+  <p><b>換你畫畫看！</b>點下面的點，畫出一個角。</p>
+  <p class="angstep">① 先點一個點，當作角的<b>頂點</b>。</p>
+  <div class="scroll"><svg class="fig" viewBox="0 0 ${W} ${H}" width="${W}" role="group" aria-label="點點格子，用來畫角"><g class="angdraw"></g>${dots}</svg></div>
+  <div class="pvpick"><button type="button" class="btn" data-angreset="1">重畫</button></div>
+  <p class="muted" style="font-size:15px">畫完以後，也在考卷背面或計算紙上用尺畫一個角，標出頂點和邊。</p>
+</div>`;
+}
+function angDraw(box){
+  const pts=JSON.parse(box.dataset.pts),g=box.querySelector('.angdraw');let h='';
+  const P=k=>angPt(pts[k][0],pts[k][1]);
+  if(pts.length>=2){const [vx,vy]=P(0);[1,2].forEach(k=>{if(pts[k]){const [x,y]=P(k);h+=`<line x1="${vx}" y1="${vy}" x2="${x}" y2="${y}" stroke="var(--pen)" stroke-width="5" stroke-linecap="round"/><text x="${(vx+x)/2+8}" y="${(vy+y)/2-10}" font-size="16" font-weight="700" fill="var(--pen)" style="font-family:var(--f-body)">邊${k}</text>`}})}
+  if(pts.length>=1){const [vx,vy]=P(0);h+=`<circle cx="${vx}" cy="${vy}" r="11" fill="none" stroke="var(--red)" stroke-width="3"/><circle cx="${vx}" cy="${vy}" r="5" fill="var(--red)"/><text x="${vx}" y="${vy+30}" text-anchor="middle" font-size="16" font-weight="700" fill="var(--red)" style="font-family:var(--f-body)">頂點</text>`}
+  g.innerHTML=h;
+  const st=box.querySelector('.angstep');
+  st.className='angstep'+(pts.length===3?' done':'');
+  st.innerHTML=['① 先點一個點，當作角的<b>頂點</b>。','② 再點另一個點，從頂點畫出<b>第一條邊</b>。','③ 再點一個點，畫出<b>第二條邊</b>，兩條邊要張開喔。','你畫好一個角了！數數看：紅色的<b>頂點有 1 個</b>，藍色的<b>邊有 2 條</b>。'][pts.length];
+}
+function angAct(el){
+  const box=el.closest('[data-anglab]');
+  if(el.dataset.angreset){box.dataset.pts='[]';angDraw(box);return}
+  const pts=JSON.parse(box.dataset.pts);if(pts.length>=3)return;
+  const p=[+el.dataset.ai,+el.dataset.aj];
+  if(pts.some(q=>q[0]===p[0]&&q[1]===p[1]))return;
+  if(pts.length===2){
+    const [v,a]=pts,ax=a[0]-v[0],ay=a[1]-v[1],bx=p[0]-v[0],by=p[1]-v[1];
+    if(ax*by-ay*bx===0){const st=box.querySelector('.angstep');st.className='angstep warn';st.innerHTML=(ax*bx+ay*by>0?'兩條邊疊在一起了':'兩條邊變成一直線了')+'，換一個點，讓兩條邊張開。';return}
+  }
+  pts.push(p);box.dataset.pts=JSON.stringify(pts);angDraw(box);
+}
+document.addEventListener('keydown',e=>{const a=e.target.closest&&e.target.closest('.adot');if(a&&(e.key==='Enter'||e.key===' ')){e.preventDefault();angAct(a)}});
 /* ---------- questions ---------- */
 const S=[
  {id:'s1',name:'一、選擇題',note:'每題 2 分，共 20 分'},
@@ -457,7 +502,7 @@ const Q=[
  {s:'s2',n:'(9)',type:'fill',stem:'5 公尺＝（[[w]]）毫米',ans:['5000'],hint:'1 公尺＝100 公分，1 公分＝10 毫米，所以 1 公尺＝幾毫米？',ex:'<p>1 公尺＝1000 毫米，5 公尺＝<b>5000</b> 毫米。</p>'},
  {s:'s2',n:'(10)',type:'fill',stem:'4430 毫米＝（[[s]]）公尺（[[s]]）公分',ans:['4','43'],hint:'先拿出 4000 毫米換成公尺，剩下的 430 毫米再換成公分。',ex:'<p>4000 毫米＝4 公尺；430 毫米＝43 公分 → <b>4</b> 公尺 <b>43</b> 公分。</p>'},
  {s:'s2',n:'(11)',type:'fill',stem:'2050mm＝（[[s]]）m（[[s]]）cm',ans:['2','5'],hint:'m 是公尺，cm 是公分，mm 是毫米。',ex:'<p>2000mm＝2m；剩下 50mm＝5cm → <b>2</b> m <b>5</b> cm。</p>'},
- {s:'s2',n:'(12)',type:'fill',stem:'角是由（[[s]]）個頂點和（[[s]]）個邊所組成的。',ans:['1','2'],hint:'畫一個角看看：有幾個尖尖的點？有幾條直直的線？',ex:'<p>一個角有 <b>1</b> 個頂點和 <b>2</b> 個邊。</p>'},
+ {s:'s2',n:'(12)',type:'fill',stem:'角是由（[[s]]）個頂點和（[[s]]）個邊所組成的。',ans:['1','2'],hint:'畫一個角看看：有幾個尖尖的點？有幾條直直的線？',ex:'<p>一個角有 <b>1</b> 個頂點和 <b>2</b> 個邊。</p>'+angLab()},
  {s:'s2',n:'(13)①',type:'fill',stem:'在 □ 中填入適當的數字：<div class="vadd"><span></span><span>2</span><span>7</span><span>[[box]]</span><span>5</span><span class="ul">＋</span><span class="ul">3</span><span class="ul">[[box]]</span><span class="ul">8</span><span class="ul">7</span><span></span><span>[[box]]</span><span>9</span><span>0</span><span>[[box]]</span></div>',ans:['1','1','5','2'],
   hint:'從個位開始算：5＋7＝12，寫幾、進幾？再算十位：□＋8＋進位＝?0。',
   ex:'<p>個位：5＋7＝12，寫 2 進 1。</p><p>十位：□＋8＋1 要等於 10，□＝1，再進 1。</p><p>百位：7＋□＋1＝9，□＝1。千位：2＋3＝5。</p>'+vert(2715,'＋',3187,5902)},
@@ -718,9 +763,11 @@ function toggleCorner(g){
 }
 document.addEventListener('keydown',e=>{const g=e.target.closest&&e.target.closest('.hit');if(g&&(e.key===' '||e.key==='Enter')){e.preventDefault();toggleCorner(g)}});
 document.addEventListener('click',e=>{
+  const ad=e.target.closest('.adot');if(ad){angAct(ad);return}
   const t=e.target.closest('button,.hit');if(!t)return;
   if(t.classList.contains('hit')){toggleCorner(t);return}
   if(t.dataset.nlAct){nlAct(t);return}
+  if(t.dataset.angreset){angAct(t);return}
   if(t.dataset.pv||t.dataset.cmp){pvAct(t);return}
   if(t.dataset.step!=null){if(t.dataset.step==='test'){state.view='test'}else{state.view='review';state.cur=+t.dataset.step}save();render();window.scrollTo(0,0);return}
   if(t.dataset.goto!=null){if(t.dataset.goto==='test')state.view='test';else state.cur=+t.dataset.goto;save();render();window.scrollTo(0,0);return}
