@@ -140,6 +140,18 @@ footer{margin-top:40px;color:var(--muted);font-size:14px;text-align:center}
 .step:disabled{opacity:.4;cursor:not-allowed}
 .step.test b{color:var(--red)}
 .muted{color:var(--muted)}
+.pvlab{margin:10px 0;padding:12px;border:1.5px solid var(--line);border-radius:12px;background:var(--paper)}
+.pvlab p{margin:4px 0}
+.pvpick{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0}
+.pvpick .k{font-family:var(--f-num);font-size:13px;display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;border:1.5px solid currentColor;margin-right:2px}
+.pvpick .btn.sel{border-color:var(--pen);background:var(--pen-soft)}
+.pvpick .btn.good{border-color:var(--ok);background:var(--ok-soft);color:var(--ok)}
+.pvpick .btn.bad{border-color:var(--red);background:var(--red-soft);color:var(--red)}
+td.pvslot{font-weight:700;font-size:22px;color:var(--ink)}
+td.pvslot.on{color:var(--pen);background:var(--pen-soft)}
+.pvfb{min-height:1.6em;border-radius:8px;padding:0 8px}
+.pvfb.ok{background:var(--ok-soft)} .pvfb.no{background:var(--red-soft)}
+.pvsum{background:var(--card);border:1.5px solid var(--ok);border-radius:10px;padding:6px 12px!important}
 .trap{display:inline-block;background:var(--red-soft);color:var(--red);border:1.5px solid var(--red);border-radius:8px;padding:2px 12px;margin:4px 0}
 .hrow{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin:4px 0}
 .hrow .lbl{font-family:var(--f-num);font-size:15px;color:var(--muted);min-width:3.4em}
@@ -350,6 +362,43 @@ function nl5s(){
   const pt=(v,ok)=>`<circle cx="${X(v)}" cy="${Y}" r="7" fill="${ok?'var(--ok)':'var(--red)'}"/><text x="${X(v)}" y="${Y-20}" text-anchor="middle" font-size="16" font-weight="700" fill="${ok?'var(--ok)':'var(--red)'}">${v}${ok?' ✔':' ✗'}</text>`;
   return `<div class="scroll"><svg class="fig" viewBox="0 0 560 130" width="540" role="img" aria-label="數線上標出 1500 和 1600，1501、1526、1596 在中間，1614 在 1600 的右邊"><line x1="20" y1="${Y}" x2="535" y2="${Y}" stroke="var(--ink)" stroke-width="2.5"/><polygon points="535,${Y-7} 548,${Y} 535,${Y+7}" fill="var(--ink)"/>${tick(1500)}${tick(1600)}${pt(1501,true)}${pt(1526,true)}${pt(1596,true)}${pt(1614,false)}</svg></div><p>綠色的 1501、1526、1596 都在 1500 和 1600 中間；紅色的 1614 跑到 1600 的右邊了。</p>`;
 }
+/* place-value lab for 一、10 */
+function pvLab(){
+  return `<div class="pvlab" data-pvlab>
+  <p>把選項的數字放進百位試試看：</p>
+  <div class="pvpick">${[4,5,6,7].map((d,i)=>`<button type="button" class="btn" data-pv="${d}"><span class="k">${i+1}</span> ${d}</button>`).join('')}</div>
+  <table class="pv"><tr><th>千位</th><th>百位</th><th>十位</th><th>個位</th></tr><tr><td>2</td><td class="pvslot">▲</td><td>4</td><td>8</td></tr></table>
+  <div class="pvq" hidden>
+    <p>這個數是 <b class="pvnum"></b>，它比 2450 大還是小？</p>
+    <div class="pvpick"><button type="button" class="btn" data-cmp="lt">比 2450 小</button><button type="button" class="btn" data-cmp="gt">比 2450 大</button></div>
+    <p class="pvfb"></p>
+  </div>
+  <p class="pvsum" hidden>四個都試完了！只有 4 放進百位，2448 才會比 2301 大、又比 2450 小，所以答案是 <b>① 4</b>。</p>
+</div>`;
+}
+function pvAct(t){
+  const box=t.closest('[data-pvlab]');
+  if(t.dataset.pv){
+    const d=+t.dataset.pv;box.dataset.d=d;
+    box.querySelectorAll('[data-pv]').forEach(b=>b.classList.toggle('sel',b===t));
+    const slot=box.querySelector('.pvslot');slot.textContent=d;slot.classList.add('on');
+    box.querySelector('.pvnum').textContent=2000+d*100+48;
+    box.querySelector('.pvq').hidden=false;
+    const fb=box.querySelector('.pvfb');fb.textContent='';fb.className='pvfb';
+    return;
+  }
+  const d=+box.dataset.d,n=2000+d*100+48,right=n<2450?'lt':'gt',fb=box.querySelector('.pvfb');
+  if(t.dataset.cmp===right){
+    fb.className='pvfb ok';
+    fb.innerHTML=n<2450?`答對了！${n} 比 2450 小，也比 2301 大，所以 ▲ <b>可以</b>是 ${d}。`:`答對了！${n} 比 2450 大，所以 ▲ <b>不能</b>是 ${d}。`;
+    const b=box.querySelector(`[data-pv="${d}"]`);b.classList.add(n<2450?'good':'bad');b.dataset.done='1';
+    if(box.querySelectorAll('[data-pv][data-done]').length===4) box.querySelector('.pvsum').hidden=false;
+    else fb.innerHTML+='　再換下一個數字試試看。';
+  } else {
+    fb.className='pvfb no';
+    fb.innerHTML=d===4?'再想想：千位、百位都一樣，接著比十位：4 和 5 哪個大？':`再想想：千位都是 2，接著比百位：${d} 和 4 哪個大？`;
+  }
+}
 /* ---------- questions ---------- */
 const S=[
  {id:'s1',name:'一、選擇題',note:'每題 2 分，共 20 分'},
@@ -392,7 +441,7 @@ const Q=[
   ex:'<div class="figrow">'+clockSVG(1,140)+clockSVG(5,140)+'</div><p>1 點鐘兩針之間只隔 1 大格，5 點鐘隔了 5 大格，張開比較大，所以 <b>5 點鐘</b>的角比較大。</p>'},
  {s:'s1',n:'10',type:'choice',stem:'<u>小君</u>將某個四位數記在定位板上，如果這個數比 2301 大，比 2450 小，▲ 的數字可能是下列哪個選項？',fig:'<table class="pv"><tr><th>千位</th><th>百位</th><th>十位</th><th>個位</th></tr><tr><td>2</td><td>▲</td><td>4</td><td>8</td></tr></table>',opts:['4','5','6','7'],ans:0,
   hint:'把選項放進 ▲ 試試看，例如 2448、2548……哪一個在 2301 和 2450 中間？',
-  ex:'<p>2448 比 2301 大，也比 2450 小 ✔。2548、2648、2748 都比 2450 大，不行。所以 ▲ 是 <b>4</b>。</p>'},
+  ex:pvLab()},
 
  {s:'s2',n:'(1)',type:'fill',stem:'「二千四百一十三」記作（[[w]]）。',ans:['2413'],hint:'二千寫在千位、四百寫在百位、一十寫在十位、三寫在個位。',ex:'<p>2 個千、4 個百、1 個十、3 個一 → <b>2413</b>。</p>'},
  {s:'s2',n:'(2)',type:'fill',stem:'「五千零二」記作（[[w]]）。',ans:['5002'],hint:'「零」代表中間的位置沒有東西，要補 0。百位和十位都是 0 喔。',ex:'<p>5 個千、0 個百、0 個十、2 個一 → <b>5002</b>。</p>'},
@@ -672,6 +721,7 @@ document.addEventListener('click',e=>{
   const t=e.target.closest('button,.hit');if(!t)return;
   if(t.classList.contains('hit')){toggleCorner(t);return}
   if(t.dataset.nlAct){nlAct(t);return}
+  if(t.dataset.pv||t.dataset.cmp){pvAct(t);return}
   if(t.dataset.step!=null){if(t.dataset.step==='test'){state.view='test'}else{state.view='review';state.cur=+t.dataset.step}save();render();window.scrollTo(0,0);return}
   if(t.dataset.goto!=null){if(t.dataset.goto==='test')state.view='test';else state.cur=+t.dataset.goto;save();render();window.scrollTo(0,0);return}
   if(t.dataset.mark){
