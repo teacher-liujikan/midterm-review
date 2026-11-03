@@ -140,6 +140,7 @@ footer{margin-top:40px;color:var(--muted);font-size:14px;text-align:center}
 .step:disabled{opacity:.4;cursor:not-allowed}
 .step.test b{color:var(--red)}
 .muted{color:var(--muted)}
+.mh{font-weight:700;color:var(--pen);margin-top:10px!important}
 .anglab{margin:10px 0;padding:12px;border:1.5px solid var(--line);border-radius:12px;background:var(--paper)}
 .anglab p{margin:4px 0}
 .anglab svg{background:var(--card);border-radius:10px;touch-action:manipulation}
@@ -444,6 +445,19 @@ function angAct(el){
   pts.push(p);box.dataset.pts=JSON.stringify(pts);angDraw(box);
 }
 document.addEventListener('keydown',e=>{const a=e.target.closest&&e.target.closest('.adot');if(a&&(e.key==='Enter'||e.key===' ')){e.preventDefault();angAct(a)}});
+/* ruler with counting hops for 二、(19) */
+function countRuler(a,b){
+  const p=7,x0=24,X=v=>x0+v*p,ry=96;
+  let g=`<rect x="${X(a)}" y="${ry-22}" width="${(b-a)*p}" height="20" fill="var(--shade)"/>`;
+  g+=`<rect x="${x0-8}" y="${ry}" width="${70*p+16}" height="36" fill="var(--card)" stroke="var(--ink)" stroke-width="1.2"/>`;
+  for(let i=0;i<=70;i++){const x=X(i),l=i%10===0?16:i%5===0?11:7;g+=`<line x1="${x}" y1="${ry}" x2="${x}" y2="${ry+l}" stroke="var(--ink)" stroke-width="${i%10?0.8:1.4}"/>`;if(i%10===0)g+=`<text x="${x}" y="${ry+31}" text-anchor="middle" font-size="12" fill="var(--ink)">${i/10}</text>`}
+  let v=a,big=0,small=0;
+  while(v<b){
+    if(v%10===0&&v+10<=b){big++;const x1=X(v),x2=X(v+10);g+=`<path d="M${x1} ${ry-24} Q${(x1+x2)/2} ${ry-62} ${x2} ${ry-24}" fill="none" stroke="var(--pen)" stroke-width="2.5"/><text x="${(x1+x2)/2}" y="${ry-50}" text-anchor="middle" font-size="14" font-weight="700" fill="var(--pen)">10</text>`;v+=10}
+    else{small++;const x1=X(v),x2=X(v+1);g+=`<path d="M${x1} ${ry-24} Q${(x1+x2)/2} ${ry-38} ${x2} ${ry-24}" fill="none" stroke="var(--red)" stroke-width="1.8"/><text x="${(x1+x2)/2}" y="${ry-38}" text-anchor="middle" font-size="11" font-weight="700" fill="var(--red)">${small}</text>`;v+=1}
+  }
+  return `<div class="scroll"><svg class="fig" viewBox="0 0 ${70*p+56} ${ry+42}" width="${70*p+56}" role="img" aria-label="在尺上一格一格數灰色長條：${big} 大格、${small} 小格">${g}</svg></div>`;
+}
 /* ---------- questions ---------- */
 const S=[
  {id:'s1',name:'一、選擇題',note:'每題 2 分，共 20 分'},
@@ -522,7 +536,10 @@ const Q=[
   hint:'先看到了幾公分，再數多出來的小格子，1 小格是 1 毫米。',ex:'<p>上面的虛線在 4 公分再過 7 小格，4 公分＝40 毫米，40＋7＝<b>47 毫米</b>。</p>'},
  {s:'s2',n:'(19)',type:'fill',stem:'寫出灰色圖形的長度：',fig:'<span class="sub">①</span>'+barRulerSVG(10,64),after:'<span class="sub">答：（[[n]]）毫米</span><span class="sub">②</span>'+barRulerSVG(25,60)+'<span class="sub">答：（[[n]]）毫米</span>',ans:['54','35'],
   hint:'灰色長條不是從 0 開始喔！要用「結束的地方」減掉「開始的地方」。',
-  ex:'<p>① 從 1 公分（10 毫米）到 6 公分 4 毫米（64 毫米）：64－10＝<b>54 毫米</b>。</p><p>② 從 2 公分 5 毫米（25 毫米）到 6 公分（60 毫米）：60－25＝<b>35 毫米</b>。</p>'},
+  ex:'<p class="mh">方法一：用減的</p><p>① 從 1 公分（10 毫米）到 6 公分 4 毫米（64 毫米）：64－10＝<b>54 毫米</b>。</p><p>② 從 2 公分 5 毫米（25 毫米）到 6 公分（60 毫米）：60－25＝<b>35 毫米</b>。</p>'
+   +'<p class="mh">方法二：用數的</p><p>從灰色長條的開頭數到結尾：1 大格是 10 毫米，1 小格是 1 毫米。</p>'
+   +'<p>①</p>'+countRuler(10,64)+'<p>從 1 數到 6，跳了 5 大格，就是 5 個 10 毫米＝50 毫米。再數 6 後面的小格：1、2、3、4，有 4 小格＝4 毫米。50＋4＝<b>54 毫米</b>。</p>'
+   +'<p>②</p>'+countRuler(25,60)+'<p>先數 2 公分 5 毫米到 3 的小格：1、2、3、4、5，有 5 小格＝5 毫米。再從 3 數到 6，跳了 3 大格＝30 毫米。5＋30＝<b>35 毫米</b>。</p>'},
 
  {s:'s3',n:'(1)',type:'fill',stem:'五千零五（[[s:>|<|=]]）5050',ans:['<'],hint:'先把「五千零五」寫成數字。',ex:'<p>五千零五＝5005。5005 和 5050 比十位：0 比 5 小，所以 5005 <b>＜</b> 5050。</p>'},
  {s:'s3',n:'(2)',type:'fill',stem:'6002－4982（[[s:>|<|=]]）605×5',ans:['<'],hint:'兩邊都先算出來再比。',ex:'<div class="verts">'+vert(6002,'−',4982,1020)+vert(605,'×',5,3025)+'</div><p>1020 <b>＜</b> 3025。</p>'},
