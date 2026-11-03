@@ -343,6 +343,13 @@ function nlAct(btn){
   nlShow(box,0);let n=0;const tick=()=>{n++;nlShow(box,n);if(n<4)box._t=setTimeout(tick,n===3?2200:2600)};box._t=setTimeout(tick,400);
 }
 
+/* simple static number line for 一、5 */
+function nl5s(){
+  const X=v=>40+(v-1490)*3.4, Y=80;
+  const tick=v=>`<line x1="${X(v)}" y1="${Y-12}" x2="${X(v)}" y2="${Y+12}" stroke="var(--ink)" stroke-width="2.5"/><text x="${X(v)}" y="${Y+36}" text-anchor="middle" font-size="18" font-weight="700" fill="var(--ink)">${v}</text>`;
+  const pt=(v,ok)=>`<circle cx="${X(v)}" cy="${Y}" r="7" fill="${ok?'var(--ok)':'var(--red)'}"/><text x="${X(v)}" y="${Y-20}" text-anchor="middle" font-size="16" font-weight="700" fill="${ok?'var(--ok)':'var(--red)'}">${v}${ok?' ✔':' ✗'}</text>`;
+  return `<div class="scroll"><svg class="fig" viewBox="0 0 560 130" width="540" role="img" aria-label="數線上標出 1500 和 1600，1501、1526、1596 在中間，1614 在 1600 的右邊"><line x1="20" y1="${Y}" x2="535" y2="${Y}" stroke="var(--ink)" stroke-width="2.5"/><polygon points="535,${Y-7} 548,${Y} 535,${Y+7}" fill="var(--ink)"/>${tick(1500)}${tick(1600)}${pt(1501,true)}${pt(1526,true)}${pt(1596,true)}${pt(1614,false)}</svg></div><p>綠色的 1501、1526、1596 都在 1500 和 1600 中間；紅色的 1614 跑到 1600 的右邊了。</p>`;
+}
 /* ---------- questions ---------- */
 const S=[
  {id:'s1',name:'一、選擇題',note:'每題 2 分，共 20 分'},
@@ -373,7 +380,7 @@ const Q=[
    +'<p>下次看到「最多」「最少」，要停下來想一想喔！</p>'},
  {s:'s1',n:'5',type:'choice',stem:'在數線上，有一個數在 1500 的右邊和 1600 的左邊，這個數<u>不可能</u>是下面哪一個？',opts:['1501','1596','1526','1614'],ans:3,
   hint:'在 1500 右邊表示比 1500 大，在 1600 左邊表示比 1600 小。題目問的是「不可能」。',
-  ex:'<p>這個數要比 1500 大、比 1600 小。1614 比 1600 大，在 1600 的右邊，所以<b>不可能</b>。</p><p>看數線動畫，拿出紙跟著畫一次：</p>'+nl5()},
+  ex:'<p>這個數要比 1500 大、比 1600 小。1614 比 1600 大，在 1600 的右邊，所以<b>不可能</b>。</p><p>畫在數線上看看：</p>'+nl5s()},
  {s:'s1',n:'6',type:'choice',stem:'「1mm」是指什麼？',opts:['1 公分','1 毫米','1 公尺','1 公里'],ans:1,
   hint:'cm 是公分，m 是公尺，那 mm 呢？',ex:'<p>mm 讀作「毫米」，1mm 就是 1 毫米。</p>'},
  {s:'s1',n:'7',type:'choice',stem:'幾個 1 毫米合起來是 3 公分？',opts:['3 個','30 個','300 個','3000 個'],ans:1,
