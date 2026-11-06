@@ -1,4 +1,11 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}
+.crowd{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:8px 0 0;font-size:15px;color:var(--muted)}
+.crowd .cb{display:inline-block;width:96px;height:8px;border-radius:4px;background:var(--grid);overflow:hidden}
+.crowd .cb i{display:block;height:100%;background:var(--ok)}
+.crowd.mid .cb i{background:#d99a1e} .crowd.low .cb i{background:var(--red)}
+.crowd b{font-family:var(--f-num);color:var(--ink);font-variant-numeric:tabular-nums}
+.crowd small{font-size:13px}
+</style></head><body>
 <title>三上數學第一次定期評量檢討</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -287,6 +294,8 @@ body.bpmf{--f-body:var(--kaibpmf)}
 const $=s=>document.querySelector(s);
 const norm=s=>String(s??'').replace(/[０-９]/g,c=>String.fromCharCode(c.charCodeAt(0)-65248)).replace(/[,，\s]/g,'').trim();
 const KEY='m3-exam1-115-1';
+const CLASS_N=16, CLASS_RIGHT={"q0": 15, "q1": 16, "q10": 12, "q11": 12, "q12": 14, "q13": 6, "q14": 10, "q15": 12, "q16": 11, "q29": 16, "q30": 16, "q28": 16, "q2": 14, "q9": 12, "q17": 13, "q18": 12, "q35": 16, "q36": 14, "q37": 14, "q38": 13, "q44": 10, "q45": 14, "q48": 7, "q6": 13, "q7": 12, "q23": 15, "q24": 12, "q32": 15, "q33": 15, "q34": 15, "q41": 12, "q42": 15, "q43": 14, "q46": 11, "q47": 13, "q3": 16, "q4": 13, "q19": 16, "q20": 13, "q21": 15, "q22": 10, "q31": 13, "q39": 15, "q40": 12, "q27": 12, "q5": 16, "q8": 11, "q25": 15, "q26": 10};
+function crowd(q){const r=CLASS_RIGHT[q.id];if(r==null)return '';const c=r<=10?' low':r<=12?' mid':'';return `<p class="crowd${c}"><span>全班</span><span class="cb" aria-hidden="true"><i style="width:${r/CLASS_N*100}%"></i></span><span><b>${r}</b> / ${CLASS_N} 人答對</span>${r<=10?'<small>（很多人卡在這題，仔細看詳解）</small>':''}</p>`}
 let state={v:{},st:{},tries:{},bpmf:true};
 try{const s=JSON.parse(localStorage.getItem(KEY)||'null'); if(s) state=Object.assign(state,s);}catch(e){}
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}};
@@ -1322,6 +1331,7 @@ function reviewCard(q,locked){
   return `<article class="q${m?' marked '+m:''}" id="${q.id}">
     <span class="mark" aria-hidden="true">${m==='right'?'○':m==='wrong'?'✗':''}</span>
     ${reviewBody(q,!!m)}
+    ${crowd(q)}
     ${locked?'':`<div class="selfmark" role="group" aria-label="這題你寫對還是寫錯">
       <span class="ask">考卷上這題：</span>
       <button type="button" class="mk ok${m==='right'?' on':''}" data-mark="right" data-q="${q.id}" aria-pressed="${m==='right'}">○ 我寫對了</button>
