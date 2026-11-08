@@ -269,6 +269,30 @@ button.opt{justify-content:center;font-size:1.1rem}button.opt .kai{font-size:1.5
 @media (prefers-reduced-motion:reduce){.bin.shake{animation:none}}
 @media (max-width:760px){.sk-wrap{grid-template-columns:1fr}.sk-pad-wrap{order:-1}}
 .idiom-frame{width:100%;height:min(82vh,900px);border:1.5px solid var(--line);border-radius:12px;background:var(--card);display:block}
+/* 遊戲感 */
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:40}
+.stars{color:var(--gold);letter-spacing:1px;font-size:.95em}.stars .off{color:var(--line)}
+.tmap{background:linear-gradient(160deg,#1d2b45,#2b3f64);color:#f4f1e8;border-radius:16px;padding:14px 18px;margin:14px 0}
+.tmap-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.tmap-head h2{margin:0;font-size:1.4rem}
+.rank{background:#f0c262;color:#2b1d00;border-radius:999px;padding:.05em .7em;font-weight:700;font-size:.9rem}
+.tot{margin-left:auto;font-weight:700;font-size:1.1rem;color:#f0c262}
+.sky{width:100%;max-width:520px;display:block;margin:6px auto 0}
+.sky .dim{fill:#5a6b8c}.sky .lit{fill:#ffe07a;filter:drop-shadow(0 0 4px #ffe07a)}
+.sky .cline{fill:none;stroke:#ffe07a;stroke-width:1.6;stroke-dasharray:4 3;opacity:.85}
+.tmap-tip{color:#c6cfdf!important;font-size:.85rem;margin:.2em 0 0}
+.gtab{display:inline-flex;align-items:center;gap:6px}.gtab.on .stars .off{color:#56657a}
+.hud{display:flex;gap:16px;flex-wrap:wrap;align-items:center;font-weight:700;margin:8px 0 4px;font-variant-numeric:tabular-nums}
+.combo{background:var(--accent-soft);color:var(--accent);border-radius:999px;padding:.05em .7em;animation:pulse .6s}
+@keyframes pulse{0%{transform:scale(.7)}60%{transform:scale(1.15)}100%{transform:scale(1)}}
+.pbar,.tbar{height:10px;border-radius:999px;background:var(--line);overflow:hidden;margin:4px 0 10px}
+.pbar i,.tbar i{display:block;height:100%;background:var(--ok);border-radius:999px;transition:width .3s}
+.tbar i{width:100%;background:var(--teal);transition:width .1s linear}.tbar i.low{background:var(--no)}.tbar.stop i{opacity:.4}
+.bin.pop{animation:pulse .5s;border-color:var(--ok);border-style:solid}
+.result-card{background:var(--card);border:2px solid var(--gold);border-radius:16px;padding:18px;text-align:center;margin:10px 0;display:grid;gap:6px;justify-items:center}
+.result-card p{margin:0}.big-stars{font-size:2.4rem}
+.gain{color:var(--gold);font-size:1.15em}
+@media (prefers-reduced-motion:reduce){.combo,.bin.pop{animation:none}}
 /* QR code */
 .qr-fixed{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));right:max(12px,env(safe-area-inset-right,0px));z-index:6}
 .qr-btn{display:grid;justify-items:center;gap:2px;background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:6px 6px 4px;font-size:.78rem;color:var(--muted)}
@@ -1236,10 +1260,10 @@ function tBoard() {
   }
   if (sid === 'bonus') {
     return `<section class="panel"><div class="row wrap-row"><label class="field inline"><span>關卡</span><select id="bsel">${opts}</select></label></div>
-    <div class="scroll"><table class="tbl board"><thead><tr><th>座號</th><th>部首配對</th><th>找不同</th><th>筆順挑戰（完成字數）</th><th>筆順錯誤次數</th><th>成語練功房</th></tr></thead><tbody>
+    <div class="scroll"><table class="tbl board"><thead><tr><th>座號</th><th>部首配對</th><th>找不同</th><th>筆順挑戰（完成字數）</th><th>筆順錯誤次數</th><th>成語練功房</th><th>星星</th></tr></thead><tbody>
     ${seats.map(n => { const b = recOf(n, 'bonus')?.extra || {}; const sk = Object.values(b.strokes || {});
       return `<tr><td class="num">${n}</td><td class="num">${b.radical?.done ? `${b.radical.secs} 秒・錯 ${b.radical.miss}` : '·'}</td>
-      <td class="num">${b.diff?.done ? `${b.diff.score} / ${b.diff.max}` : '·'}</td><td class="num">${sk.length || '·'}</td><td class="num">${sk.length ? sk.reduce((a, x) => a + x.miss, 0) : '·'}</td><td>${Object.entries(b.idiom || {}).map(([k, v]) => `${IDIOM_MODE[k] || k} ${v.score}/${v.total}`).join('、') || '·'}</td></tr>`; }).join('')}
+      <td class="num">${b.diff?.done ? `${b.diff.score} / ${b.diff.max}` : '·'}</td><td class="num">${sk.length || '·'}</td><td class="num">${sk.length ? sk.reduce((a, x) => a + x.miss, 0) : '·'}</td><td>${Object.entries(b.idiom || {}).map(([k, v]) => `${IDIOM_MODE[k] || k} ${v.score}/${v.total}`).join('、') || '·'}</td><td class="num">${Object.values(gameStars(b)).reduce((a, x) => a + x, 0)} / 12</td></tr>`; }).join('')}
     </tbody></table></div></section>`;
   }
   return `<section class="panel">${extra}<div class="row wrap-row"><label class="field inline"><span>關卡</span><select id="bsel">${opts}</select></label>
@@ -1524,6 +1548,58 @@ function bindPreReview(s) {
   });
 }
 
+
+// ===== 遊戲感：音效、彩帶、星星、奶奶的藏寶圖 =====
+let AC = null;
+function sfx(kind) {
+  try {
+    AC = AC || new (window.AudioContext || window.webkitAudioContext)();
+    const notes = { ok: [660, 880], no: [220, 180], win: [523, 659, 784, 1046], tick: [990] }[kind] || [600];
+    notes.forEach((f, i) => {
+      const o = AC.createOscillator(), g = AC.createGain(); const t = AC.currentTime + i * 0.09;
+      o.type = kind === 'no' ? 'square' : 'triangle'; o.frequency.value = f;
+      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(kind === 'tick' ? 0.05 : 0.18, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.18);
+      o.connect(g).connect(AC.destination); o.start(t); o.stop(t + 0.2);
+    });
+  } catch (e) {}
+}
+function confetti() {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const cv = document.createElement('canvas'); cv.className = 'confetti'; document.body.appendChild(cv);
+  const W = cv.width = innerWidth, H = cv.height = innerHeight, ctx = cv.getContext('2d');
+  const cols = ['#c8323f', '#f0b429', '#14706f', '#b8365f', '#2a68ad'];
+  const ps = Array.from({ length: 120 }, () => ({ x: W / 2 + (Math.random() - .5) * 200, y: H * .35, vx: (Math.random() - .5) * 14, vy: -Math.random() * 12 - 4, r: Math.random() * 6 + 4, c: cols[Math.floor(Math.random() * 5)], a: Math.random() * 6 }));
+  let n = 0; (function step() {
+    ctx.clearRect(0, 0, W, H);
+    ps.forEach(p => { p.vy += .35; p.x += p.vx; p.y += p.vy; p.a += .2; ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.a); ctx.fillStyle = p.c; ctx.fillRect(-p.r / 2, -p.r / 4, p.r, p.r / 2); ctx.restore(); });
+    if (++n < 110) requestAnimationFrame(step); else cv.remove();
+  })();
+}
+const starRow = (n, max = 3) => `<span class="stars" aria-label="${n} 顆星">${'★'.repeat(n)}<span class="off">${'★'.repeat(max - n)}</span></span>`;
+function gameStars(b) {
+  const r = b.radical, d = b.diff, sk = Object.values(b.strokes || {}), id = Object.values(b.idiom || {});
+  return {
+    radical: !r?.done ? 0 : r.miss === 0 && r.secs <= 60 ? 3 : r.miss <= 3 ? 2 : 1,
+    diff: !d?.done ? 0 : d.score / d.max >= .9 ? 3 : d.score / d.max >= .7 ? 2 : 1,
+    stroke: !sk.length ? 0 : sk.length >= 5 && sk.filter(x => x.miss === 0).length >= 3 ? 3 : sk.length >= 3 ? 2 : 1,
+    idiom: !id.length ? 0 : id.filter(x => x.score === x.total).length >= 3 ? 3 : id.length >= 2 ? 2 : 1
+  };
+}
+const RANKS = [[0, '尋寶新手'], [4, '連星小高手'], [8, '藏寶大師'], [12, '最年輕的尋寶王']];
+// 12 顆星連成「奶奶的星座」
+const CONST_PTS = [[30, 70], [62, 40], [98, 58], [130, 26], [168, 46], [200, 22], [236, 52], [268, 34], [300, 66], [270, 96], [210, 104], [150, 94]];
+function treasureMap(b) {
+  const gs = gameStars(b); const total = gs.radical + gs.diff + gs.stroke + gs.idiom;
+  const rank = RANKS.filter(r => total >= r[0]).pop()[1];
+  const pts = CONST_PTS.map((p, i) => `<circle cx="${p[0]}" cy="${p[1]}" r="${i < total ? 6 : 3.5}" class="${i < total ? 'lit' : 'dim'}"/>`).join('');
+  const line = total > 1 ? `<polyline points="${CONST_PTS.slice(0, total).map(p => p.join(',')).join(' ')}" class="cline"/>` : '';
+  return `<section class="tmap">
+    <div class="tmap-head"><h2 class="kai">奶奶的藏寶圖</h2><span class="rank">${rank}</span><span class="tot">★ ${total} / 12</span></div>
+    <svg viewBox="0 0 330 124" class="sky" role="img" aria-label="已點亮 ${total} 顆星">${line}${pts}</svg>
+    <p class="muted tmap-tip">每個遊戲最多拿 3 顆星。星星會像課文裡一樣，在奶奶的手上連成星座！</p>
+  </section>`;
+}
+
 // ===== 加分挑戰 =====
 const RADICALS = [...new Set(CHARS.map(c => c[2]))];
 const DIFF_Q = [
@@ -1545,9 +1621,10 @@ const bonusState = { tab: 'radical', rad: null, diff: null, sk: null };
 function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
 function bonusBody() {
   if (!st.recs.pre?.extra?.check?.ok) return `<div class="notice">先完成「預習單」，並請老師檢核通過，才能玩加分挑戰。</div>`;
-  const b = myRec('bonus').extra;
-  const tabs = [['radical', '部首配對', b.radical?.done], ['diff', '找不同', b.diff?.done], ['stroke', '筆順挑戰', Object.keys(b.strokes || {}).length], ['idiom', '成語練功房', Object.keys(b.idiom || {}).length]];
-  return `<nav class="gtabs">${tabs.map(([k, n, d]) => `<button class="gtab ${bonusState.tab === k ? 'on' : ''}" data-gt="${k}">${n}${d ? ' ✓' : ''}</button>`).join('')}</nav>
+  const b = myRec('bonus').extra; const gs = gameStars(b);
+  const tabs = [['radical', '部首配對', '🧩'], ['diff', '找不同', '🔍'], ['stroke', '筆順挑戰', '✍️'], ['idiom', '成語練功房', '📜']];
+  return `${treasureMap(b)}
+  <nav class="gtabs">${tabs.map(([k, n, ic]) => `<button class="gtab ${bonusState.tab === k ? 'on' : ''}" data-gt="${k}"><span aria-hidden="true">${ic}</span> ${n} ${starRow(gs[k])}</button>`).join('')}</nav>
   <div id="game"></div>`;
 }
 function bindBonus() {
@@ -1555,10 +1632,12 @@ function bindBonus() {
   document.querySelectorAll('[data-gt]').forEach(b => b.onclick = () => { bonusState.tab = b.dataset.gt; renderStage(); });
   ({ radical: radicalGame, diff: diffGame, stroke: strokeGame, idiom: idiomGame })[bonusState.tab]();
 }
+function refreshMap() { const m = document.querySelector('.tmap'); if (m) m.outerHTML = treasureMap(myRec('bonus').extra); const b = myRec('bonus').extra, gs = gameStars(b); document.querySelectorAll('.gtab').forEach(t => { const st2 = t.querySelector('.stars'); if (st2) st2.outerHTML = starRow(gs[t.dataset.gt]); }); }
 function saveBonus(key, val) {
   const rec = myRec('bonus'); rec.extra[key] = val;
   const b = rec.extra; rec.done = !!(b.radical?.done && b.diff?.done && Object.keys(b.strokes || {}).length && Object.keys(b.idiom || {}).length);
   queueSave('bonus', true);
+  refreshMap();
 }
 
 // --- 成語練功房（第七課版，結果回傳記錄） ---
@@ -1580,54 +1659,89 @@ window.addEventListener('message', e => {
 // --- 部首配對 ---
 function radicalGame() {
   const S = bonusState;
-  if (!S.rad) S.rad = { pile: shuffle(CHARS.map(c => c[0])), placed: {}, sel: null, miss: 0, t0: Date.now(), msg: '' };
+  if (!S.rad) S.rad = { pile: shuffle(CHARS.map(c => c[0])), placed: {}, sel: null, miss: 0, t0: null, msg: '點一個生字開始計時！', combo: 0, best: 0, flash: null };
   const R = S.rad; const best = myRec('bonus').extra.radical;
   const g = $('#game');
   const done = R.pile.length === 0;
-  g.innerHTML = `<div class="game-head"><p>點一個生字，再點它的部首。全部放對就完成！</p>
-    <span class="muted">錯 ${R.miss} 次${best?.done ? `・最佳紀錄 ${best.secs} 秒` : ''}</span></div>
-    ${done ? `<div class="notice done">完成！花了 ${R.secs} 秒，錯 ${R.miss} 次。<button class="ghost sm" id="radAgain">再玩一次</button></div>` : ''}
-    <div class="pile">${R.pile.map(c => `<button class="tile-char kai ${R.sel === c ? 'sel' : ''}" data-c="${c}">${c}</button>`).join('') || ''}</div>
+  const left = CHARS.length - R.pile.length;
+  g.innerHTML = `<div class="game-head"><p>點一個生字，再點它的部首。越快、越少錯，星星越多！</p>
+    <span class="muted">${best?.done ? `最佳紀錄 ${best.secs} 秒` : ''}</span></div>
+    <div class="hud"><span>⏱ <b id="radTime">${R.t0 ? Math.round(((R.secs != null ? R.t0 + R.secs * 1000 : Date.now()) - R.t0) / 1000) : 0}</b> 秒</span><span>✔ ${left} / ${CHARS.length}</span><span>✖ ${R.miss}</span>${R.combo >= 2 ? `<span class="combo">🔥 連對 ${R.combo}</span>` : ''}</div>
+    <div class="pbar"><i style="width:${left / CHARS.length * 100}%"></i></div>
+    ${done ? `<div class="result-card"><p class="big-stars">${starRow(R.stars)}</p><p>完成！花了 <b>${R.secs}</b> 秒，錯 <b>${R.miss}</b> 次，最多連對 <b>${R.best}</b> 題。</p><p class="muted">3 顆星：不出錯，而且 60 秒內完成。</p><button class="primary" id="radAgain">再挑戰一次</button></div>` : ''}
+    <div class="pile">${R.pile.map(c => `<button class="tile-char kai ${R.sel === c ? 'sel' : ''}" data-c="${c}">${c}</button>`).join('')}</div>
     <p class="game-msg" id="radMsg">${esc(R.msg)}</p>
-    <div class="bins">${RADICALS.map(r => `<button class="bin" data-r="${r}"><span class="bin-r kai">${r}</span><span class="bin-in kai">${(R.placed[r] || []).join('')}</span></button>`).join('')}</div>`;
-  g.querySelectorAll('[data-c]').forEach(b => b.onclick = () => { R.sel = b.dataset.c; R.msg = `選了「${R.sel}」，它的部首是哪一個？`; radicalGame(); });
+    <div class="bins">${RADICALS.map(r => `<button class="bin ${R.flash === r ? 'pop' : ''}" data-r="${r}"><span class="bin-r kai">${r}</span><span class="bin-in kai">${(R.placed[r] || []).join('')}</span></button>`).join('')}</div>`;
+  R.flash = null;
+  clearInterval(S.radTimer);
+  if (R.t0 && !done) S.radTimer = setInterval(() => { const el = $('#radTime'); if (!el || bonusState.tab !== 'radical') return clearInterval(S.radTimer); el.textContent = Math.round((Date.now() - R.t0) / 1000); }, 500);
+  g.querySelectorAll('[data-c]').forEach(b => b.onclick = () => { if (!R.t0) R.t0 = Date.now(); R.sel = b.dataset.c; R.msg = `選了「${R.sel}」，它的部首是哪一個？`; sfx('tick'); radicalGame(); });
   g.querySelectorAll('[data-r]').forEach(b => b.onclick = () => {
     if (!R.sel) { R.msg = '先點上面的一個生字。'; return radicalGame(); }
     const c = CHARS.find(x => x[0] === R.sel);
     if (c[2] === b.dataset.r) {
       R.placed[b.dataset.r] = [...(R.placed[b.dataset.r] || []), R.sel]; R.pile = R.pile.filter(x => x !== R.sel);
-      R.msg = `對了！「${R.sel}」是${c[2]}部。`; R.sel = null;
+      R.combo++; R.best = Math.max(R.best, R.combo); R.flash = b.dataset.r;
+      R.msg = R.combo >= 3 ? `太強了！連續答對 ${R.combo} 題！` : `對了！「${R.sel}」是${c[2]}部。`; R.sel = null; sfx('ok');
       if (!R.pile.length) {
         R.secs = Math.round((Date.now() - R.t0) / 1000);
+        R.stars = R.miss === 0 && R.secs <= 60 ? 3 : R.miss <= 3 ? 2 : 1;
         const prev = myRec('bonus').extra.radical;
-        if (!prev?.done || R.secs < prev.secs) saveBonus('radical', { done: true, secs: R.secs, miss: R.miss });
+        if (!prev?.done || R.secs < prev.secs || R.miss < prev.miss) saveBonus('radical', { done: true, secs: prev?.done ? Math.min(R.secs, prev.secs) : R.secs, miss: prev?.done ? Math.min(R.miss, prev.miss) : R.miss });
+        sfx('win'); confetti();
       }
-    } else { R.miss++; R.msg = `「${R.sel}」不是${b.dataset.r}部，再找找看。`; b.classList.add('shake'); }
+    } else { R.miss++; R.combo = 0; R.msg = `「${R.sel}」不是${b.dataset.r}部，再找找看。`; sfx('no'); b.classList.add('shake'); setTimeout(() => radicalGame(), 300); return; }
     radicalGame();
   });
   $('#radAgain') && ($('#radAgain').onclick = () => { S.rad = null; radicalGame(); });
 }
 
 // --- 找不同 ---
+const DIFF_SEC = 12;
 function diffGame() {
   const S = bonusState;
-  if (!S.diff) S.diff = { qs: shuffle(DIFF_Q), i: 0, score: 0, pick: null };
+  if (!S.diff) S.diff = { qs: shuffle(DIFF_Q).slice(0, 10), i: 0, score: 0, pts: 0, combo: 0, pick: null, t0: Date.now(), gain: 0 };
   const D = S.diff; const g = $('#game');
+  clearInterval(S.diffTimer);
   if (D.i >= D.qs.length) {
-    g.innerHTML = `<div class="notice done">完成！答對 ${D.score} / ${D.qs.length} 題。<button class="ghost sm" id="dfAgain">再玩一次</button></div>`;
+    const stars = D.score / D.qs.length >= .9 ? 3 : D.score / D.qs.length >= .7 ? 2 : 1;
+    g.innerHTML = `<div class="result-card"><p class="big-stars">${starRow(stars)}</p><p>答對 <b>${D.score}</b> / ${D.qs.length} 題，總分 <b>${D.pts}</b> 分！</p><p class="muted">答得越快分數越高，連續答對還有加分。</p><button class="primary" id="dfAgain">再挑戰一次</button></div>`;
     $('#dfAgain').onclick = () => { S.diff = null; diffGame(); };
     return;
   }
   const q = D.qs[D.i];
-  g.innerHTML = `<div class="game-head"><p>第 ${D.i + 1} / ${D.qs.length} 題</p><span class="muted">答對 ${D.score} 題</span></div>
+  const answered = D.pick != null;
+  g.innerHTML = `<div class="hud"><span>第 ${D.i + 1} / ${D.qs.length} 題</span><span>⭐ ${D.pts} 分</span>${D.combo >= 2 ? `<span class="combo">🔥 連對 ${D.combo}</span>` : ''}</div>
+  <div class="tbar ${answered ? 'stop' : ''}"><i id="tfill"></i></div>
   <div class="q"><p class="sq big-q">${esc(q.q)}</p>
-    <div class="opts ${q.o.length <= 2 ? 'two' : 'three'}">${q.o.map((o, k) => `<button class="opt ${D.pick != null ? (k === q.a ? 'right' : k === D.pick ? 'wrong' : '') : ''}" data-k="${k}" ${D.pick != null ? 'disabled' : ''}><span class="${q.o.length <= 2 ? 'kai' : ''}">${esc(o)}</span></button>`).join('')}</div>
-    ${D.pick != null ? `<p class="fb ${D.pick === q.a ? 'ok' : 'no'}">${D.pick === q.a ? '答對了！' : '答錯了。'}${esc(q.tip)}</p><button class="primary" id="dfNext">${D.i + 1 < D.qs.length ? '下一題' : '看結果'}</button>` : ''}
+    <div class="opts ${q.o.length <= 2 ? 'two' : 'three'}">${q.o.map((o, k) => `<button class="opt ${answered ? (k === q.a ? 'right' : k === D.pick ? 'wrong' : '') : ''}" data-k="${k}" ${answered ? 'disabled' : ''}><span class="${q.o.length <= 2 ? 'kai' : ''}">${esc(o)}</span></button>`).join('')}</div>
+    ${answered ? `<p class="fb ${D.pick === q.a ? 'ok' : 'no'}">${D.pick === q.a ? `答對了！<b class="gain">+${D.gain}</b> ` : D.pick === -1 ? '時間到！' : '答錯了。'}${esc(q.tip)}</p><button class="primary" id="dfNext">${D.i + 1 < D.qs.length ? '下一題' : '看結果'}</button>` : ''}
   </div>`;
-  g.querySelectorAll('[data-k]').forEach(b => b.onclick = () => { D.pick = +b.dataset.k; if (D.pick === q.a) D.score++; diffGame(); });
+  const answer = k => {
+    if (D.pick != null) return;
+    clearInterval(S.diffTimer);
+    const used = (Date.now() - D.t0) / 1000;
+    D.pick = k;
+    if (k === q.a) { D.score++; D.combo++; D.gain = 10 + Math.max(0, Math.round((DIFF_SEC - used) * 2)) + (D.combo >= 3 ? 5 : 0); D.pts += D.gain; sfx('ok'); }
+    else { D.combo = 0; sfx('no'); }
+    diffGame();
+  };
+  if (!answered) {
+    const fill = $('#tfill');
+    S.diffTimer = setInterval(() => {
+      if (bonusState.tab !== 'diff' || !$('#tfill')) return clearInterval(S.diffTimer);
+      const r = Math.max(0, 1 - (Date.now() - D.t0) / 1000 / DIFF_SEC); fill.style.width = r * 100 + '%'; fill.classList.toggle('low', r < .3);
+      if (r <= 0) answer(-1);
+    }, 100);
+  }
+  g.querySelectorAll('[data-k]').forEach(b => b.onclick = () => answer(+b.dataset.k));
   $('#dfNext') && ($('#dfNext').onclick = () => {
-    D.i++; D.pick = null;
-    if (D.i >= D.qs.length) { const prev = myRec('bonus').extra.diff; if (!prev?.done || D.score > prev.score) saveBonus('diff', { done: true, score: D.score, max: D.qs.length }); }
+    D.i++; D.pick = null; D.t0 = Date.now();
+    if (D.i >= D.qs.length) {
+      const prev = myRec('bonus').extra.diff;
+      if (!prev?.done || D.score / D.qs.length > prev.score / prev.max || (D.score / D.qs.length === prev.score / prev.max && D.pts > (prev.pts || 0))) saveBonus('diff', { done: true, score: D.score, max: D.qs.length, pts: D.pts });
+      sfx('win'); confetti();
+    }
     diffGame();
   });
 }
@@ -1672,7 +1786,7 @@ function strokeGame() {
     const all = Object.assign({}, myRec('bonus').extra.strokes || {});
     const prev = all[c[0]];
     if (!prev || (!K.trace && prev.mode === 'trace') || ((K.trace ? 'trace' : 'blank') === prev.mode && K.miss < prev.miss)) all[c[0]] = { miss: K.miss, mode: K.trace ? 'trace' : 'blank' };
-    saveBonus('strokes', all); strokeGame();
+    saveBonus('strokes', all); sfx('win'); if (!K.miss) confetti(); strokeGame();
   };
   const g = $('#game');
   g.innerHTML = `<div class="game-head"><div class="seg" role="group" aria-label="練習方式">
@@ -1688,12 +1802,13 @@ function strokeGame() {
     </div>
     <div class="sk-pad-wrap">
       <canvas id="pad" class="pad" aria-label="寫字板"></canvas>
-      ${K.done ? `<div class="sk-done"><p class="fb ok">寫完了！錯了 ${K.miss} 次。看看課本的筆順，和你寫的一樣嗎？</p><img src="${STROKE_IMG[K.ci]}" alt="「${c[0]}」課本筆順圖" class="stroke-img"></div>` : ''}
+      ${K.done ? `<div class="sk-done"><p class="fb ok">寫完了！錯了 ${K.miss} 次 ${starRow(K.miss === 0 ? 3 : K.miss <= 2 ? 2 : 1)}　看看課本的筆順，和你寫的一樣嗎？</p><button class="primary sm" id="skAnother">再來一個字</button><img src="${STROKE_IMG[K.ci]}" alt="「${c[0]}」課本筆順圖" class="stroke-img"></div>` : ''}
     </div>
   </div>`;
   setupPad(K);
   g.querySelectorAll('[data-mode]').forEach(b => b.onclick = () => { S.skMode = b.dataset.mode; S.sk = newSk(K.ci); strokeGame(); });
   $('#skClear').onclick = () => { S.sk = newSk(K.ci); strokeGame(); };
+  $('#skAnother') && ($('#skAnother').onclick = () => $('#skNext').click());
   $('#skNext').onclick = () => { let i; do { i = Math.floor(Math.random() * CHARS.length); } while (i === K.ci); S.sk = newSk(i); strokeGame(); };
   g.querySelectorAll('[data-ci]').forEach(b => b.onclick = () => { S.sk = newSk(+b.dataset.ci); strokeGame(); });
 }
@@ -1746,9 +1861,9 @@ function setupPad(K) {
         K.done = true; K.msg = '';
         K.onDone && K.onDone(); return;
       }
-      K.msg = K.missHere ? '' : '很好，繼續寫下一筆。';
+      K.msg = K.missHere ? '' : '很好，繼續寫下一筆。'; sfx('tick');
     } else {
-      K.miss++; K.missHere++; K.bad = u;
+      K.miss++; K.missHere++; K.bad = u; sfx('no');
       K.msg = m.rev ? '這一筆的方向反了，想想看從哪裡起筆。'
         : later >= 0 ? `這是後面的筆畫喔！想想看第 ${K.k + 1} 筆要寫哪裡。`
         : '這一筆的位置或寫法不太對，再試一次。';
