@@ -538,6 +538,9 @@ const LESSON_ZY=[["ㄋㄞˇ", "˙ㄋㄞ", "˙ㄉㄜ", "ㄕㄡˇ", "ㄅㄟˋ", "�
 // 把 Google Apps Script 部署後的網址貼在這裡；留空就是「示範模式」（資料只存在這台裝置）。
 const API_URL = 'https://script.google.com/macros/s/AKfycbwyOaa2qiRi3Z5NK2phCQkOJK01KTQPDE8ec2AAJ-GkMgOph69goR0eIXUe2txmYdsC/exec';
 const DEMO_KEY = '1234';
+// 連不上後台時的備用設定：預設開放第 1 節的關卡；老師檢核改用下面這組檢核碼
+const OFFLINE_UNLOCK = ['pre', 'stroke', 'vteach', 'bonus'];
+const CHECK_PIN = '0000';
 const DEFAULT_CLASS = '三甲';
 
 // ===== 小工具 =====
@@ -661,7 +664,7 @@ async function refreshMine() {
     return true;
   } catch (e) { return false; }
 }
-function isOpen(id) { return (st.cfg?.unlocked || []).includes(id); }
+function isOpen(id) { return (st.cfg ? (st.cfg.unlocked || []) : OFFLINE_UNLOCK).includes(id); }
 function myGroup(diff) {
   const ov = st.cfg?.ov?.[diff];
   if (ov) return ov;
@@ -1391,7 +1394,7 @@ function teacherCheckPanel(rec) {
     <div class="check-box"><p class="label">老師檢核區</p>
     ${CHECK_ITEMS.map(([k, n]) => `<div class="check-item"><span>${n}</span><span class="check-btns">
       ${['正確', '要訂正'].map(v => `<button type="button" class="chip ${d[k] === v ? 'on' : ''} ${v === '要訂正' ? 'fix' : ''}" data-ck="${k}" data-v="${v}">${v}</button>`).join('')}</span></div>`).join('')}
-    <div class="row"><label class="field inline"><span>教師密碼</span><input id="ckKey" type="password" autocomplete="off" inputmode="numeric" size="8"></label>
+    <div class="row"><label class="field inline"><span>老師檢核碼</span><input id="ckKey" type="password" autocomplete="off" inputmode="numeric" size="8"></label>
       <button class="primary" type="button" id="ckSave">老師確認</button><span class="err" id="ckErr"></span></div></div>
   </div>`;
 }
@@ -1404,7 +1407,10 @@ function bindTeacherCheck(s) {
   $('#ckSave') && ($('#ckSave').onclick = async () => {
     const items = Object.assign({}, rec.extra.check?.items || {}, checkDraft);
     if (CHECK_ITEMS.some(([k]) => !items[k])) { $('#ckErr').textContent = '每一項都要勾「正確」或「要訂正」。'; return; }
-    try { await API.check(st.cls, $('#ckKey').value); } catch (e) { $('#ckErr').textContent = '密碼不對。'; return; }
+    const pin = $('#ckKey').value;
+    let okPin = pin === CHECK_PIN;
+    if (!okPin) { try { await API.check(st.cls, pin); okPin = true; } catch (e) {} }
+    if (!okPin) { $('#ckErr').textContent = '檢核碼不對。'; return; }
     rec.extra.check = { items, ok: CHECK_ITEMS.every(([k]) => items[k] === '正確'), t: Date.now() };
     for (const k in checkDraft) delete checkDraft[k];
     queueSave(s.id, true);
