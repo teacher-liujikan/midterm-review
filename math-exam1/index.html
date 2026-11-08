@@ -266,6 +266,16 @@ input.blank.t{width:10.5em;font-family:var(--f-body)}
 :root{--kaibpmf:"Bpmf Zihi Kai Std","Kai Std Plain","TW-Kai","DFKai-SB","BiauKai","標楷體",serif}
 body.bpmf{--f-body:var(--kaibpmf)}
 .nb,.zy,select.blank,.refa{font-family:var(--kai)!important}
+
+.todo{margin-top:8px;padding:10px 14px;border:1.5px solid var(--pen);border-radius:12px;background:var(--card);display:flex;flex-direction:column;gap:6px}
+.todo h3{margin:0;font-size:17px;color:var(--pen)}
+.todo .row2{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:space-between;border-top:1px dashed var(--line);padding-top:6px}
+.todo .row2 b{font-family:var(--f-num);color:var(--red)}
+.todo .ok2{color:var(--ok)}
+.findleft{margin-top:6px}
+article.q.flash{border-color:var(--pen);animation:qflash 1.1s ease-out 3}
+@keyframes qflash{0%{box-shadow:0 0 0 0 var(--pen)}60%{box-shadow:0 0 0 9px transparent}100%{box-shadow:0 0 0 0 transparent}}
+article.q.flash .selfmark{background:var(--pen-soft);border-radius:10px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 
@@ -1561,6 +1571,55 @@ rz.addEventListener('click',e=>{
   $('#qrClose').addEventListener('click',()=>{m.hidden=true});
   m.addEventListener('click',e=>{if(e.target===m)m.hidden=true});
   document.addEventListener('keydown',e=>{if(e.key==='Escape')m.hidden=true});
+})();
+
+/* ---------- 還沒按到的題目 ---------- */
+(function(){
+  const tools=document.querySelector('.tools');
+  const tb=document.createElement('button');tb.type='button';tb.className='btn';tb.id='todoBtn';tb.textContent='🔍 還沒按到的題目';
+  tools.appendChild(tb);
+  const box=document.createElement('div');box.className='todo';box.id='todoBox';box.hidden=true;box.setAttribute('aria-live','polite');
+  tools.parentNode.insertBefore(box,tools.nextSibling);
+  const unmarked=s=>secQs(s.id).filter(q=>!state.mark[q.id]);
+  function flashFirst(){
+    const qs=[...document.querySelectorAll('#main article.q')].filter(a=>!state.mark[a.id]);
+    if(!qs.length)return false;
+    const cur=document.querySelector('#main article.q.flash');let i=cur?qs.indexOf(cur)+1:0;if(i>=qs.length)i=0;
+    document.querySelectorAll('#main article.q.flash').forEach(a=>a.classList.remove('flash'));
+    const a=qs[i];void a.offsetWidth;a.classList.add('flash');a.scrollIntoView({block:'center',behavior:'smooth'});
+    const b=a.querySelector('[data-mark="right"]');if(b)b.focus({preventScroll:true});
+    return true;
+  }
+  function draw(){
+    const fo=firstOpen();let total=0;
+    const rows=S.map((s,i)=>{
+      const st=state.sec[s.id],n=unmarked(s).length;
+      if(st==='done')return `<div class="row2"><span>${s.name}</span><span class="ok2">✔ 檢討完成</span></div>`;
+      if(st==='teacher')return `<div class="row2"><span>${s.name}</span><span>等老師確認 <button type="button" class="btn" data-todo="${i}">去看</button></span></div>`;
+      total+=n;
+      if(i>fo)return `<div class="row2"><span>${s.name}</span><span class="muted">還有 <b>${n}</b> 題（先完成前面的大題）</span></div>`;
+      return `<div class="row2"><span>${s.name}</span><span>${n?`還有 <b>${n}</b> 題沒按`:'<span class="ok2">都按好了</span>'} <button type="button" class="btn primary" data-todo="${i}">${n?'帶我去':'去看'}</button></span></div>`;
+    }).join('');
+    box.innerHTML=`<h3>${total?`還有 ${total} 題沒按「我寫對了／我寫錯了」`:'每一題都按好了！'}</h3>${rows}<div><button type="button" class="btn" data-todo="close">關閉</button></div>`;
+  }
+  tb.addEventListener('click',()=>{if(box.hidden){draw();box.hidden=false;box.scrollIntoView({block:'nearest',behavior:'smooth'})}else box.hidden=true});
+  box.addEventListener('click',e=>{
+    const b=e.target.closest('[data-todo]');if(!b)return;
+    if(b.dataset.todo==='close'){box.hidden=true;return}
+    const i=+b.dataset.todo;state.view='review';state.cur=i;save();render();box.hidden=true;
+    setTimeout(()=>{if(!flashFirst())window.scrollTo({top:0,behavior:'smooth'})},60);
+  });
+  /* 每一大題下方：找下一題沒按的 */
+  function updLeft(){
+    const msg=document.getElementById('leftMsg');let fb=document.getElementById('findLeft');
+    if(!msg||state.view!=='review'){return}
+    const left=unmarked(S[state.cur]).length;
+    if(!fb){fb=document.createElement('button');fb.type='button';fb.className='btn findleft';fb.id='findLeft';fb.textContent='🔍 找出還沒按的題目';fb.addEventListener('click',flashFirst);msg.parentNode.insertBefore(fb,msg.nextSibling)}
+    fb.hidden=!left;
+    if(!box.hidden)draw();
+  }
+  const _render=render;render=function(){_render();updLeft()};
+  document.addEventListener('click',()=>setTimeout(updLeft,0));
 })();
 applyBpmf();render();
 })();
