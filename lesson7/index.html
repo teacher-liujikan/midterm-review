@@ -755,6 +755,8 @@ async function refreshMine() {
 function isOpen(id) {
   if (st.preview) return true;
   if ((st.cfg ? (st.cfg.unlocked || []) : OFFLINE_UNLOCK).includes(id)) return true;
+  // 加分挑戰：老師檢核通過就自動開啟
+  if (id === 'bonus' && st.recs.pre?.extra?.check?.ok) return true;
   // 分組任務：做完對應的檢測就自動分組並開啟，不用等老師
   const s = stageById(id);
   if (s?.diff) { const test = STAGES.find(x => x.group === s.diff); return !!st.recs[test.id]?.done; }
@@ -1662,7 +1664,7 @@ function bindPreReview(s) {
   $('#tr3').onchange = () => { rec.extra.circle = $('#tr3').checked; queueSave(s.id); };
   $('#showCircle').onclick = () => { rec.extra.showCircle = !rec.extra.showCircle; queueSave(s.id); rerender(); };
   bindTeacherCheck(s);
-  $('#toBonus') && ($('#toBonus').onclick = () => { if (isOpen('bonus')) { st.stage = 'bonus'; go('stage'); } else { $('#toBonus').textContent = '老師還沒打開，等一下喔'; } });
+  $('#toBonus') && ($('#toBonus').onclick = () => { st.stage = 'bonus'; go('stage'); scrollTo(0, 0); });
   $('#preDone') && ($('#preDone').onclick = () => {
     const qs = s.items.filter(i => i.t === 'mc' && i.id !== 'genre'); const seen = rec.extra.seen || {};
     const need = [];
