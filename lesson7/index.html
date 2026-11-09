@@ -346,6 +346,28 @@ button.opt{justify-content:center;font-size:1.1rem}button.opt .kai{font-size:1.5
 .topic{display:grid;gap:2px;text-align:left;border:1.5px solid var(--line);background:var(--paper);border-radius:10px;padding:.5em .7em;min-width:0}
 .topic b{font-size:1rem}.topic span{font-size:.82rem;color:var(--muted)}
 .topic.on{border-color:var(--rose);background:var(--rose-soft)}
+/* 課文遊戲題 */
+.hot{max-width:360px;margin:4px auto 0;background:var(--paper);border-radius:14px;padding:8px}
+.hand-svg{width:100%;display:block;cursor:pointer}
+.hot .hs{cursor:pointer}.hot.is-done{cursor:default}
+.hand-svg .hs.hl[data-part=spot] circle:not([fill=transparent]){fill:#e0453a;animation:pulse .6s}
+.hand-svg .hs.hl[data-part=wrinkle] path{stroke:#e0453a}
+.hand-svg .hs.hl[data-part=wrinkle] g path{stroke:transparent}
+.tap-para{display:flex;flex-wrap:wrap;gap:6px;background:var(--paper);border-radius:12px;padding:10px}
+.sent{border:1.5px dashed var(--line);background:var(--card);border-radius:8px;padding:.35em .6em;font-size:1.15rem;line-height:1.6;text-align:left}
+.sent:hover:not([disabled]){border-color:var(--accent)}
+.sent.right{border:2px solid var(--ok);background:var(--ok-soft)}.sent.wrong{border-color:var(--no);background:var(--no-soft);text-decoration:line-through;opacity:.7}
+.pool{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 10px;min-height:2.6em}
+.card-chip{border:1.5px solid var(--line);background:var(--card);border-radius:10px;padding:.45em .8em;font-size:1.02rem;text-align:left}
+.card-chip.sel{border-color:var(--accent);background:var(--accent-soft);transform:translateY(-2px)}
+.buckets{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:10px}
+.bucket{display:grid;gap:6px;align-content:start;min-height:120px;border:2px dashed var(--line);border-radius:14px;padding:10px;background:var(--paper);text-align:left}
+.bucket b{font-size:1.15rem}.bucket.b0 b{color:var(--gold)}.bucket.b1 b{color:var(--rose)}
+.bucket-in{display:flex;flex-wrap:wrap;gap:6px}.placed{background:var(--card);border:1.5px solid var(--ok);border-radius:8px;padding:.2em .5em;font-size:.95rem}
+.seq{list-style:none;padding:0;margin:6px 0;display:grid;gap:6px}
+.seq li{display:flex;gap:10px;align-items:center;border:1.5px dashed var(--line);border-radius:10px;padding:.45em .7em;min-height:2.6em;background:var(--paper)}
+.seq li.filled{border-style:solid;border-color:var(--ok);background:var(--ok-soft)}
+.seq-no{flex:none;font-family:var(--f-kai);border:1.5px solid var(--accent);color:var(--accent);border-radius:4px;width:1.6em;text-align:center}
 /* 老師預覽 */
 .pv-form{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}.pv-form input{padding:.4em .6em;border:1.5px solid var(--line);border-radius:8px;width:9em}
 .pv-tag{background:var(--accent);color:var(--accent-ink);border-radius:999px;padding:.1em .7em;font-size:.85rem}
@@ -555,16 +577,16 @@ const STAGES = [
       ]
     } },
   { id: 'reading', sec: '課文內容', name: '課文提問', when: '第3節',
-    intro: '老師會一題一題提問。先在課文裡找答案，再寫下你的想法。',
+    intro: '跟著老師一題一題玩：在圖上點一點、在課文裡點句子、分類、排順序。都不用打字！',
     showText: true,
     items: [
-      { id: 'r0', t: 'mc', q: '第二段在說奶奶充滿什麼？', o: ['活力', '煩惱', '寶物', '星座'], a: 0, ex: '第二段寫奶奶凡事努力，做得快又好，充滿活力。' },
-      { id: 'rx', t: 'mc', q: '第三段在說奶奶充滿什麼？', o: ['皺紋', '創意', '力氣', '銀光'], a: 1, ex: '第三段寫奶奶會剪美麗的窗花，充滿創意。' },
-      { id: 'r1', t: 'text', tag: '找一找', q: '奶奶的外表有什麼特徵？', ref: '手背上有斑點和皺紋，頭髮是銀白色。', wall: true },
-      { id: 'r2', t: 'text', tag: '想一想', q: '奶奶為什麼說自己「只知道凡事努力做」？', ref: '凡事努力是奶奶的生活態度：一起床就梳理頭髮，幫花除蟲、洗衣，做得快又好。', wall: true },
-      { id: 'r3', t: 'text', tag: '想一想', q: '為什麼作者覺得奶奶像一位大藝術家？', ref: '一張平凡的紙，經過奶奶的巧手，不一會兒就變成美麗的窗花。', wall: true },
-      { id: 'r4', t: 'text', tag: '想一想', q: '奶奶為什麼說作者「才是我的寶貝」？', ref: '奶奶疼愛作者，覺得作者是任何寶物都比不上的寶貝。', wall: true },
-      { id: 'r5', t: 'text', tag: '說說看', q: '奶奶的手上已經有斑點和皺紋，作者為什麼還說她是「最年輕的奶奶」？你覺得什麼是「年輕」？', ref: '奶奶人老心不老，跟年輕人一樣充滿活力和創意。（答案僅供參考）', wall: true }
+      { id: 'r1', t: 'hotspot', label: '點一點', tag: '找一找', q: '作者把奶奶手上的什麼當成「星星」？在圖上點出來。', target: 'spot', ex: '第二段：我把奶奶手上的斑點當成星星，連出奇特的星座。' },
+      { id: 'r2', t: 'hotspot', label: '點一點', tag: '找一找', q: '那「群山」又是奶奶手上的什麼？在圖上點出來。', target: 'wrinkle', ex: '第三段：我把奶奶手上的皺紋當成群山，連出一條藏寶路線。' },
+      { id: 'r3', t: 'tap', label: '點句子', tag: '找一找', q: '奶奶說自己「只知道凡事努力做」。第二段哪一句，看得出奶奶做事又快又認真？點一點。', para: 1, a: [4], ex: '「奶奶幫花除完蟲，轉身忙洗衣，做得快又好。」做完一件馬上做下一件，又快又好。' },
+      { id: 'r4', t: 'sort', label: '分一分', tag: '想一想', q: '這些事情，哪些看出奶奶「充滿活力」？哪些看出奶奶「充滿創意」？', buckets: ['充滿活力', '充滿創意'], cards: [['一起床就又梳又夾', 0], ['幫花除完蟲', 0], ['轉身忙洗衣', 0], ['把紙摺摺剪剪', 1], ['剪出美麗的窗花', 1], ['像一位大藝術家', 1]], ex: '做事又快又勤勞是活力；把一張紙變成窗花是創意。' },
+      { id: 'r5', t: 'tap', label: '點句子', tag: '想一想', q: '第三段哪一句，看得出奶奶很疼愛作者？點一點。', para: 2, a: [1], ex: '奶奶捏捏作者的臉說「你才是我的寶貝呀！」，作者比任何寶物都重要。' },
+      { id: 'r6', t: 'order', label: '排一排', tag: '整理', q: '依照課文的順序，把每一段的大意排好。', cards: ['奶奶的手背上有好多斑點和皺紋。', '斑點像星星；奶奶凡事努力，做得快又好。', '皺紋像群山；奶奶會剪窗花，像大藝術家。', '奶奶充滿活力和創意，是最年輕的奶奶。'], ex: '開頭介紹手背 → 活力 → 創意 → 結語。' },
+      { id: 'r7', t: 'mc', tag: '說說看', q: '奶奶的手上已經有斑點和皺紋，作者為什麼還說她是「最年輕的奶奶」？', o: ['因為奶奶的年紀最小', '因為奶奶充滿活力和創意，心不老', '因為奶奶很會看星座', '因為奶奶沒有白頭髮'], a: 1, ex: '奶奶年紀大了，可是人老心不老，像年輕人一樣有活力、有創意。' }
     ] },
   { id: 'stest', sec: '修辭句型', name: '句型修辭檢測', when: '第3節', group: 's',
     intro: '6 題小檢測。交卷後會自動分組，並打開你這一組的分組任務。',
@@ -1027,8 +1049,10 @@ function teachBody(s, rec) {
     <div class="submit-row">${rec.done ? '<span class="pill ok">已完成這一關</span>' : '<button class="primary" type="submit">完成這一關</button>'}<span class="muted" id="left"></span></div>
   </form>`;
 }
+const GAME_T = ['hotspot', 'tap', 'sort', 'order'];
 function answered(it, rec) {
   const v = rec.ans[it.id];
+  if (GAME_T.includes(it.t)) return v === 'done';
   if (it.t === 'match') return !!v && Object.keys(v).length === it.pairs.length;
   return v != null && String(v).trim() !== '';
 }
@@ -1046,7 +1070,9 @@ function qHtml(s, it, i, rec) {
     ${(rec.hints[it.id] || 0) < it.hs.length ? `<button type="button" class="ghost sm hbtn" data-id="${it.id}">看提示 ${(rec.hints[it.id] || 0) + 1}</button>` : ''}</div>` : '';
   const tag = it.tag ? `<span class="qtag">${esc(it.tag)}</span>` : '';
   let input = '';
-  if (it.t === 'match') {
+  if (GAME_T.includes(it.t)) {
+    input = gameHtml(s, it, rec);
+  } else if (it.t === 'match') {
     const m = rec.ans[it.id] || {}; const ord = matchOrder(it, rec); const used = Object.values(m);
     const colors = ['c1', 'c2', 'c3', 'c4', 'c5'];
     const done = Object.keys(m).length === it.pairs.length;
@@ -1092,6 +1118,7 @@ function bindItems(s) {
       updateLeft();
     }
   });
+  bindGames(s, items, rec, () => { const y = scrollY; renderStage(); scrollTo(0, y); });
   form.querySelectorAll('.mitem').forEach(b => b.onclick = () => {
     const id = b.dataset.mid; const it = items.find(x => x.id === id); const m = rec.ans[id] = rec.ans[id] || {};
     if (b.dataset.l != null) { matchSel[id] = +b.dataset.l; form.querySelectorAll(`.mitem.L[data-mid="${id}"]`).forEach(x => x.classList.toggle('sel', x === b)); return; }
@@ -1120,7 +1147,7 @@ function bindItems(s) {
       const q = form.querySelector(`.q[data-id="${miss[0].id}"]`); q.classList.add('miss'); q.scrollIntoView({ behavior: 'smooth', block: 'center' });
       $('#left').textContent = `還有 ${miss.length} 題沒寫`; return;
     }
-    const mcs = items.filter(it => it.t === 'mc' || it.t === 'match');
+    const mcs = items.filter(it => it.t === 'mc' || it.t === 'match' || GAME_T.includes(it.t));
     rec.max = mcs.length;
     rec.score = mcs.filter(it => (isTest ? rec.ok[it.id] : rec.first[it.id])).length;
     if (group) rec.extra.group = group;
@@ -1128,6 +1155,81 @@ function bindItems(s) {
     renderStage(); scrollTo(0, 0);
   };
   updateLeft();
+}
+
+
+// ===== 課文遊戲題：點圖、點句子、分類、排序 =====
+const HAND_SVG = (hl) => `<svg viewBox="0 0 320 250" class="hand-svg" role="img" aria-label="奶奶的手背">
+  <g fill="#f1c9a5" stroke="#b9805a" stroke-width="2">
+    <rect x="96" y="22" width="34" height="112" rx="17"/><rect x="134" y="10" width="34" height="122" rx="17"/>
+    <rect x="172" y="16" width="34" height="118" rx="17"/><rect x="210" y="36" width="30" height="100" rx="15"/>
+    <rect x="40" y="120" width="34" height="96" rx="17" transform="rotate(-38 57 168)"/>
+    <rect x="86" y="108" width="160" height="128" rx="46"/></g>
+  <g class="hs ${hl === 'wrinkle' ? 'hl' : ''}" data-part="wrinkle" fill="none" stroke="#9a6440" stroke-width="2.4" stroke-linecap="round">
+    <path d="M102 66q6-4 12 0t12 0"/><path d="M140 58q6-4 12 0t12 0"/><path d="M178 62q6-4 12 0t12 0"/><path d="M214 80q5-4 10 0t10 0"/>
+    <path d="M106 150q20-10 40 0t40 0t40 0"/><path d="M112 172q18-9 36 0t36 0t36 0"/><path d="M120 196q16-8 32 0t32 0t32 0"/>
+    <g stroke="transparent" stroke-width="16"><path d="M102 66q6-4 12 0t12 0"/><path d="M140 58q6-4 12 0t12 0"/><path d="M178 62q6-4 12 0t12 0"/><path d="M214 80q5-4 10 0t10 0"/><path d="M106 150q20-10 40 0t40 0t40 0"/><path d="M112 172q18-9 36 0t36 0t36 0"/><path d="M120 196q16-8 32 0t32 0t32 0"/></g></g>
+  <g class="hs ${hl === 'spot' ? 'hl' : ''}" data-part="spot" fill="#a8693f">
+    <circle cx="132" cy="128" r="5"/><circle cx="168" cy="122" r="4"/><circle cx="210" cy="136" r="6"/><circle cx="150" cy="214" r="4.5"/>
+    <circle cx="198" cy="210" r="5"/><circle cx="226" cy="186" r="4"/><circle cx="116" cy="210" r="3.5"/>
+    <g fill="transparent"><circle cx="132" cy="128" r="13"/><circle cx="168" cy="122" r="12"/><circle cx="210" cy="136" r="13"/><circle cx="150" cy="214" r="12"/><circle cx="198" cy="210" r="13"/><circle cx="226" cy="186" r="12"/><circle cx="116" cy="210" r="12"/></g></g>
+  <g class="hs" data-part="nail" fill="#fbe3d3" stroke="#b9805a" stroke-width="1.5"><rect x="104" y="28" width="18" height="16" rx="7"/><rect x="142" y="16" width="18" height="16" rx="7"/><rect x="180" y="22" width="18" height="16" rx="7"/><rect x="216" y="42" width="18" height="15" rx="7"/></g>
+</svg>`;
+const splitSents = p => p.match(/[^。！？]*[。！？]」?/g) || [p];
+function gameState(rec, it) { rec.extra.g = rec.extra.g || {}; return rec.extra.g[it.id] = rec.extra.g[it.id] || {}; }
+function gameHtml(s, it, rec) {
+  const G = gameState(rec, it); const done = rec.ans[it.id] === 'done'; const miss = (rec.extra.gmiss || {})[it.id] || 0;
+  const fb = done ? `<p class="fb ok">答對了！${miss ? `（錯了 ${miss} 次）` : '一次就答對！'}</p><p class="ex"><b>課文這樣寫</b>${esc(it.ex)}</p>` : (G.msg ? `<p class="fb no">${esc(G.msg)}</p>` : '');
+  if (it.t === 'hotspot') return `<div class="hot ${done ? 'is-done' : ''}" data-gid="${it.id}">${HAND_SVG(done ? it.target : '')}</div>${fb}`;
+  if (it.t === 'tap') {
+    const sents = splitSents(LESSON.paras[it.para]);
+    return `<p class="muted">第${'一二三四'[it.para]}段：</p><div class="tap-para kai">${sents.map((x, k) => `<button type="button" class="sent ${done && it.a.includes(k) ? 'right' : ''} ${(G.wrong || []).includes(k) ? 'wrong' : ''}" data-gid="${it.id}" data-k="${k}" ${done ? 'disabled' : ''}>${esc(x)}</button>`).join('')}</div>${fb}`;
+  }
+  if (it.t === 'sort') {
+    const placed = G.placed || {}; const order = G.order || (G.order = shuffle(it.cards.map((_, k) => k)));
+    const pool = order.filter(k => placed[k] == null);
+    return `<p class="muted">先點一張卡片，再點它屬於哪一邊。</p>
+      <div class="pool">${pool.map(k => `<button type="button" class="card-chip ${G.sel === k ? 'sel' : ''}" data-gid="${it.id}" data-card="${k}">${esc(it.cards[k][0])}</button>`).join('') || '<span class="muted">全部分好了！</span>'}</div>
+      <div class="buckets">${it.buckets.map((b, bi) => `<button type="button" class="bucket b${bi}" data-gid="${it.id}" data-bucket="${bi}"><b>${esc(b)}</b><span class="bucket-in">${Object.keys(placed).filter(k => placed[k] === bi).map(k => `<span class="placed">${esc(it.cards[k][0])}</span>`).join('')}</span></button>`).join('')}</div>${fb}`;
+  }
+  if (it.t === 'order') {
+    const seq = G.seq || []; const order = G.order || (G.order = shuffle(it.cards.map((_, k) => k)));
+    return `<p class="muted">從第一段開始，依序點卡片。</p>
+      <ol class="seq">${it.cards.map((c, k) => `<li class="${k < seq.length ? 'filled' : ''}"><span class="seq-no">${'一二三四五六'[k]}</span>${k < seq.length ? esc(it.cards[seq[k]]) : '　'}</li>`).join('')}</ol>
+      <div class="pool">${order.filter(k => !seq.includes(k)).map(k => `<button type="button" class="card-chip" data-gid="${it.id}" data-ord="${k}">${esc(it.cards[k])}</button>`).join('')}</div>${fb}`;
+  }
+  return '';
+}
+function gameMiss(rec, it, msg) { rec.extra.gmiss = rec.extra.gmiss || {}; rec.extra.gmiss[it.id] = (rec.extra.gmiss[it.id] || 0) + 1; gameState(rec, it).msg = msg; try { sfx('no'); } catch (e) {} }
+function gameDone(rec, it) { rec.ans[it.id] = 'done'; rec.ok[it.id] = true; if (rec.first[it.id] == null) rec.first[it.id] = !((rec.extra.gmiss || {})[it.id]); gameState(rec, it).msg = ''; try { sfx('win'); } catch (e) {} }
+function bindGames(s, items, rec, rerender) {
+  const find = id => items.find(x => x.id === id);
+  document.querySelectorAll('.hot:not(.is-done) .hs, .hot:not(.is-done) .hand-svg').forEach(el => el.onclick = e => {
+    e.stopPropagation();
+    const box = el.closest('.hot'); const it = find(box.dataset.gid); const part = e.target.closest('[data-part]')?.dataset.part;
+    if (part === it.target) gameDone(rec, it);
+    else gameMiss(rec, it, part === 'spot' ? '這是斑點，再想一想。' : part === 'wrinkle' ? '這是皺紋，再想一想。' : '再找找看，點在手背上的小點或紋路。');
+    queueSave(s.id); rerender();
+  });
+  document.querySelectorAll('.sent[data-gid]').forEach(b => b.onclick = () => {
+    const it = find(b.dataset.gid); const k = +b.dataset.k; const G = gameState(rec, it);
+    if (it.a.includes(k)) gameDone(rec, it); else { G.wrong = [...(G.wrong || []), k]; gameMiss(rec, it, '這一句不是答案，再讀一讀其他句子。'); }
+    queueSave(s.id); rerender();
+  });
+  document.querySelectorAll('[data-card]').forEach(b => b.onclick = () => { const it = find(b.dataset.gid); gameState(rec, it).sel = +b.dataset.card; gameState(rec, it).msg = ''; rerender(); });
+  document.querySelectorAll('[data-bucket]').forEach(b => b.onclick = () => {
+    const it = find(b.dataset.gid); const G = gameState(rec, it); if (G.sel == null) { G.msg = '先點上面的一張卡片。'; return rerender(); }
+    if (it.cards[G.sel][1] === +b.dataset.bucket) { G.placed = Object.assign({}, G.placed, { [G.sel]: +b.dataset.bucket }); G.sel = null; G.msg = ''; try { sfx('ok'); } catch (e) {}
+      if (Object.keys(G.placed).length === it.cards.length) gameDone(rec, it); }
+    else gameMiss(rec, it, `「${it.cards[G.sel][0]}」不是放這邊喔。`);
+    queueSave(s.id); rerender();
+  });
+  document.querySelectorAll('[data-ord]').forEach(b => b.onclick = () => {
+    const it = find(b.dataset.gid); const G = gameState(rec, it); G.seq = G.seq || []; const k = +b.dataset.ord;
+    if (k === G.seq.length) { G.seq = [...G.seq, k]; G.msg = ''; try { sfx('ok'); } catch (e) {} if (G.seq.length === it.cards.length) gameDone(rec, it); }
+    else gameMiss(rec, it, `這張不是第${'一二三四五六'[G.seq.length]}段，再想一想。`);
+    queueSave(s.id); rerender();
+  });
 }
 
 // ===== 生字筆順 =====
@@ -1364,6 +1466,7 @@ function bControl() {
 function cellOf(it, rec) {
   if (!rec) return ['', '·'];
   const v = rec.ans?.[it.id];
+  if (GAME_T.includes(it.t)) { if (!answered(it, rec)) return ['', '·']; return rec.first?.[it.id] ? ['ok', '✓'] : ['no', '✗']; }
   if (it.t === 'match') { if (!answered(it, rec)) return rec.ans?.[it.id] ? ['', '…'] : ['', '·']; return rec.first?.[it.id] ? ['ok', '✓'] : ['no', '✗']; }
   if (it.t === 'self') { const m = rec.self?.[it.id]; return m === '對了' ? ['ok', '✓'] : m === '要訂正' ? ['no', '訂'] : ['', '·']; }
   if (v == null || String(v).trim() === '') return ['', '·'];
@@ -1430,7 +1533,7 @@ function showDetail(seat, sid) {
     <header><h2>${seat} 號・${esc(s.name)}</h2><button class="ghost sm" id="mclose">關閉</button></header>
     ${!r ? '<p class="muted">還沒有作答。</p>' : items.map((it, i) => { const v = r.ans?.[it.id]; const hn = r.hints?.[it.id];
       return `<div class="d-item"><p class="d-q">${i + 1}. ${esc(it.q)}</p>
-        <p>${it.t === 'match' ? (answered(it, r) ? `<span class="mark ${r.first?.[it.id] ? 'ok' : 'no'}">完成</span>錯 ${(r.extra?.mmiss || {})[it.id] || 0} 次` : '<span class="muted">未完成</span>') : it.t === 'self' ? (r.self?.[it.id] ? `<span class="mark ${r.self[it.id] === '對了' ? 'ok' : 'no'}">${r.self[it.id]}</span>` : '<span class="muted">未自評</span>') : it.t === 'mc' ? (v == null ? '<span class="muted">未作答</span>' : `<span class="mark ${cellOf(it, r)[0] === 'ok' ? 'ok' : 'no'}">${esc(it.o[v])}</span>${cellOf(it, r)[0] === 'ok' ? '' : `　正解：${esc(it.o[it.a])}`}`) : (v ? `<span class="answer">${esc(v)}</span>` : '<span class="muted">未作答</span>')}
+        <p>${GAME_T.includes(it.t) ? (answered(it, r) ? `<span class="mark ${r.first?.[it.id] ? 'ok' : 'no'}">完成</span>錯 ${(r.extra?.gmiss || {})[it.id] || 0} 次` : '<span class="muted">未完成</span>') : it.t === 'match' ? (answered(it, r) ? `<span class="mark ${r.first?.[it.id] ? 'ok' : 'no'}">完成</span>錯 ${(r.extra?.mmiss || {})[it.id] || 0} 次` : '<span class="muted">未完成</span>') : it.t === 'self' ? (r.self?.[it.id] ? `<span class="mark ${r.self[it.id] === '對了' ? 'ok' : 'no'}">${r.self[it.id]}</span>` : '<span class="muted">未自評</span>') : it.t === 'mc' ? (v == null ? '<span class="muted">未作答</span>' : `<span class="mark ${cellOf(it, r)[0] === 'ok' ? 'ok' : 'no'}">${esc(it.o[v])}</span>${cellOf(it, r)[0] === 'ok' ? '' : `　正解：${esc(it.o[it.a])}`}`) : (v ? `<span class="answer">${esc(v)}</span>` : '<span class="muted">未作答</span>')}
         ${hn ? `<span class="pill">用了 ${hn} 層提示</span>` : ''}</p>
         ${it.ref ? `<p class="muted">參考：${esc(it.ref)}</p>` : ''}</div>`; }).join('')}
     ${sid === 'pre' && r?.extra?.check ? `<p><b>老師檢核：</b>${CHECK_ITEMS.map(([k, n]) => `${n}：${r.extra.check.items[k]}`).join('；')}</p>` : ''}
