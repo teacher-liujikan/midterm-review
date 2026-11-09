@@ -319,6 +319,12 @@ button.opt{justify-content:center;font-size:1.1rem}button.opt .kai{font-size:1.5
 .ws-w{font-size:1.05rem}.ws-z{font-size:1.1rem}
 .ws-notes{margin:.5em 0;padding-left:1.2em;color:var(--muted)}
 .teach-sec>button{justify-self:start}
+.vthumb{position:relative;border:0;padding:0;border-radius:10px;overflow:hidden;background:#000;margin-bottom:6px;display:block;width:100%}
+.vthumb img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;opacity:.85;max-width:100%}
+.vthumb span{position:absolute;inset:auto 8px 8px auto;background:rgba(0,0,0,.65);color:#fff;border-radius:999px;padding:.15em .7em;font-size:.85rem}
+.vbox2{background:#000;border-radius:14px;overflow:hidden;width:min(92vw,820px)}
+.vhead2{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:#fff;color:#1f2b3d}.vhead2 b{font-size:1.3rem}
+.vbox2 video{width:100%;display:block;max-height:75vh;background:#000}
 /* 老師預覽 */
 .pv-form{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}.pv-form input{padding:.4em .6em;border:1.5px solid var(--line);border-radius:8px;width:9em}
 .pv-tag{background:var(--accent);color:var(--accent-ink);border-radius:999px;padding:.1em .7em;font-size:.85rem}
@@ -387,7 +393,7 @@ const LESSON = {
 
 // 生字：字、注音、部首、部首外筆畫、總筆畫、造詞、延伸成語、寫字提醒
 const CHARS = [
-  ['背','ㄅㄟˋ','肉',5,9,['背面','背部'],'離鄉背井','第五筆是「豎曲鉤」。'],
+  ['背','ㄅㄟˋ','肉',5,9,['背面','背部'],'','第五筆是「豎曲鉤」。'],
   ['斑','ㄅㄢ','文',8,12,['斑駁','斑馬'],'','左中右結構，左邊「王」的末筆是「挑」。'],
   ['皺','ㄓㄡˋ','皮',10,15,['皺眉','皺褶'],'','左邊的包字頭裡面，不是「山」。'],
   ['淘','ㄊㄠˊ','水',8,11,['淘金','淘空'],'','右邊「勹」是「撇、橫折鉤」；裡面是「缶」。'],
@@ -413,8 +419,10 @@ const WORDS = [
   ['藝術家','從事藝術工作而有相當成就的人。','美術館裡，藝術家正在向大家介紹自己的作品。'],['創意','表現出新意與巧思。','這學期的環境布置比賽，我們班獲得最佳創意獎。']
 ];
 
+// 成語動畫（老師自製，放在成語練功房網站）
+const IDIOM_VIDEO = { '自命不凡': 'ziming-bufan', '笑裡藏刀': 'xiaoli-cangdao', '不學無術': 'buxue-wushu' };
+const VIDEO_BASE = 'https://teacher-liujikan.github.io/idiompractice/videos/';
 const IDIOMS = [
-  ['離鄉背井','離開故鄉，在外地生活。','叔叔離鄉背井到外地打拚多年，終於有所成就。'],
   ['自命不凡','自以為聰明、不平凡。','雖然爺爺是醫學界的權威，但他為人謙虛，從不自命不凡。'],
   ['笑裡藏刀','外表和善可親，內心卻陰險狠毒。','他是個笑裡藏刀的人，得小心應付。'],
   ['不學無術','沒有學問，也沒有才能、技術。','原本不學無術的小虎，經歷這次教訓後，刻苦自學。']
@@ -466,7 +474,7 @@ const STAGES = [
       { id: 't5', t: 'mc', part: 'sound', q: '「收藏」的「藏」怎麼念？', o: ['ㄘㄤˊ', 'ㄗㄤˋ'], a: 0, ex: '收存、躲起來念ㄘㄤˊ；珍藏的寶物念ㄗㄤˋ，例如寶藏。' },
       { id: 't6', t: 'mc', part: 'word', q: '「藝術家」是什麼意思？', o: ['很會畫畫的小朋友', '從事藝術工作而有相當成就的人', '賣畫的店'], a: 1, ex: '藝術家：從事藝術工作而有相當成就的人。' },
       { id: 't7', t: 'mc', part: 'word', q: '「不一會兒就變成美麗的窗花」，「不一會兒」是多久？', o: ['很久很久', '沒過多少時間', '一個晚上'], a: 1, ex: '不一會兒：沒過多少時間。' },
-      { id: 't8', t: 'mc', part: 'idiom', q: '「叔叔離開家鄉，到外地打拚多年」可以用哪個成語？', o: ['離鄉背井', '笑裡藏刀', '自命不凡'], a: 0, ex: '離鄉背井：離開故鄉，在外地生活。' }
+      { id: 't8', t: 'mc', part: 'idiom', q: '「表面對你笑嘻嘻，心裡卻想害你」可以用哪個成語？', o: ['笑裡藏刀', '自命不凡', '不學無術'], a: 0, ex: '笑裡藏刀：笑容的後面藏著刀，形容外表和善、內心陰險。' }
     ] },
   { id: 'vtest', sec: '生字語詞', name: '生字語詞檢測', when: '第2節', group: 'v',
     intro: '先看語詞卡，再挑戰 8 題檢測。做完會分成三組，接著依組別練習。',
@@ -504,10 +512,10 @@ const STAGES = [
       ],
       C: [
         { id: 'gc1', t: 'mc', q: '「笑裡藏刀」是什麼意思？', o: ['笑的時候要小心刀子', '外表和善，內心卻陰險', '把刀子藏起來', '很會說笑話'], a: 1, ex: '笑容後面藏著刀，形容外貌和善、內心陰險。' },
-        { id: 'gc2', t: 'mc', q: '「離鄉背井」是什麼意思？', o: ['離開故鄉，在外地生活', '背著水井走路', '離家出走', '搬到隔壁住'], a: 0, ex: '離開故鄉，在外地生活。' },
+        { id: 'gc2', t: 'mc', q: '「不學無術」是什麼意思？', o: ['沒有學問，也沒有本領', '不想學魔術', '學習很認真', '很會變魔術'], a: 0, ex: '不學無術：沒有學問，也沒有才能、技術。' },
         { id: 'gc3', t: 'mc', q: '「他從來不自命不凡」說明他是怎樣的人？', o: ['很驕傲', '很謙虛', '很平凡', '很淘氣'], a: 1, ex: '自命不凡是自以為了不起；「從不」自命不凡，就是謙虛。' },
         { id: 'gc4', t: 'mc', q: '哪一句的成語用對了？', o: ['他不學無術，所以考了一百分。', '他從小不學無術，長大才努力學習。', '奶奶不學無術，剪出美麗的窗花。', '老師不學無術，教我們好多知識。'], a: 1, ex: '不學無術是沒有學問也沒有才能，後面接「才努力學習」才合理。' },
-        { id: 'gc5', t: 'text', q: '選一個成語（離鄉背井、自命不凡、笑裡藏刀、不學無術）造一個句子。', wall: true },
+        { id: 'gc5', t: 'text', q: '選一個成語（自命不凡、笑裡藏刀、不學無術）造一個句子。', wall: true },
         { id: 'gc6', t: 'text', q: '「藏」有兩個念法：ㄘㄤˊ 和 ㄗㄤˋ。請各寫一個語詞。（例：ㄘㄤˊ：____；ㄗㄤˋ：____）', wall: true }
       ]
     } },
@@ -735,6 +743,16 @@ function showQR() {
   d.onclick = e => { if (e.target === d || e.target.tagName === 'BUTTON') d.remove(); };
   document.body.appendChild(d);
 }
+// ===== 成語動畫 =====
+function openVideo(w) {
+  const f = IDIOM_VIDEO[w]; if (!f) return;
+  const d = document.createElement('div'); d.className = 'qr-overlay';
+  d.innerHTML = `<div class="vbox2" role="dialog" aria-label="${w} 成語動畫"><div class="vhead2"><b class="kai">${w}</b><button type="button" class="ghost sm">關閉</button></div><video src="${VIDEO_BASE}${f}.mp4" poster="${VIDEO_BASE}${f}.jpg" controls autoplay playsinline></video></div>`;
+  const close = () => { const v = d.querySelector('video'); if (v) v.pause(); d.remove(); };
+  d.onclick = e => { if (e.target === d || e.target.tagName === 'BUTTON') close(); };
+  document.body.appendChild(d);
+}
+document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-video]'); if (b && document.getElementById('app').contains(b)) { e.preventDefault(); openVideo(b.dataset.video); } });
 // ===== 畫面：登入 =====
 function renderLogin() {
   const app = $('#app');
@@ -949,12 +967,12 @@ function teachBody(s, rec) {
     <button type="button" class="ghost sm" data-ws="wsLook">${openL ? '隱藏答案' : '看答案'}</button>
     ${openL ? `<ul class="ws-notes">${LOOKALIKE.map(([a, b, tip]) => `<li><b class="kai">${a[0]}／${b[0]}</b>：${esc(tip)}</li>`).join('')}</ul>` : ''}`;
   const words = `<div class="word-grid">${WORDS.map(([w, m, e]) => `<div class="word"><div class="word-top"><b class="kai">${esc(w)}</b><button type="button" class="say" data-say="${esc(w + '。' + (e || ''))}" aria-label="念「${esc(w)}」">念</button></div><span>${esc(m)}</span>${e ? `<span class="eg kai">${esc(e)}</span>` : ''}</div>`).join('')}</div>`;
-  const idioms = `<div class="idiom-grid">${IDIOMS.map(([w, m, e]) => `<div class="idiom-card"><b class="kai">${w}</b><span>${esc(m)}</span><span class="eg kai">${esc(e)}</span></div>`).join('')}</div>`;
+  const idioms = `<div class="idiom-grid">${IDIOMS.map(([w, m, e]) => `<div class="idiom-card">${IDIOM_VIDEO[w] ? `<button type="button" class="vthumb" data-video="${w}" aria-label="看「${w}」動畫"><img src="${VIDEO_BASE}${IDIOM_VIDEO[w]}.jpg" alt="" loading="lazy"><span>🎬 看動畫</span></button>` : ''}<b class="kai">${w}</b><span>${esc(m)}</span><span class="eg kai">${esc(e)}</span></div>`).join('')}</div>`;
   return `<form id="qform">
     ${sec('一、多音字練習', '同一個字，放在不同的語詞裡，念法和意思會不同。', poly, 'sound')}
     ${sec('二、分辨形近字', '長得很像的字，只要一個部件不同，意思就不一樣。', look, 'look')}
     ${sec('語詞', '先讀解釋，再讀例句。按「念」可以聽讀音。', words, 'word')}
-    ${sec('延伸成語', '每個成語都藏著一個本課生字。', idioms, 'idiom')}
+    ${sec('延伸成語', '每個成語都藏著一個本課生字。先看動畫，再讀解釋和例句。', idioms, 'idiom')}
     <div class="submit-row">${rec.done ? '<span class="pill ok">已完成這一關</span>' : '<button class="primary" type="submit">完成這一關</button>'}<span class="muted" id="left"></span></div>
   </form>`;
 }
@@ -1691,7 +1709,7 @@ const IDIOM_MODE = { comic: '情境漫畫', exp: '看解釋選成語', sent: '�
 function idiomGame() {
   const b = myRec('bonus').extra.idiom || {};
   const done = Object.entries(b).map(([k, v]) => `${IDIOM_MODE[k] || k} ${v.score}/${v.total}`).join('、');
-  $('#game').innerHTML = `<p class="muted">四個延伸成語：離鄉背井、自命不凡、笑裡藏刀、不學無術。${done ? `已完成：${done}` : ''}</p>
+  $('#game').innerHTML = `<p class="muted">本課延伸成語，課本成語（自命不凡、笑裡藏刀、不學無術）都有動畫。${done ? `已完成：${done}` : ''}</p>
     <iframe class="idiom-frame" src="idiom7.html" title="第七課成語練功房"></iframe>`;
 }
 window.addEventListener('message', e => {
