@@ -472,7 +472,7 @@ const GROUPS = {
 // 題目型別：mc 選擇、text 簡答／造句（進作品牆）
 const STAGES = [
   { id: 'pre', sec: '預習', name: '預習單', when: '第1節', review: true,
-    intro: '先完成生字描寫，再做預習單。每一題選好答案後按「看答案」，看完詳解再做下一題。',
+    intro: '先完成生字描寫和圈詞，再讀課文、回答問題。每一題點一下就會對答案。',
     items: [
       { id: 'genre', t: 'mc', q: '這一課的文體是什麼？', o: ['記敘文', '應用文', '童詩'], a: 0, ex: '這一課記下作者和奶奶相處的事，是記敘文本。' },
       { id: 'para', t: 'mc', q: '這一課共有幾個自然段？', o: ['三段', '四段', '五段'], a: 1, ex: '每一段開頭空兩格的地方，就是新的自然段。按上面的「顯示自然段編號」，對照你在課本標的段落。' },
@@ -1602,11 +1602,11 @@ function preReviewBody(s) {
   const seen = rec.extra.seen || {};
   const marked = rec.extra.marked || [];
   const CIRC = '①②③④';
-  const mcCard = (it, no) => { const v = rec.ans[it.id]; const sn = seen[it.id]; return `<div class="q self-q" data-id="${it.id}">
+  const mcCard = (it, no) => { const v = rec.ans[it.id]; const sn = seen[it.id] && v != null; return `<div class="q self-q" data-id="${it.id}">
       <p class="sq"><span class="qno">${no}</span>${esc(it.q)}</p>
-      <div class="opts">${it.o.map((o, k) => `<label class="opt ${v === k ? 'sel' : ''} ${sn ? (k === it.a ? 'right' : v === k ? 'wrong' : '') : ''}"><input type="radio" name="${it.id}" value="${k}" ${v === k ? 'checked' : ''} ${sn ? 'disabled' : ''}><span>${CIRC[k]} ${esc(o)}</span></label>`).join('')}</div>
-      ${sn ? `<p class="fb ${v === it.a ? 'ok' : 'no'}">${v === it.a ? '答對了！' : `答錯了，正確答案是 ${CIRC[it.a]}。`}</p><p class="ex"><b>詳解</b>${esc(it.ex)}</p>`
-        : `<button type="button" class="ghost sm" data-see="${it.id}" ${v == null ? 'disabled' : ''}>看答案</button>`}
+      <div class="opts">${it.o.map((o, k) => `<label class="opt ${sn ? (k === it.a ? 'right' : v === k ? 'wrong' : '') : ''}"><input type="radio" name="${it.id}" value="${k}" ${v === k ? 'checked' : ''} ${sn ? 'disabled' : ''}><span>${CIRC[k]} ${esc(o)}</span></label>`).join('')}</div>
+      ${sn ? (v === it.a ? `<p class="fb ok">答對了！${esc(it.ex)}</p>`
+        : `<p class="fb no">答錯了。正確答案是 <b>${CIRC[it.a]} ${esc(it.o[it.a])}</b>。</p><p class="ex"><b>為什麼</b>${esc(it.ex)}</p>`) : ''}
     </div>`; };
   const step = (n, title, inner, done) => `<section class="step ${done ? 'is-done' : ''}"><header class="step-head"><span class="step-no">${n}</span><h2>${title}</h2>${done ? '<span class="pill ok">完成</span>' : ''}</header>${inner}</section>`;
   return `
@@ -1632,7 +1632,7 @@ function preReviewBody(s) {
   ${step(4, '自然段', `<p>在課本上標出自然段，再回答這一題。按「顯示自然段編號」可以對照答案。</p>
     <button type="button" class="${rec.extra.showNo ? 'ghost' : 'primary'}" id="showNo">${rec.extra.showNo ? '隱藏自然段編號' : '顯示自然段編號'}</button>
     <div class="qlist">${mcCard(para, 1)}</div>`, !!seen[para.id])}
-  ${step(5, '課文問答', `<p>在課文裡找答案，選好再按「看答案」。答錯的看完詳解，回課文找一找。</p>
+  ${step(5, '課文問答', `<p>在課文裡找答案，點一下就會對答案。答錯的看看為什麼，再回課文找一找。</p>
     <div class="qlist">${rest.map((it, i) => mcCard(it, i + 2)).join('')}</div>`, rest.every(it => seen[it.id]))}
   </div>
   <div class="submit-row">${rec.done ? teacherCheckPanel(rec)
@@ -1644,7 +1644,9 @@ function bindPreReview(s) {
   const vb = $('#vbook'); if (vb && !vb.dataset.init) { vb.scrollLeft = vb.scrollWidth; vb.dataset.init = 1; }
   document.querySelectorAll('input[type=radio]').forEach(r => r.onchange = () => {
     const it = s.items.find(i => i.id === r.name); const k = +r.value;
-    rec.ans[it.id] = k; rec.ok[it.id] = k === it.a; if (rec.first[it.id] == null && it.id === 'genre') rec.first.genre = rec.ok.genre;
+    if (it.id !== 'genre' && (rec.extra.seen || {})[it.id]) return;
+    rec.ans[it.id] = k; rec.ok[it.id] = k === it.a; if (rec.first[it.id] == null) rec.first[it.id] = rec.ok[it.id];
+    if (it.id !== 'genre') { rec.extra.seen = Object.assign({}, rec.extra.seen, { [it.id]: true }); rec.self[it.id] = k === it.a ? '對了' : '要訂正'; try { sfx(k === it.a ? 'ok' : 'no'); } catch (e) {} }
     queueSave(s.id); rerender();
   });
   document.querySelectorAll('[data-play]').forEach(b => b.onclick = () => togglePlay(+b.dataset.play));
