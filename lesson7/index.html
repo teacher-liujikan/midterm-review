@@ -306,6 +306,23 @@ button.opt{justify-content:center;font-size:1.1rem}button.opt .kai{font-size:1.5
 @media (max-width:640px){.qr-btn svg{width:60px;height:60px}}
 .circle-ans{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 4px}
 .cw{border:2px solid var(--accent);border-radius:999px;padding:.1em .7em;font-size:1.2rem}
+/* 生字教學學習單 */
+.ws-grid{display:flex;flex-wrap:wrap;gap:12px;margin:8px 0}
+.ws-pair{display:flex;gap:6px}
+.ws-card{border:1.5px solid var(--ink);border-radius:6px;background:var(--card);display:grid;min-width:150px}
+.ws-row{display:grid;grid-template-columns:3.2em 1fr;border-top:1px solid var(--ink)}.ws-row:first-child{border-top:0}
+.ws-lab{font-size:.85rem;color:var(--muted);display:grid;place-items:center;border-right:1px solid var(--ink);padding:.3em}
+.ws-c{font-size:2rem;text-align:center;padding:.15em}
+.ws-cells{display:grid;grid-auto-flow:column;grid-auto-columns:1fr}
+.ws-cells>span{min-height:2.4em;display:grid;place-items:center;padding:.2em .4em;text-align:center;color:var(--accent)}
+.ws-cells>span+span{border-left:1px solid var(--ink)}
+.ws-w{font-size:1.05rem}.ws-z{font-size:1.1rem}
+.ws-notes{margin:.5em 0;padding-left:1.2em;color:var(--muted)}
+.teach-sec>button{justify-self:start}
+/* 老師預覽 */
+.pv-form{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}.pv-form input{padding:.4em .6em;border:1.5px solid var(--line);border-radius:8px;width:9em}
+.pv-tag{background:var(--accent);color:var(--accent-ink);border-radius:999px;padding:.1em .7em;font-size:.85rem}
+.pv-switch{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0}.pv-switch .label{margin:0}
 /* 老師檢核 */
 .check-panel{display:grid;gap:12px;width:100%}
 .check-call{background:var(--warn-soft);border-radius:12px;padding:14px 18px;margin:0;font-size:1.15rem}
@@ -404,18 +421,15 @@ const IDIOMS = [
 ];
 
 // 生字教學：形近字、一字多音（依課本字音字形辨析與加油小站）
-const LOOKALIKE = [
-  [['斑','ㄅㄢ','雀斑、斑點'],['班','ㄅㄢ','班級、班長'],'中間不一樣：「斑」是「文」，「班」是一把刀。'],
-  [['夾','ㄐㄧㄚˊ','夾縫、髮夾'],['來','ㄌㄞˊ','來回、回來'],'「夾」中間是大「人」，左右各一個小「人」。'],
-  [['淘','ㄊㄠˊ','淘汰、淘氣'],['陶','ㄊㄠˊ','陶土、陶藝'],'念法一樣，部首不同：淘是水部，陶是阜部（左耳）。'],
-  [['梳','ㄕㄨ','梳理、梳子'],['流','ㄌㄧㄡˊ','流浪、流水'],'右邊很像；梳子多是木頭做的，所以是木部。'],
-  [['摺','ㄓㄜˊ','摺衣服、摺紙'],['習','ㄒㄧˊ','學習、練習'],'摺要用手，左邊多了提手旁。'],
-  [['術','ㄕㄨˋ','美術、魔術'],['街','ㄐㄧㄝ','街道、逛街'],'都是行部；中間「朮」是術，兩個「土」是街。']
-];
+// 依老師的學習單：一、多音字練習（背、藏）　二、分辨形近字（斑／班、夾／來、術／街）
 const POLY = [
-  ['背',[['ㄅㄟˋ','背景、手背','身體胸部的後面；物體的反面'],['ㄅㄟ','背包、背書包','用背來負荷東西']]],
-  ['藏',[['ㄘㄤˊ','收藏、隱藏','收存；躲起來不被發現'],['ㄗㄤˋ','寶藏','珍藏的貴重物品']]],
-  ['創',[['ㄔㄨㄤˋ','開創、創意','開始做以前沒有的事'],['ㄔㄨㄤ','創傷','受傷的地方']]]
+  ['背',[['ㄅㄟˋ','手背、背景、背面','身體胸部的後面；物體的反面'],['ㄅㄟ','背包、背書包','用背來負荷東西']]],
+  ['藏',[['ㄘㄤˊ','收藏、隱藏、捉迷藏','收存；躲起來不被發現'],['ㄗㄤˋ','寶藏','珍藏的貴重物品']]]
+];
+const LOOKALIKE = [
+  [['斑','ㄅㄢ','斑點、雀斑、斑馬'],['班','ㄅㄢ','班級、班長'],'中間不一樣：「斑」是「文」，「班」是一把刀。'],
+  [['夾','ㄐㄧㄚˊ','髮夾、皮夾、夾縫'],['來','ㄌㄞˊ','回來、來回'],'「夾」中間是大「人」，左右各一個小「人」。'],
+  [['術','ㄕㄨˋ','美術、魔術、藝術'],['街','ㄐㄧㄝ','街道、逛街'],'都是行部；中間「朮」是術，兩個「土」是街。']
 ];
 
 // 分組名稱（學生只看得到自己的組名；程度對應只在教師端出現）
@@ -447,7 +461,7 @@ const STAGES = [
     items: [
       { id: 't1', t: 'mc', part: 'look', q: '「斑」和「班」哪裡不一樣？', o: ['「斑」中間是「文」，「班」中間是一把刀', '兩個字完全一樣', '「斑」左邊沒有「王」'], a: 0, ex: '斑點的「斑」中間是「文」；班級的「班」中間是一把刀「刂」。' },
       { id: 't2', t: 'mc', part: 'look', q: '奶奶「＿」著頭髮，梳得整整齊齊。', o: ['來', '夾'], a: 1, ex: '「夾」中間是大「人」，兩邊各一個小「人」；「來」是從別處到這裡。' },
-      { id: 't3', t: 'mc', part: 'look', q: '用黏土做「＿」藝作品。', o: ['淘', '陶'], a: 1, ex: '「陶」是陶土、陶藝；「淘」是淘氣、淘汰。' },
+      { id: 't3', t: 'mc', part: 'look', q: '放學後，我們一起去逛「＿」。', o: ['術', '街'], a: 1, ex: '「街」中間是兩個「土」；「術」中間是「朮」，例如美術、魔術。' },
       { id: 't4', t: 'mc', part: 'sound', q: '「背景」的「背」怎麼念？', o: ['ㄅㄟˋ', 'ㄅㄟ'], a: 0, ex: '背景、手背念ㄅㄟˋ；背包、背書包念ㄅㄟ。' },
       { id: 't5', t: 'mc', part: 'sound', q: '「收藏」的「藏」怎麼念？', o: ['ㄘㄤˊ', 'ㄗㄤˋ'], a: 0, ex: '收存、躲起來念ㄘㄤˊ；珍藏的寶物念ㄗㄤˋ，例如寶藏。' },
       { id: 't6', t: 'mc', part: 'word', q: '「藝術家」是什麼意思？', o: ['很會畫畫的小朋友', '從事藝術工作而有相當成就的人', '賣畫的店'], a: 1, ex: '藝術家：從事藝術工作而有相當成就的人。' },
@@ -580,6 +594,7 @@ const DEMO_KEY = '1234';
 // 連不上後台時的備用設定：預設開放第 1 節的關卡；老師檢核改用下面這組檢核碼
 const OFFLINE_UNLOCK = ['pre', 'stroke', 'vteach', 'bonus'];
 const CHECK_PIN = '0000';
+const PREVIEW_PIN = '1122'; // 老師預覽：輸入後可看到全部關卡（不記錄作答）
 const DEFAULT_CLASS = '三甲';
 
 // ===== 小工具 =====
@@ -671,6 +686,7 @@ function myRec(stageId) {
 let saveTimers = {};
 function queueSave(stageId, now) {
   const rec = myRec(stageId); rec.t = Date.now();
+  if (st.preview) return;
   pending[stageId] = rec; LS.set('l7-pending', pending);
   LS.set(`l7-me-${st.cls}-${st.seat}`, st.recs);
   clearTimeout(saveTimers[stageId]);
@@ -703,8 +719,9 @@ async function refreshMine() {
     return true;
   } catch (e) { return false; }
 }
-function isOpen(id) { return (st.cfg ? (st.cfg.unlocked || []) : OFFLINE_UNLOCK).includes(id); }
+function isOpen(id) { if (st.preview) return true; return (st.cfg ? (st.cfg.unlocked || []) : OFFLINE_UNLOCK).includes(id); }
 function myGroup(diff) {
+  if (st.preview) return st.pvGroup || 'A';
   const ov = st.cfg?.ov?.[diff];
   if (ov) return ov;
   const test = STAGES.find(s => s.group === diff);
@@ -733,6 +750,8 @@ function renderLogin() {
       <p class="label">點你的座號</p>
       <div class="seat-grid">${seats.map(n => `<button class="seat" data-seat="${n}" ${n > 16 ? 'hidden' : ''}>${n}</button>`).join('')}</div>
       <button class="link-btn" id="moreSeats">座號超過 16 號</button>
+      <button class="link-btn" id="toPreview">老師預覽全部關卡</button>
+      <form class="pv-form" id="pvForm" hidden><input id="pvPin" type="password" inputmode="numeric" placeholder="輸入密碼" autocomplete="off"><button class="primary sm" type="submit">進入預覽</button><span class="err" id="pvErr"></span></form>
       <button class="link-btn" id="toTeacher">老師登入</button>
       ${DEMO ? '<p class="demo-note">示範模式：資料只存在這台裝置。教師密碼 1234。</p>' : ''}
     </div>
@@ -745,6 +764,13 @@ function renderLogin() {
   });
   $('#toTeacher').onclick = () => renderTeacherLogin();
   $('#qrBtn').onclick = showQR;
+  $('#toPreview').onclick = () => { $('#pvForm').hidden = false; $('#pvPin').focus(); };
+  $('#pvForm').onsubmit = (e) => {
+    e.preventDefault();
+    if ($('#pvPin').value !== PREVIEW_PIN) { $('#pvErr').textContent = '密碼不對。'; return; }
+    st.cls = $('#cls').value.trim() || DEFAULT_CLASS; st.seat = 'T'; st.role = 'student'; st.preview = true; st.recs = {};
+    go('home');
+  };
   $('#moreSeats').onclick = () => { app.querySelectorAll('.seat[hidden]').forEach(b => b.hidden = false); $('#moreSeats').hidden = true; };
 }
 
@@ -752,8 +778,8 @@ function renderLogin() {
 function stageStatus(s) {
   const r = st.recs[s.id];
   if (!isOpen(s.id)) return ['lock', '未開放'];
-  if (s.id === 'review') return st.recs.post?.done ? (r?.done ? ['done', '完成'] : ['go', '可以開始']) : ['lock', '先完成後測'];
-  if (s.bonus) { if (!st.recs.pre?.done) return ['lock', '先完成預習單']; if (!st.recs.pre?.extra?.check?.ok) return ['lock', '等老師檢核']; const b = r?.extra || {}; const n = (b.radical?.done ? 1 : 0) + (b.diff?.done ? 1 : 0) + (Object.keys(b.strokes || {}).length ? 1 : 0) + (Object.keys(b.idiom || {}).length ? 1 : 0); return n ? ['doing', `玩了 ${n} / 4 個`] : ['go', '可以開始']; }
+  if (s.id === 'review') return st.preview ? ['go', '預覽'] : st.recs.post?.done ? (r?.done ? ['done', '完成'] : ['go', '可以開始']) : ['lock', '先完成後測'];
+  if (s.bonus) { if (!st.preview && !st.recs.pre?.done) return ['lock', '先完成預習單']; if (!st.preview && !st.recs.pre?.extra?.check?.ok) return ['lock', '等老師檢核']; const b = r?.extra || {}; const n = (b.radical?.done ? 1 : 0) + (b.diff?.done ? 1 : 0) + (Object.keys(b.strokes || {}).length ? 1 : 0) + (Object.keys(b.idiom || {}).length ? 1 : 0); return n ? ['doing', `玩了 ${n} / 4 個`] : ['go', '可以開始']; }
   if (s.id === 'stroke') { const n = (r?.extra?.written || []).length; return n >= CHARS.length ? ['done', '完成'] : n ? ['doing', `${n}/15`] : ['go', '可以開始']; }
   if (s.review && r?.done && !r.extra?.check?.ok) return ['wait', r.extra?.check ? '要訂正' : '等老師檢核'];
   if (r?.done) return ['done', '完成'];
@@ -793,7 +819,7 @@ function renderHome() {
 function topbar() {
   return `<header class="topbar"><div class="topbar-in">
     <button class="brand" id="home"><span class="kai">第${LESSON.no}課</span> ${esc(LESSON.title)}</button>
-    <span class="me">${esc(st.cls)}・${st.seat} 號</span>
+    <span class="me">${st.preview ? '<b class="pv-tag">老師預覽</b>' : `${esc(st.cls)}・${st.seat} 號`}</span>
     <span id="sync" class="sync" data-s="${st.sync}"></span>
     <button class="qr-mini" id="qrTop" aria-label="顯示網址 QR code">${QR_SVG}</button>
     <button class="ghost" id="logout">登出</button>
@@ -802,7 +828,7 @@ function topbar() {
 function bindTop() {
   $('#home').onclick = () => go('home');
   $('#qrTop').onclick = showQR;
-  $('#logout').onclick = () => { LS.set('l7-login', null); st.role = null; renderLogin(); };
+  $('#logout').onclick = () => { LS.set('l7-login', null); st.role = null; st.preview = false; renderLogin(); };
   setSync(st.sync);
 }
 
@@ -879,13 +905,14 @@ function itemsBody(s) {
     group = myGroup(s.diff);
     if (!group) return `<div class="notice">老師還沒幫你分組，請等一下再回來。</div>`;
   }
+  const pvSwitch = st.preview && s.diff ? `<div class="pv-switch"><span class="label">預覽組別</span>${Object.entries(GROUPS).map(([k, g]) => `<button type="button" class="chip ${group === k ? 'on' : ''}" data-pvg="${k}">${g.name}（${g.level}）</button>`).join('')}</div>` : '';
   const items = itemsFor(s, group);
   const isTest = !!(s.group || s.test);
   const locked = rec.done && isTest;
   const top = [
     s.showText ? textBlock(s.wordMark) : '',
     s.showWords ? wordCards() : '',
-    group ? `<div class="group-banner g-${GROUPS[group].tone}"><span>你的組別</span><strong>${GROUPS[group].name}</strong></div>` : ''
+    pvSwitch, group ? `<div class="group-banner g-${GROUPS[group].tone}"><span>你的組別</span><strong>${GROUPS[group].name}</strong></div>` : ''
   ].join('');
   if (s.teach) return teachBody(s, rec);
   if (locked) {
@@ -909,15 +936,23 @@ function teachBody(s, rec) {
   const qs = part => s.items.filter(it => it.part === part).map(it => qHtml(s, it, n++, rec)).join('');
   const sec = (title, sub, cards, part) => `<section class="teach-sec"><header class="teach-head"><h2>${title}</h2><p class="muted">${sub}</p></header>${cards}
     <p class="label try">試試看</p><div class="qlist">${qs(part)}</div></section>`;
-  const look = `<div class="pair-grid">${LOOKALIKE.map(([a, b, tip]) => `<div class="pair">
-      <div class="pair-chars">${[a, b].map(([c, z, w]) => `<div class="pc"><span class="kai pc-c">${c}</span><span class="zy">${z}</span><span class="kai pc-w">${w}</span></div>`).join('<span class="vs">／</span>')}</div>
-      <p class="pair-tip">${esc(tip)}</p></div>`).join('')}</div>`;
-  const poly = `<div class="poly-grid">${POLY.map(([c, rs]) => `<div class="poly"><span class="kai poly-c">${c}</span><div class="poly-rows">${rs.map(([z, w, m]) => `<div class="poly-r"><span class="zy poly-z">${z}</span><span><b class="kai">${w}</b><br><span class="muted">${esc(m)}</span></span></div>`).join('')}</div></div>`).join('')}</div>`;
+  const ws = (c, rows, open) => `<div class="ws-card"><div class="ws-row ws-head"><span class="ws-lab">國字</span><span class="kai ws-c">${c}</span></div>
+      <div class="ws-row"><span class="ws-lab">讀音</span><span class="ws-cells">${rows.map(r => `<span class="zy ws-z">${open ? r[0] : '　'}</span>`).join('')}</span></div>
+      <div class="ws-row"><span class="ws-lab">造詞</span><span class="ws-cells">${rows.map(r => `<span class="kai ws-w">${open ? r[1] : ''}</span>`).join('')}</span></div></div>`;
+  const openP = !!rec.extra.wsPoly, openL = !!rec.extra.wsLook;
+  const poly = `<p class="muted">先在學習單上寫注音、造詞，寫好再按「看答案」對對看。</p>
+    <div class="ws-grid">${POLY.map(([c, rs]) => ws(c, rs, openP)).join('')}</div>
+    <button type="button" class="ghost sm" data-ws="wsPoly">${openP ? '隱藏答案' : '看答案'}</button>
+    ${openP ? `<ul class="ws-notes">${POLY.map(([c, rs]) => `<li><b class="kai">${c}</b>：${rs.map(r => `${r[0]} ${esc(r[2])}`).join('；')}</li>`).join('')}</ul>` : ''}`;
+  const look = `<p class="muted">先在學習單上寫注音、造詞，寫好再按「看答案」對對看。</p>
+    <div class="ws-grid">${LOOKALIKE.map(([a, b]) => `<div class="ws-pair">${ws(a[0], [[a[1], a[2]]], openL)}${ws(b[0], [[b[1], b[2]]], openL)}</div>`).join('')}</div>
+    <button type="button" class="ghost sm" data-ws="wsLook">${openL ? '隱藏答案' : '看答案'}</button>
+    ${openL ? `<ul class="ws-notes">${LOOKALIKE.map(([a, b, tip]) => `<li><b class="kai">${a[0]}／${b[0]}</b>：${esc(tip)}</li>`).join('')}</ul>` : ''}`;
   const words = `<div class="word-grid">${WORDS.map(([w, m, e]) => `<div class="word"><div class="word-top"><b class="kai">${esc(w)}</b><button type="button" class="say" data-say="${esc(w + '。' + (e || ''))}" aria-label="念「${esc(w)}」">念</button></div><span>${esc(m)}</span>${e ? `<span class="eg kai">${esc(e)}</span>` : ''}</div>`).join('')}</div>`;
   const idioms = `<div class="idiom-grid">${IDIOMS.map(([w, m, e]) => `<div class="idiom-card"><b class="kai">${w}</b><span>${esc(m)}</span><span class="eg kai">${esc(e)}</span></div>`).join('')}</div>`;
   return `<form id="qform">
-    ${sec('字字有細節', '長得很像的字，只要一個部件不同，意思就不一樣。', look, 'look')}
-    ${sec('一字多音', '同一個字，放在不同的語詞裡，念法和意思會不同。', poly, 'sound')}
+    ${sec('一、多音字練習', '同一個字，放在不同的語詞裡，念法和意思會不同。', poly, 'sound')}
+    ${sec('二、分辨形近字', '長得很像的字，只要一個部件不同，意思就不一樣。', look, 'look')}
     ${sec('語詞', '先讀解釋，再讀例句。按「念」可以聽讀音。', words, 'word')}
     ${sec('延伸成語', '每個成語都藏著一個本課生字。', idioms, 'idiom')}
     <div class="submit-row">${rec.done ? '<span class="pill ok">已完成這一關</span>' : '<button class="primary" type="submit">完成這一關</button>'}<span class="muted" id="left"></span></div>
@@ -944,6 +979,8 @@ function qHtml(s, it, i, rec) {
   </fieldset>`;
 }
 function bindItems(s) {
+  document.querySelectorAll('[data-pvg]').forEach(b => b.onclick = () => { st.pvGroup = b.dataset.pvg; const y = scrollY; renderStage(); scrollTo(0, y); });
+  document.querySelectorAll('[data-ws]').forEach(b => b.onclick = () => { const r = myRec(s.id); r.extra[b.dataset.ws] = !r.extra[b.dataset.ws]; queueSave(s.id); const y = scrollY; renderStage(); scrollTo(0, y); });
   const form = $('#qform'); if (!form) return;
   const rec = myRec(s.id);
   const isTest = !!(s.group || s.test);
@@ -1058,7 +1095,8 @@ function bindStroke() {
 
 // ===== 後測檢討 =====
 function reviewBody() {
-  const post = st.recs.post; const s = stageById('post');
+  let post = st.recs.post; const s = stageById('post');
+  if (st.preview && !post?.done) post = { done: true, score: 0, max: s.items.length, ans: {}, ok: {} };
   if (!post?.done) return `<div class="notice">先完成後測，才能看檢討。</div>`;
   const rec = myRec('review');
   const wrong = s.items.filter(it => !post.ok[it.id]);
@@ -1628,7 +1666,7 @@ const DIFF_Q = [
 const bonusState = { tab: 'radical', rad: null, diff: null, sk: null };
 function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
 function bonusBody() {
-  if (!st.recs.pre?.extra?.check?.ok) return `<div class="notice">先完成「預習單」，並請老師檢核通過，才能玩加分挑戰。</div>`;
+  if (!st.preview && !st.recs.pre?.extra?.check?.ok) return `<div class="notice">先完成「預習單」，並請老師檢核通過，才能玩加分挑戰。</div>`;
   const b = myRec('bonus').extra; const gs = gameStars(b);
   const tabs = [['radical', '部首配對', '🧩'], ['diff', '找不同', '🔍'], ['stroke', '筆順挑戰', '✍️'], ['idiom', '成語練功房', '📜']];
   return `${treasureMap(b)}
@@ -1636,7 +1674,7 @@ function bonusBody() {
   <div id="game"></div>`;
 }
 function bindBonus() {
-  if (!st.recs.pre?.extra?.check?.ok) return;
+  if (!st.preview && !st.recs.pre?.extra?.check?.ok) return;
   document.querySelectorAll('[data-gt]').forEach(b => b.onclick = () => { bonusState.tab = b.dataset.gt; renderStage(); });
   ({ radical: radicalGame, diff: diffGame, stroke: strokeGame, idiom: idiomGame })[bonusState.tab]();
 }
