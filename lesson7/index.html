@@ -328,6 +328,7 @@ button.opt{justify-content:center;font-size:1.1rem}button.opt .kai{font-size:1.5
 .copy-lab{margin:.5em 0 .1em;font-size:.82rem;color:var(--muted);letter-spacing:.05em}
 .copy-list{margin:0;padding-left:1.4em;display:grid;gap:.35em;font-size:1.15rem;line-height:1.7}
 .copy-list li{border-bottom:1px dashed var(--line);padding-bottom:.2em}
+.next-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
 /* 老師預覽 */
 .pv-form{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}.pv-form input{padding:.4em .6em;border:1.5px solid var(--line);border-radius:8px;width:9em}
 .pv-tag{background:var(--accent);color:var(--accent-ink);border-radius:999px;padding:.1em .7em;font-size:.85rem}
@@ -486,7 +487,7 @@ const STAGES = [
       { id: 't8', t: 'mc', part: 'idiom', q: '「表面對你笑嘻嘻，心裡卻想害你」可以用哪個成語？', o: ['笑裡藏刀', '自命不凡', '不學無術'], a: 0, ex: '笑裡藏刀：笑容的後面藏著刀，形容外表和善、內心陰險。' }
     ] },
   { id: 'vtest', sec: '生字語詞', name: '生字語詞檢測', when: '第2節', group: 'v',
-    intro: '先看語詞卡，再挑戰 8 題檢測。做完會分成三組，接著依組別練習。',
+    intro: '先看語詞卡，再挑戰 8 題檢測。交卷後會自動分組，並打開你這一組的分組任務。',
     showWords: true,
     items: [
       { id: 'v1', t: 'mc', q: '奶奶的手背上有好多「＿點」。', o: ['斑', '班'], a: 0, ex: '「斑」是雜色的小點；「班」是班級。' },
@@ -541,7 +542,7 @@ const STAGES = [
       { id: 'r5', t: 'text', tag: '說說看', q: '奶奶的手上已經有斑點和皺紋，作者為什麼還說她是「最年輕的奶奶」？你覺得什麼是「年輕」？', ref: '奶奶人老心不老，跟年輕人一樣充滿活力和創意。（答案僅供參考）', wall: true }
     ] },
   { id: 'stest', sec: '修辭句型', name: '句型修辭檢測', when: '第3節', group: 's',
-    intro: '6 題小檢測，下一節會依結果分組。',
+    intro: '6 題小檢測。交卷後會自動分組，並打開你這一組的分組任務。',
     items: [
       { id: 's1', t: 'mc', q: '「髮上的銀光，比清晨的陽光還明亮。」這句用了什麼寫法？', o: ['把東西比喻成另一樣東西（譬喻）', '說得比實際更誇張（誇飾）', '問問題'], a: 1, ex: '頭髮的銀光不可能比陽光還亮，這是誇張的說法。' },
       { id: 's2', t: 'mc', q: '「奶奶仔細剪出花樣，就像一位大藝術家。」這句用了什麼寫法？', o: ['把東西比喻成另一樣東西（譬喻）', '說得比實際更誇張（誇飾）', '問問題'], a: 0, ex: '用「就像」把奶奶比喻成大藝術家。' },
@@ -736,7 +737,14 @@ async function refreshMine() {
     return true;
   } catch (e) { return false; }
 }
-function isOpen(id) { if (st.preview) return true; return (st.cfg ? (st.cfg.unlocked || []) : OFFLINE_UNLOCK).includes(id); }
+function isOpen(id) {
+  if (st.preview) return true;
+  if ((st.cfg ? (st.cfg.unlocked || []) : OFFLINE_UNLOCK).includes(id)) return true;
+  // 分組任務：做完對應的檢測就自動分組並開啟，不用等老師
+  const s = stageById(id);
+  if (s?.diff) { const test = STAGES.find(x => x.group === s.diff); return !!st.recs[test.id]?.done; }
+  return false;
+}
 function myGroup(diff) {
   if (st.preview) return st.pvGroup || 'A';
   const ov = st.cfg?.ov?.[diff];
@@ -943,8 +951,12 @@ function itemsBody(s) {
   ].join('');
   if (s.teach) return teachBody(s, rec);
   if (locked) {
-    const msg = s.test ? '後測已交卷。到「後測檢討」看看每一題的詳解。' : `已完成！你答對 ${rec.score} / ${rec.max} 題。等老師開下一關。`;
-    return top + `<div class="notice done">${msg}</div>`;
+    const next = s.group ? STAGES.find(x => x.diff === s.group) : null;
+    const g = next ? myGroup(s.group) : null;
+    const msg = s.test ? '後測已交卷。到「後測檢討」看看每一題的詳解。'
+      : next && g ? `已完成！你答對 ${rec.score} / ${rec.max} 題。你被分到 <b class="g-${GROUPS[g].tone} gchip">${GROUPS[g].name}</b>，「${next.name}」已經打開了。<button class="primary" type="button" id="goNext" data-next="${next.id}">開始${next.name}</button>`
+      : `已完成！你答對 ${rec.score} / ${rec.max} 題。等老師開下一關。`;
+    return top + `<div class="notice done next-row">${msg}</div>`;
   }
   return top + `<form class="qlist" id="qform">
     ${items.map((it, i) => qHtml(s, it, i, rec)).join('')}
@@ -1006,6 +1018,7 @@ function qHtml(s, it, i, rec) {
   </fieldset>`;
 }
 function bindItems(s) {
+  const gn = $('#goNext'); if (gn) gn.onclick = () => { st.stage = gn.dataset.next; go('stage'); scrollTo(0, 0); };
   document.querySelectorAll('[data-pvg]').forEach(b => b.onclick = () => { st.pvGroup = b.dataset.pvg; const y = scrollY; renderStage(); scrollTo(0, y); });
   document.querySelectorAll('[data-ws]').forEach(b => b.onclick = () => { const r = myRec(s.id); r.extra[b.dataset.ws] = !r.extra[b.dataset.ws]; queueSave(s.id); const y = scrollY; renderStage(); scrollTo(0, y); });
   const form = $('#qform'); if (!form) return;
