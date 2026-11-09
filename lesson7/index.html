@@ -659,7 +659,7 @@ const LESSON_ZY=[["ㄋㄞˇ", "˙ㄋㄞ", "˙ㄉㄜ", "ㄕㄡˇ", "ㄅㄟˋ", "�
 const API_URL = 'https://script.google.com/macros/s/AKfycbyoSQ0PFM7eRq8a8eDGYRLeTn0GZBrHux7NgDvZ9lbIc-O2waCgfzcoCTk6Rp9nocqK/exec';
 const DEMO_KEY = '1234';
 // 連不上後台時的備用設定：預設開放第 1 節的關卡；老師檢核改用下面這組檢核碼
-const OFFLINE_UNLOCK = ['pre', 'stroke', 'vteach', 'bonus'];
+const OFFLINE_UNLOCK = STAGES.map(s => s.id); // 後台沒接通時：全部關卡一開始就打開
 const CHECK_PIN = '0000';
 const PREVIEW_PIN = '1122'; // 老師預覽：輸入後可看到全部關卡（不記錄作答）
 const DEFAULT_CLASS = '三甲';
@@ -870,7 +870,7 @@ function stageStatus(s) {
   if (s.review && r?.done && !r.extra?.check?.ok) return ['wait', r.extra?.check ? '要訂正' : '等老師檢核'];
   if (r?.done) return ['done', '完成'];
   if (r && Object.keys(r.ans).length) return ['doing', '進行中'];
-  if (s.diff && !myGroup(s.diff)) return ['wait', '等老師分組'];
+  if (s.diff && !myGroup(s.diff)) return ['wait', '先做檢測'];
   return ['go', '可以開始'];
 }
 function renderHome() {
@@ -989,7 +989,7 @@ function itemsBody(s) {
   let group = null;
   if (s.diff) {
     group = myGroup(s.diff);
-    if (!group) return `<div class="notice">老師還沒幫你分組，請等一下再回來。</div>`;
+    if (!group) { const t = STAGES.find(x => x.group === s.diff); return `<div class="notice">先完成「${t.name}」，網站會自動幫你分組，再回來這裡。</div>`; }
   }
   const pvSwitch = st.preview && s.diff ? `<div class="pv-switch"><span class="label">預覽組別</span>${Object.entries(GROUPS).map(([k, g]) => `<button type="button" class="chip ${group === k ? 'on' : ''}" data-pvg="${k}">${g.name}（${g.level}）</button>`).join('')}</div>` : '';
   const items = itemsFor(s, group);
