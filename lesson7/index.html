@@ -329,6 +329,18 @@ button.opt{justify-content:center;font-size:1.1rem}button.opt .kai{font-size:1.5
 .copy-list{margin:0;padding-left:1.4em;display:grid;gap:.35em;font-size:1.15rem;line-height:1.7}
 .copy-list li{border-bottom:1px dashed var(--line);padding-bottom:.2em}
 .next-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+/* 配對／連連看 */
+.mt-hint{margin:0 0 6px;font-size:.88rem}
+.match{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:14px 28px}
+.match.wide{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.mcol{display:grid;gap:8px;align-content:start}
+.mitem{border:1.5px solid var(--line);background:var(--paper);border-radius:10px;padding:.55em .8em;text-align:left;font-size:1.05rem;min-height:2.8em;min-width:0}
+.mitem .kai{font-size:1.3rem}
+.mitem.sel{border-color:var(--accent);background:var(--accent-soft);box-shadow:0 0 0 2px var(--accent-soft)}
+.mitem.done{cursor:default;color:var(--ink);border-width:2px}
+.mitem.c1{background:var(--gold-soft);border-color:var(--gold)}.mitem.c2{background:var(--teal-soft);border-color:var(--teal)}.mitem.c3{background:var(--rose-soft);border-color:var(--rose)}.mitem.c4{background:var(--ok-soft);border-color:var(--ok)}.mitem.c5{background:var(--accent-soft);border-color:var(--accent)}
+.mitem.shake{animation:shake .3s;border-color:var(--no)}
+@media (max-width:560px){.match,.match.wide{gap:10px 12px}.mitem{font-size:.95rem}}
 /* 老師預覽 */
 .pv-form{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}.pv-form input{padding:.4em .6em;border:1.5px solid var(--line);border-radius:8px;width:9em}
 .pv-tag{background:var(--accent);color:var(--accent-ink);border-radius:999px;padding:.1em .7em;font-size:.85rem}
@@ -502,31 +514,31 @@ const STAGES = [
     cut: [4, 6] // 0–4 星星、5–6 群山、7–8 窗花
   },
   { id: 'vgroup', sec: '生字語詞', name: '分組任務 ①', when: '第2節', diff: 'v',
-    intro: '依你的組別完成任務。答錯可以再試一次。',
+    intro: '依你的組別完成任務：配對、選擇、連連看，最後寫一個句子。答錯可以再試一次。',
     byGroup: {
-      A: [
-        { id: 'ga1', t: 'mc', q: '過馬路要走「＿馬線」。', o: ['班', '斑'], a: 1, ex: '斑馬身上有斑紋，所以是「斑」。' },
-        { id: 'ga2', t: 'mc', q: '我是三年一「＿」的學生。', o: ['班', '斑'], a: 0, ex: '班級的「班」中間是一把刀。' },
-        { id: 'ga3', t: 'mc', q: '魔「＿」師變出一隻兔子。', o: ['街', '術'], a: 1, ex: '「術」中間是「朮」；「街」中間是兩個「土」。' },
-        { id: 'ga4', t: 'mc', q: '我們用色紙「＿」出紙鶴。', o: ['習', '摺'], a: 1, ex: '摺紙要用手，所以是提手旁。' },
-        { id: 'ga5', t: 'mc', q: '「捉迷藏」的「藏」怎麼念？', o: ['ㄘㄤˊ', 'ㄗㄤˋ'], a: 0, ex: '躲起來不被發現，念ㄘㄤˊ。' },
-        { id: 'ga6', t: 'mc', q: '「背書包」的「背」怎麼念？', o: ['ㄅㄟˋ', 'ㄅㄟ'], a: 1, ex: '用背來負荷東西，念ㄅㄟ。' }
+      A: [ // 星星組：上課、下課、功課、放學、學校
+        { id: 'ga1', t: 'match', label: '配對', q: '把語詞和它的意思配成一對。', kaiL: true, pairs: [['手背', '手掌的反面'], ['淘氣', '頑皮、搗蛋'], ['仔細', '小心謹慎'], ['不懂', '不明白、不了解']] },
+        { id: 'ga2', t: 'mc', q: '下課時，弟弟太「＿＿」了，在走廊跑來跑去。', o: ['淘氣', '仔細', '創意'], a: 0, ex: '淘氣：頑皮、搗蛋。' },
+        { id: 'ga3', t: 'mc', q: '寫功課要很「＿＿」，寫完再檢查一次。', o: ['淘氣', '仔細', '斑點'], a: 1, ex: '仔細：小心謹慎。' },
+        { id: 'ga4', t: 'mc', q: '上課有「＿＿」的地方，要舉手問老師。', o: ['不懂', '凡事', '藏寶'], a: 0, ex: '不懂：不明白、不了解。' },
+        { id: 'ga5', t: 'match', label: '連連看', q: '這些字長得很像，連到正確的語詞。', kaiL: true, pairs: [['斑', '斑馬線'], ['班', '班會'], ['夾', '資料夾'], ['來', '放學回來']] },
+        { id: 'ga6', t: 'text', q: '用「仔細」寫一句和上課或寫功課有關的句子。', wall: true, hint: '例：考試時，我仔細的看完每一題。' }
       ],
-      B: [
-        { id: 'gb1', t: 'mc', q: '妹妹很「＿＿」，喜歡在家裡和我玩捉迷藏。', o: ['仔細', '淘氣', '創意', '凡事'], a: 1, ex: '淘氣：頑皮、搗蛋。' },
-        { id: 'gb2', t: 'mc', q: '寫完考卷，要「＿＿」的檢查一次再交卷。', o: ['淘氣', '凡事', '仔細', '皺紋'], a: 2, ex: '仔細：小心謹慎。' },
-        { id: 'gb3', t: 'mc', q: '爺爺一笑，眼角的「＿＿」就跑出來了。', o: ['斑點', '皺紋', '窗花', '創意'], a: 1, ex: '皺紋：皮膚上凹凸的紋路。' },
-        { id: 'gb4', t: 'mc', q: '這學期的布置比賽，我們班獲得最佳「＿＿」獎。', o: ['創意', '藝術家', '仔細', '藏寶'], a: 0, ex: '創意：表現出新意與巧思。' },
-        { id: 'gb5', t: 'mc', q: '「＿＿」往好的地方想，做起來會更有動力。', o: ['不懂', '凡事', '淘氣', '藏寶'], a: 1, ex: '凡事：無論什麼事情。' },
-        { id: 'gb6', t: 'mc', q: '美術館裡，「＿＿＿」正在介紹自己的作品。', o: ['藝術家', '窗花', '創意', '寶物'], a: 0, ex: '藝術家：從事藝術工作而有相當成就的人。' }
+      B: [ // 群山組：家人、社區、假日
+        { id: 'gb1', t: 'match', label: '配對', q: '把語詞和它的意思配成一對。', kaiL: true, pairs: [['凡事', '無論什麼事情'], ['創意', '表現出新意與巧思'], ['藝術家', '從事藝術工作而有成就的人'], ['藏寶', '掩埋、隱藏寶物']] },
+        { id: 'gb2', t: 'mc', q: '媽媽說：「＿＿都要盡力，結果就沒那麼重要了。」', o: ['凡事', '不懂', '皺紋'], a: 0, ex: '凡事：無論什麼事情。' },
+        { id: 'gb3', t: 'mc', q: '爺爺在社區公園畫畫，大家都說他是社區裡的「＿＿＿」。', o: ['藝術家', '藏寶', '淘氣'], a: 0, ex: '藝術家：從事藝術工作而有相當成就的人。' },
+        { id: 'gb4', t: 'mc', q: '姊姊用舊紙盒做成小書櫃，真有「＿＿」！', o: ['皺紋', '創意', '仔細'], a: 1, ex: '創意：表現出新意與巧思。' },
+        { id: 'gb5', t: 'match', label: '連連看', q: '同一個字有不同念法，連到正確的讀音。', pairs: [['背書包的「背」', 'ㄅㄟ'], ['手背的「背」', 'ㄅㄟˋ'], ['捉迷藏的「藏」', 'ㄘㄤˊ'], ['寶藏的「藏」', 'ㄗㄤˋ']] },
+        { id: 'gb6', t: 'text', q: '用「創意」寫一句和家人有關的句子。', wall: true, hint: '例：奶奶用舊衣服做成杯墊，真有創意。' }
       ],
-      C: [
-        { id: 'gc1', t: 'mc', q: '「笑裡藏刀」是什麼意思？', o: ['笑的時候要小心刀子', '外表和善，內心卻陰險', '把刀子藏起來', '很會說笑話'], a: 1, ex: '笑容後面藏著刀，形容外貌和善、內心陰險。' },
-        { id: 'gc2', t: 'mc', q: '「不學無術」是什麼意思？', o: ['沒有學問，也沒有本領', '不想學魔術', '學習很認真', '很會變魔術'], a: 0, ex: '不學無術：沒有學問，也沒有才能、技術。' },
-        { id: 'gc3', t: 'mc', q: '「他從來不自命不凡」說明他是怎樣的人？', o: ['很驕傲', '很謙虛', '很平凡', '很淘氣'], a: 1, ex: '自命不凡是自以為了不起；「從不」自命不凡，就是謙虛。' },
-        { id: 'gc4', t: 'mc', q: '哪一句的成語用對了？', o: ['他不學無術，所以考了一百分。', '他從小不學無術，長大才努力學習。', '奶奶不學無術，剪出美麗的窗花。', '老師不學無術，教我們好多知識。'], a: 1, ex: '不學無術是沒有學問也沒有才能，後面接「才努力學習」才合理。' },
-        { id: 'gc5', t: 'text', q: '選一個成語（自命不凡、笑裡藏刀、不學無術）造一個句子。', wall: true },
-        { id: 'gc6', t: 'text', q: '「藏」有兩個念法：ㄘㄤˊ 和 ㄗㄤˋ。請各寫一個語詞。（例：ㄘㄤˊ：____；ㄗㄤˋ：____）', wall: true }
+      C: [ // 窗花組：議題、國家、時事
+        { id: 'gc1', t: 'match', label: '配對', q: '把成語和它的意思配成一對。', kaiL: true, pairs: [['自命不凡', '自以為很了不起'], ['笑裡藏刀', '外表和善，內心卻陰險'], ['不學無術', '沒有學問，也沒有本領'], ['凡事', '無論什麼事情']] },
+        { id: 'gc2', t: 'mc', q: '臺灣隊拿到世界冠軍後，選手們沒有「＿＿＿＿」，反而感謝每一位隊友。', o: ['自命不凡', '笑裡藏刀', '不學無術'], a: 0, ex: '贏了也不覺得自己最了不起，就是沒有「自命不凡」。' },
+        { id: 'gc3', t: 'mc', q: '新聞提醒大家：網路上有些人「＿＿＿＿」，說要送禮物，其實是想騙錢。', o: ['不學無術', '笑裡藏刀', '自命不凡'], a: 1, ex: '表面親切、心裡想騙人，就是「笑裡藏刀」。' },
+        { id: 'gc4', t: 'mc', q: '為了減少塑膠垃圾，同學想出用竹子做吸管，這個「＿＿」得到環保比賽大獎。', o: ['創意', '皺紋', '藏寶'], a: 0, ex: '創意：表現出新意與巧思。' },
+        { id: 'gc5', t: 'match', label: '連連看', q: '這些字長得很像，連到正確的語詞。', kaiL: true, pairs: [['斑', '過斑馬線要小心'], ['班', '搭班機出國'], ['街', '參加淨街活動'], ['術', '科技與技術']] },
+        { id: 'gc6', t: 'text', q: '選一個成語（自命不凡、笑裡藏刀、不學無術），寫一句和新聞或社會有關的句子。', wall: true, hint: '例：詐騙集團笑裡藏刀，我們要提高警覺。' }
       ]
     } },
   { id: 'reading', sec: '課文內容', name: '課文提問', when: '第3節',
@@ -554,26 +566,28 @@ const STAGES = [
     cut: [3, 5] // 0–3 星星、4–5 群山、6 窗花
   },
   { id: 'sgroup', sec: '修辭句型', name: '分組任務 ②', when: '第4節', diff: 's',
-    intro: '依你的組別完成任務。寫好的句子會出現在老師的作品牆上。',
+    intro: '依你的組別完成任務：連連看、選擇，最後照樣寫一個句子，會出現在老師的作品牆上。',
     byGroup: {
-      A: [
-        { id: 'ha1', t: 'mc', q: '「妹妹的臉紅得像蘋果。」用了什麼寫法？', o: ['譬喻', '誇飾'], a: 0, ex: '用「像」把臉比喻成蘋果。' },
-        { id: 'ha2', t: 'mc', q: '「他的聲音比打雷還大聲。」用了什麼寫法？', o: ['譬喻', '誇飾'], a: 1, ex: '人的聲音不會比打雷還大，是誇張的說法。' },
-        { id: 'ha3', t: 'mc', q: '「天上的雲朵像棉花糖。」用了什麼寫法？', o: ['譬喻', '誇飾'], a: 0, ex: '用「像」把雲朵比喻成棉花糖。' },
-        { id: 'ha4', t: 'mc', q: '「站上講臺演說，那短短的三分鐘，是我最緊張的時刻。」刪掉補充說明後是？', o: ['站上講臺演說，是我最緊張的時刻。', '那短短的三分鐘。', '我最緊張。'], a: 0, ex: '「那短短的三分鐘」是補充說明，可以刪掉。' },
-        { id: 'ha5', t: 'mc', q: '「我學會用紙摺出小狗、大象和長頸鹿等動物造型。」刪掉舉例說明後是？', o: ['我學會用紙摺出小狗。', '我學會用紙摺出動物造型。', '小狗、大象和長頸鹿。'], a: 1, ex: '「小狗、大象和長頸鹿等」是舉例，可以刪掉。' },
-        { id: 'ha6', t: 'text', q: '照樣寫：比夏日的晚風還涼爽 → 比＿＿＿的＿＿＿還＿＿＿', wall: true, hint: '例：比冬天的棉被還溫暖、比廚房的冰塊還冰' }
+      A: [ // 星星組：學校生活
+        { id: 'ha1', t: 'match', label: '連連看', q: '把句子的前半和後半連起來。', wide: true, pairs: [['雖然功課很多，', '可是我還是認真寫完了。'], ['放學後，我不是去公園，', '也不是去書店，是直接回家。'], ['下課時，弟弟的聲音', '比打雷還大聲。'], ['考試時，教室安靜得', '像圖書館一樣。']] },
+        { id: 'ha2', t: 'mc', q: '「下課時，操場熱鬧得像菜市場。」用了什麼寫法？', o: ['譬喻', '誇飾'], a: 0, ex: '用「像」把操場比喻成菜市場。' },
+        { id: 'ha3', t: 'mc', q: '「我的作業簿疊得比山還高。」用了什麼寫法？', o: ['譬喻', '誇飾'], a: 1, ex: '作業簿不可能比山還高，是誇張的說法。' },
+        { id: 'ha4', t: 'mc', q: '「上課時，小明仔細的抄寫黑板上的生字。」縮寫後是哪一句？', o: ['小明抄寫生字。', '上課時，小明。', '黑板上的生字。'], a: 0, ex: '刪掉補充說明「上課時」和動作細節「仔細的」「黑板上的」。' },
+        { id: 'ha5', t: 'text', q: '照樣寫：比＿＿的＿＿還＿＿（寫學校裡的東西）', wall: true, hint: '例：操場的草比客廳的地毯還軟。' }
       ],
-      B: [
-        { id: 'hb1', t: 'text', q: '照樣寫短語：比清晨的陽光還明亮 → 寫一個描寫家人的句子，用「比＿＿的＿＿還＿＿」。', wall: true, hint: '例：爸爸的笑聲比過年的鞭炮還響亮。' },
-        { id: 'hb2', t: 'text', q: '用「雖然……可是……」造句。', wall: true, hint: '前後兩句的意思要相反。' },
-        { id: 'hb3', t: 'text', q: '用「不是……也不是……」造句。', wall: true, hint: '例：用功讀書不是為了父母，也不是為了老師，是為了自己的將來。' },
-        { id: 'hb4', t: 'text', q: '縮寫句子：「奶奶幫花除完蟲，轉身忙洗衣，做得快又好。」', wall: true, ref: '奶奶做事做得快又好。', hint: '留下「誰＋怎麼樣」，刪掉做了哪些事的細節。' }
+      B: [ // 群山組：家人、社區
+        { id: 'hb1', t: 'match', label: '連連看', q: '把句子的前半和後半連起來。', wide: true, pairs: [['雖然爸爸工作很累，', '可是他還是陪我下棋。'], ['週末我們不是去爬山，', '也不是去看電影，是去看外婆。'], ['媽媽煮的湯', '比餐廳的還好喝。'], ['阿姨笑起來', '像太陽一樣溫暖。']] },
+        { id: 'hb2', t: 'mc', q: '「爺爺的手粗得像樹皮。」用了什麼寫法？', o: ['譬喻', '誇飾'], a: 0, ex: '用「像」把爺爺的手比喻成樹皮。' },
+        { id: 'hb3', t: 'mc', q: '「哥哥的打呼聲比火車還大聲。」用了什麼寫法？', o: ['譬喻', '誇飾'], a: 1, ex: '打呼聲不可能比火車還大聲，是誇張的說法。' },
+        { id: 'hb4', t: 'mc', q: '「週末早上，爸爸在廚房裡做了香噴噴的蛋餅。」縮寫後是哪一句？', o: ['爸爸做了蛋餅。', '週末早上在廚房。', '香噴噴的蛋餅。'], a: 0, ex: '刪掉補充說明「週末早上」「在廚房裡」和形容「香噴噴的」。' },
+        { id: 'hb5', t: 'text', q: '照樣寫：比＿＿的＿＿還＿＿（描寫一位家人）', wall: true, hint: '例：媽媽的笑容比春天的陽光還溫暖。' }
       ],
-      C: [
-        { id: 'hc1', t: 'text', q: '仔細想一位家人的外表（手、頭髮、眼睛……），用「聯想」寫 2～3 句：他／她的＿＿像＿＿，可以＿＿。', wall: true, long: true, hint: '學課文：奶奶手上的斑點像星星，可以連出星座。' },
-        { id: 'hc2', t: 'text', q: '在你寫的句子裡，加一個「比……還……」，讓這位家人更生動。', wall: true, long: true },
-        { id: 'hc3', t: 'text', q: '仿寫課文第四段：雖然＿＿說：「＿＿」可是在我心中，＿＿。', wall: true, long: true, hint: '學課文：雖然奶奶說自己老了，可是在我心中，她是最年輕的奶奶。' }
+      C: [ // 窗花組：議題、國家、時事
+        { id: 'hc1', t: 'match', label: '連連看', q: '把句子的前半和後半連起來。', wide: true, pairs: [['雖然颱風快來了，', '可是救難人員還是上山救人。'], ['減少塑膠不是只靠政府，', '也不是只靠商店，要靠每一個人。'], ['臺灣選手衝向終點，跑得', '比風還快。'], ['玉山上的雲海', '像一大片白色的棉被。']] },
+        { id: 'hc2', t: 'mc', q: '「台北101像一根插進雲裡的竹筍。」用了什麼寫法？', o: ['譬喻', '誇飾'], a: 0, ex: '用「像」把台北101比喻成竹筍。' },
+        { id: 'hc3', t: 'mc', q: '「球迷的加油聲比雷聲還響亮，全世界都聽見了。」用了什麼寫法？', o: ['譬喻', '誇飾'], a: 1, ex: '全世界都聽見，是誇張的說法。' },
+        { id: 'hc4', t: 'mc', q: '「為了保護海洋，許多志工在週末到海邊，撿寶特瓶、吸管和塑膠袋等垃圾。」縮寫後是哪一句？', o: ['許多志工到海邊撿垃圾。', '為了保護海洋。', '寶特瓶、吸管和塑膠袋。'], a: 0, ex: '刪掉補充說明「為了保護海洋」「在週末」和舉例說明「寶特瓶、吸管和塑膠袋等」。' },
+        { id: 'hc5', t: 'text', q: '照樣寫：比＿＿的＿＿還＿＿（寫臺灣的景物，或一則新聞）', wall: true, hint: '例：阿里山的空氣比冰箱裡的水還清涼。' }
       ]
     } },
   { id: 'practice', sec: '習作', name: '課後練習', when: '第5節', hints: true,
@@ -958,10 +972,11 @@ function itemsBody(s) {
       : `已完成！你答對 ${rec.score} / ${rec.max} 題。等老師開下一關。`;
     return top + `<div class="notice done next-row">${msg}</div>`;
   }
-  return top + `<form class="qlist" id="qform">
+  const doneNote = rec.done && !isTest ? `<div class="notice done">完成這一關了！第一次就答對 ${rec.score} / ${rec.max} 題。想再練習可以往下看，也可以回闖關地圖。</div>` : '';
+  return top + doneNote + `<form class="qlist" id="qform">
     ${items.map((it, i) => qHtml(s, it, i, rec)).join('')}
     <div class="submit-row">
-      ${isTest ? `<button class="primary" type="submit">交出${s.test ? '後測' : '檢測'}</button>` : `<button class="primary" type="submit">完成這一關</button>`}
+      ${isTest ? `<button class="primary" type="submit">交出${s.test ? '後測' : '檢測'}</button>` : rec.done ? '' : `<button class="primary" type="submit">完成這一關</button>`}
       <span class="muted" id="left"></span>
     </div>
   </form>`;
@@ -997,6 +1012,17 @@ function teachBody(s, rec) {
     <div class="submit-row">${rec.done ? '<span class="pill ok">已完成這一關</span>' : '<button class="primary" type="submit">完成這一關</button>'}<span class="muted" id="left"></span></div>
   </form>`;
 }
+function answered(it, rec) {
+  const v = rec.ans[it.id];
+  if (it.t === 'match') return !!v && Object.keys(v).length === it.pairs.length;
+  return v != null && String(v).trim() !== '';
+}
+function matchOrder(it, rec) {
+  rec.extra.ord = rec.extra.ord || {};
+  if (!rec.extra.ord[it.id]) rec.extra.ord[it.id] = shuffle(it.pairs.map((_, k) => k));
+  return rec.extra.ord[it.id];
+}
+const matchSel = {};
 function qHtml(s, it, i, rec) {
   const v = rec.ans[it.id];
   const isTest = !!(s.group || s.test);
@@ -1005,7 +1031,15 @@ function qHtml(s, it, i, rec) {
     ${(rec.hints[it.id] || 0) < it.hs.length ? `<button type="button" class="ghost sm hbtn" data-id="${it.id}">看提示 ${(rec.hints[it.id] || 0) + 1}</button>` : ''}</div>` : '';
   const tag = it.tag ? `<span class="qtag">${esc(it.tag)}</span>` : '';
   let input = '';
-  if (it.t === 'mc') {
+  if (it.t === 'match') {
+    const m = rec.ans[it.id] || {}; const ord = matchOrder(it, rec); const used = Object.values(m);
+    const colors = ['c1', 'c2', 'c3', 'c4', 'c5'];
+    const done = Object.keys(m).length === it.pairs.length;
+    input = `<p class="muted mt-hint">${it.label === '連連看' ? '先點左邊，再點右邊連起來。' : '先點左邊，再點右邊配成一對。'}</p>
+    <div class="match ${it.wide ? 'wide' : ''}"><div class="mcol">${it.pairs.map((p, k) => `<button type="button" class="mitem L ${m[k] != null ? 'done ' + colors[k % 5] : ''} ${matchSel[it.id] === k ? 'sel' : ''}" data-mid="${it.id}" data-l="${k}" ${m[k] != null ? 'disabled' : ''}><span class="${it.kaiL ? 'kai' : ''}">${esc(p[0])}</span></button>`).join('')}</div>
+      <div class="mcol">${ord.map(r => { const lk = Object.keys(m).find(x => m[x] === r); return `<button type="button" class="mitem R ${lk != null ? 'done ' + colors[lk % 5] : ''}" data-mid="${it.id}" data-r="${r}" ${lk != null ? 'disabled' : ''}><span class="${/^[ㄅ-ㄩ˙]/.test(it.pairs[r][1]) ? 'zy' : ''}">${esc(it.pairs[r][1])}</span></button>`; }).join('')}</div></div>
+    ${done ? `<p class="fb ok">全部${it.label === '連連看' ? '連' : '配'}對了！${(rec.extra.mmiss || {})[it.id] ? `（錯了 ${(rec.extra.mmiss || {})[it.id]} 次）` : '一次就全對！'}${it.ex ? esc(it.ex) : ''}</p>` : ''}`;
+  } else if (it.t === 'mc') {
     input = `<div class="opts ${it.o.length <= 2 ? 'two' : ''}">${it.o.map((o, k) => `
       <label class="opt ${v === k ? 'sel' : ''} ${!isTest && v === k ? (k === it.a ? 'right' : 'wrong') : ''}">
         <input type="radio" name="${it.id}" value="${k}" ${v === k ? 'checked' : ''}><span class="${/^[ㄅ-ㄩ]/.test(o) ? 'zy' : ''}">${esc(o)}</span></label>`).join('')}</div>`;
@@ -1013,7 +1047,7 @@ function qHtml(s, it, i, rec) {
     input = `<textarea id="ta-${it.id}" data-id="${it.id}" rows="${it.long ? 4 : 2}" placeholder="${esc(it.hint || '寫下你的答案')}">${esc(v || '')}</textarea>`;
   }
   return `<fieldset class="q" data-id="${it.id}">
-    <legend><span class="qno">${i + 1}</span>${tag}<span class="qtext">${esc(it.q)}</span></legend>
+    <legend><span class="qno">${i + 1}</span>${it.label ? `<span class="qtag">${esc(it.label)}</span>` : ''}${tag}<span class="qtext">${esc(it.q)}</span></legend>
     ${input}${fb}${hints}
   </fieldset>`;
 }
@@ -1028,7 +1062,7 @@ function bindItems(s) {
   const items = itemsFor(s, group);
   const updateLeft = () => {
     const need = items.filter(it => !it.opt);
-    const n = need.filter(it => rec.ans[it.id] != null && String(rec.ans[it.id]).trim() !== '').length;
+    const n = need.filter(it => answered(it, rec)).length;
     $('#left').textContent = `已作答 ${n} / ${need.length}`;
   };
   form.querySelectorAll('input[type=radio]').forEach(r => r.onchange = () => {
@@ -1042,17 +1076,27 @@ function bindItems(s) {
       updateLeft();
     }
   });
+  form.querySelectorAll('.mitem').forEach(b => b.onclick = () => {
+    const id = b.dataset.mid; const it = items.find(x => x.id === id); const m = rec.ans[id] = rec.ans[id] || {};
+    if (b.dataset.l != null) { matchSel[id] = +b.dataset.l; form.querySelectorAll(`.mitem.L[data-mid="${id}"]`).forEach(x => x.classList.toggle('sel', x === b)); return; }
+    const L = matchSel[id]; if (L == null) { b.classList.add('shake'); setTimeout(() => b.classList.remove('shake'), 300); return; }
+    const R = +b.dataset.r;
+    if (R === L) { m[L] = R; delete matchSel[id]; try { sfx('ok'); } catch (e) {} }
+    else { rec.extra.mmiss = rec.extra.mmiss || {}; rec.extra.mmiss[id] = (rec.extra.mmiss[id] || 0) + 1; b.classList.add('shake'); try { sfx('no'); } catch (e) {} setTimeout(() => b.classList.remove('shake'), 300); queueSave(s.id); return; }
+    if (Object.keys(m).length === it.pairs.length) { const miss = (rec.extra.mmiss || {})[id] || 0; rec.ok[id] = true; if (rec.first[id] == null) rec.first[id] = miss === 0; }
+    queueSave(s.id); const y = scrollY; renderStage(); scrollTo(0, y);
+  });
   form.querySelectorAll('textarea').forEach(t => t.oninput = () => { rec.ans[t.dataset.id] = t.value; queueSave(s.id); updateLeft(); });
   form.querySelectorAll('.hbtn').forEach(b => b.onclick = () => { rec.hints[b.dataset.id] = (rec.hints[b.dataset.id] || 0) + 1; queueSave(s.id); const y = scrollY; renderStage(); scrollTo(0, y); });
   form.onsubmit = (e) => {
     e.preventDefault();
     const need = items.filter(it => !it.opt);
-    const miss = need.filter(it => rec.ans[it.id] == null || String(rec.ans[it.id]).trim() === '');
+    const miss = need.filter(it => !answered(it, rec));
     if (miss.length) {
       const q = form.querySelector(`.q[data-id="${miss[0].id}"]`); q.classList.add('miss'); q.scrollIntoView({ behavior: 'smooth', block: 'center' });
       $('#left').textContent = `還有 ${miss.length} 題沒寫`; return;
     }
-    const mcs = items.filter(it => it.t === 'mc');
+    const mcs = items.filter(it => it.t === 'mc' || it.t === 'match');
     rec.max = mcs.length;
     rec.score = mcs.filter(it => (isTest ? rec.ok[it.id] : rec.first[it.id])).length;
     if (group) rec.extra.group = group;
@@ -1296,6 +1340,7 @@ function bControl() {
 function cellOf(it, rec) {
   if (!rec) return ['', '·'];
   const v = rec.ans?.[it.id];
+  if (it.t === 'match') { if (!answered(it, rec)) return rec.ans?.[it.id] ? ['', '…'] : ['', '·']; return rec.first?.[it.id] ? ['ok', '✓'] : ['no', '✗']; }
   if (it.t === 'self') { const m = rec.self?.[it.id]; return m === '對了' ? ['ok', '✓'] : m === '要訂正' ? ['no', '訂'] : ['', '·']; }
   if (v == null || String(v).trim() === '') return ['', '·'];
   if (it.t === 'text') return ['txt', '寫'];
@@ -1361,7 +1406,7 @@ function showDetail(seat, sid) {
     <header><h2>${seat} 號・${esc(s.name)}</h2><button class="ghost sm" id="mclose">關閉</button></header>
     ${!r ? '<p class="muted">還沒有作答。</p>' : items.map((it, i) => { const v = r.ans?.[it.id]; const hn = r.hints?.[it.id];
       return `<div class="d-item"><p class="d-q">${i + 1}. ${esc(it.q)}</p>
-        <p>${it.t === 'self' ? (r.self?.[it.id] ? `<span class="mark ${r.self[it.id] === '對了' ? 'ok' : 'no'}">${r.self[it.id]}</span>` : '<span class="muted">未自評</span>') : it.t === 'mc' ? (v == null ? '<span class="muted">未作答</span>' : `<span class="mark ${cellOf(it, r)[0] === 'ok' ? 'ok' : 'no'}">${esc(it.o[v])}</span>${cellOf(it, r)[0] === 'ok' ? '' : `　正解：${esc(it.o[it.a])}`}`) : (v ? `<span class="answer">${esc(v)}</span>` : '<span class="muted">未作答</span>')}
+        <p>${it.t === 'match' ? (answered(it, r) ? `<span class="mark ${r.first?.[it.id] ? 'ok' : 'no'}">完成</span>錯 ${(r.extra?.mmiss || {})[it.id] || 0} 次` : '<span class="muted">未完成</span>') : it.t === 'self' ? (r.self?.[it.id] ? `<span class="mark ${r.self[it.id] === '對了' ? 'ok' : 'no'}">${r.self[it.id]}</span>` : '<span class="muted">未自評</span>') : it.t === 'mc' ? (v == null ? '<span class="muted">未作答</span>' : `<span class="mark ${cellOf(it, r)[0] === 'ok' ? 'ok' : 'no'}">${esc(it.o[v])}</span>${cellOf(it, r)[0] === 'ok' ? '' : `　正解：${esc(it.o[it.a])}`}`) : (v ? `<span class="answer">${esc(v)}</span>` : '<span class="muted">未作答</span>')}
         ${hn ? `<span class="pill">用了 ${hn} 層提示</span>` : ''}</p>
         ${it.ref ? `<p class="muted">參考：${esc(it.ref)}</p>` : ''}</div>`; }).join('')}
     ${sid === 'pre' && r?.extra?.check ? `<p><b>老師檢核：</b>${CHECK_ITEMS.map(([k, n]) => `${n}：${r.extra.check.items[k]}`).join('；')}</p>` : ''}
