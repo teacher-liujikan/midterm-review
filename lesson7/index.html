@@ -342,6 +342,10 @@ button.opt{justify-content:center;font-size:1.1rem}button.opt .kai{font-size:1.5
 .mitem.shake{animation:shake .3s;border-color:var(--no)}
 @media (max-width:560px){.match,.match.wide{gap:10px 12px}.mitem{font-size:.95rem}}
 .check-list{margin:0 0 8px;padding-left:1.3em;color:var(--muted);display:grid;gap:2px}
+.topic-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,200px),1fr));gap:8px;margin:4px 0 10px}
+.topic{display:grid;gap:2px;text-align:left;border:1.5px solid var(--line);background:var(--paper);border-radius:10px;padding:.5em .7em;min-width:0}
+.topic b{font-size:1rem}.topic span{font-size:.82rem;color:var(--muted)}
+.topic.on{border-color:var(--rose);background:var(--rose-soft)}
 /* 老師預覽 */
 .pv-form{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}.pv-form input{padding:.4em .6em;border:1.5px solid var(--line);border-radius:8px;width:9em}
 .pv-tag{background:var(--accent);color:var(--accent-ink);border-radius:999px;padding:.1em .7em;font-size:.85rem}
@@ -539,7 +543,17 @@ const STAGES = [
         { id: 'gc3', t: 'mc', q: '新聞提醒大家：網路上有些人「＿＿＿＿」，說要送禮物，其實是想騙錢。', o: ['不學無術', '笑裡藏刀', '自命不凡'], a: 1, ex: '表面親切、心裡想騙人，就是「笑裡藏刀」。' },
         { id: 'gc4', t: 'mc', q: '為了減少塑膠垃圾，同學想出用竹子做吸管，這個「＿＿」得到環保比賽大獎。', o: ['創意', '皺紋', '藏寶'], a: 0, ex: '創意：表現出新意與巧思。' },
         { id: 'gc5', t: 'match', label: '連連看', q: '這些字長得很像。想一想，每個字要填進哪一個空格？', kaiL: true, pairs: [['斑', '過「＿」馬線要小心'], ['班', '搭「＿」機出國'], ['街', '參加淨「＿」活動'], ['術', '學習新技「＿」']], ex: '斑馬線、班機、淨街、技術。' },
-        { id: 'gc6', t: 'text', q: '選一個成語（自命不凡、笑裡藏刀、不學無術），寫一句和新聞或社會有關的句子。', wall: true, hint: '例：詐騙集團笑裡藏刀，我們要提高警覺。' }
+        { id: 'gc6', t: 'text', q: '選一個成語（自命不凡、笑裡藏刀、不學無術），寫一句和新聞或社會有關的句子。', wall: true, hint: '先點下面一個主題，再接著寫。',
+          topics: [
+            ['📞 詐騙電話、網路詐騙', '笑裡藏刀', '詐騙集團笑裡藏刀，'],
+            ['🏆 運動比賽、選手奪冠', '自命不凡', '那位選手拿到冠軍後，'],
+            ['🌀 颱風、地震防災', '自命不凡', '颱風來的時候，'],
+            ['📱 網路假消息、亂轉傳', '不學無術', '有些人不查證就亂轉傳消息，'],
+            ['🌊 海洋垃圾、減少塑膠', '不學無術', '為了保護海洋，'],
+            ['🚸 交通安全、過馬路', '自命不凡', '過馬路的時候，'],
+            ['🤖 機器人、AI 新科技', '不學無術', '現在科技進步很快，'],
+            ['🤝 志工、幫助別人', '自命不凡', '那些默默幫助別人的志工，']
+          ] }
       ]
     } },
   { id: 'reading', sec: '課文內容', name: '課文提問', when: '第3節',
@@ -1047,7 +1061,8 @@ function qHtml(s, it, i, rec) {
       <label class="opt ${v === k ? 'sel' : ''} ${!isTest && v === k ? (k === it.a ? 'right' : 'wrong') : ''}">
         <input type="radio" name="${it.id}" value="${k}" ${v === k ? 'checked' : ''}><span class="${/^[ㄅ-ㄩ]/.test(o) ? 'zy' : ''}">${esc(o)}</span></label>`).join('')}</div>`;
   } else {
-    input = `<textarea id="ta-${it.id}" data-id="${it.id}" rows="${it.long ? 4 : 2}" placeholder="${esc(it.hint || '寫下你的答案')}">${esc(v || '')}</textarea>`;
+    const tps = it.topics ? `<p class="label">可以選一個主題（點一下，會幫你寫好開頭）</p><div class="topic-grid">${it.topics.map(([t, idm, start], k) => `<button type="button" class="topic" data-tid="${it.id}" data-tk="${k}"><b>${esc(t)}</b><span>適合用：${esc(idm)}</span></button>`).join('')}</div>` : '';
+    input = `${tps}<textarea id="ta-${it.id}" data-id="${it.id}" rows="${it.long ? 4 : 2}" placeholder="${esc(it.hint || '寫下你的答案')}">${esc(v || '')}</textarea>`;
   }
   return `<fieldset class="q" data-id="${it.id}">
     <legend><span class="qno">${i + 1}</span>${it.label ? `<span class="qtag">${esc(it.label)}</span>` : ''}${tag}<span class="qtext">${esc(it.q)}</span></legend>
@@ -1088,6 +1103,14 @@ function bindItems(s) {
     else { rec.extra.mmiss = rec.extra.mmiss || {}; rec.extra.mmiss[id] = (rec.extra.mmiss[id] || 0) + 1; b.classList.add('shake'); try { sfx('no'); } catch (e) {} setTimeout(() => b.classList.remove('shake'), 300); queueSave(s.id); return; }
     if (Object.keys(m).length === it.pairs.length) { const miss = (rec.extra.mmiss || {})[id] || 0; rec.ok[id] = true; if (rec.first[id] == null) rec.first[id] = miss === 0; }
     queueSave(s.id); const y = scrollY; renderStage(); scrollTo(0, y);
+  });
+  form.querySelectorAll('.topic').forEach(b => b.onclick = () => {
+    const it = items.find(x => x.id === b.dataset.tid); const [t, idm, start] = it.topics[+b.dataset.tk];
+    const ta = $(`#ta-${it.id}`); const cur = (ta.value || '').trim();
+    if (!cur || it.topics.some(x => cur === x[2])) { ta.value = start; rec.ans[it.id] = start; queueSave(s.id); updateLeft(); }
+    ta.placeholder = `接著寫，記得用上一個成語（例如：${idm}）。`;
+    form.querySelectorAll(`.topic[data-tid="${it.id}"]`).forEach(x => x.classList.toggle('on', x === b));
+    ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length);
   });
   form.querySelectorAll('textarea').forEach(t => t.oninput = () => { rec.ans[t.dataset.id] = t.value; queueSave(s.id); updateLeft(); });
   form.querySelectorAll('.hbtn').forEach(b => b.onclick = () => { rec.hints[b.dataset.id] = (rec.hints[b.dataset.id] || 0) + 1; queueSave(s.id); const y = scrollY; renderStage(); scrollTo(0, y); });
