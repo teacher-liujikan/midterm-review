@@ -325,6 +325,9 @@ button.opt{justify-content:center;font-size:1.1rem}button.opt .kai{font-size:1.5
 .vbox2{background:#000;border-radius:14px;overflow:hidden;width:min(92vw,820px)}
 .vhead2{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:#fff;color:#1f2b3d}.vhead2 b{font-size:1.3rem}
 .vbox2 video{width:100%;display:block;max-height:75vh;background:#000}
+.copy-lab{margin:.5em 0 .1em;font-size:.82rem;color:var(--muted);letter-spacing:.05em}
+.copy-list{margin:0;padding-left:1.4em;display:grid;gap:.35em;font-size:1.15rem;line-height:1.7}
+.copy-list li{border-bottom:1px dashed var(--line);padding-bottom:.2em}
 /* 老師預覽 */
 .pv-form{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}.pv-form input{padding:.4em .6em;border:1.5px solid var(--line);border-radius:8px;width:9em}
 .pv-tag{background:var(--accent);color:var(--accent-ink);border-radius:999px;padding:.1em .7em;font-size:.85rem}
@@ -423,9 +426,15 @@ const WORDS = [
 const IDIOM_VIDEO = { '自命不凡': 'ziming-bufan', '笑裡藏刀': 'xiaoli-cangdao', '不學無術': 'buxue-wushu' };
 const VIDEO_BASE = 'https://teacher-liujikan.github.io/idiompractice/videos/';
 const IDIOMS = [
-  ['自命不凡','自以為聰明、不平凡。','雖然爺爺是醫學界的權威，但他為人謙虛，從不自命不凡。'],
-  ['笑裡藏刀','外表和善可親，內心卻陰險狠毒。','他是個笑裡藏刀的人，得小心應付。'],
-  ['不學無術','沒有學問，也沒有才能、技術。','原本不學無術的小虎，經歷這次教訓後，刻苦自學。']
+  ['自命不凡','自以為聰明、不平凡，覺得自己很了不起。',[
+    '哥哥考了一次一百分就自命不凡，覺得自己什麼都會。',
+    '真正厲害的人不會自命不凡，反而很願意向別人學習。']],
+  ['笑裡藏刀','外表和善可親，內心卻陰險狠毒。',[
+    '故事裡的大野狼笑裡藏刀，假裝很友善，其實想吃掉小紅帽。',
+    '我們要多觀察，不要被笑裡藏刀的人騙了。']],
+  ['不學無術','沒有學問，也沒有才能、技術。',[
+    '小明以前不學無術，後來下定決心，每天用功讀書。',
+    '如果整天只想玩、不肯學習，長大就會變成不學無術的人。']]
 ];
 
 // 生字教學：形近字、一字多音（依課本字音字形辨析與加油小站）
@@ -967,12 +976,12 @@ function teachBody(s, rec) {
     <button type="button" class="ghost sm" data-ws="wsLook">${openL ? '隱藏答案' : '看答案'}</button>
     ${openL ? `<ul class="ws-notes">${LOOKALIKE.map(([a, b, tip]) => `<li><b class="kai">${a[0]}／${b[0]}</b>：${esc(tip)}</li>`).join('')}</ul>` : ''}`;
   const words = `<div class="word-grid">${WORDS.map(([w, m, e]) => `<div class="word"><div class="word-top"><b class="kai">${esc(w)}</b><button type="button" class="say" data-say="${esc(w + '。' + (e || ''))}" aria-label="念「${esc(w)}」">念</button></div><span>${esc(m)}</span>${e ? `<span class="eg kai">${esc(e)}</span>` : ''}</div>`).join('')}</div>`;
-  const idioms = `<div class="idiom-grid">${IDIOMS.map(([w, m, e]) => `<div class="idiom-card">${IDIOM_VIDEO[w] ? `<button type="button" class="vthumb" data-video="${w}" aria-label="看「${w}」動畫"><img src="${VIDEO_BASE}${IDIOM_VIDEO[w]}.jpg" alt="" loading="lazy"><span>🎬 看動畫</span></button>` : ''}<b class="kai">${w}</b><span>${esc(m)}</span><span class="eg kai">${esc(e)}</span></div>`).join('')}</div>`;
+  const idioms = `<div class="idiom-grid">${IDIOMS.map(([w, m, e]) => `<div class="idiom-card">${IDIOM_VIDEO[w] ? `<button type="button" class="vthumb" data-video="${w}" aria-label="看「${w}」動畫"><img src="${VIDEO_BASE}${IDIOM_VIDEO[w]}.jpg" alt="" loading="lazy"><span>🎬 看動畫</span></button>` : ''}<b class="kai">${w}</b><span>${esc(m)}</span><p class="copy-lab">造句（可以抄寫）</p><ol class="copy-list kai">${e.map(x => `<li>${esc(x)}</li>`).join('')}</ol></div>`).join('')}</div>`;
   return `<form id="qform">
     ${sec('一、多音字練習', '同一個字，放在不同的語詞裡，念法和意思會不同。', poly, 'sound')}
     ${sec('二、分辨形近字', '長得很像的字，只要一個部件不同，意思就不一樣。', look, 'look')}
     ${sec('語詞', '先讀解釋，再讀例句。按「念」可以聽讀音。', words, 'word')}
-    ${sec('延伸成語', '每個成語都藏著一個本課生字。先看動畫，再讀解釋和例句。', idioms, 'idiom')}
+    ${sec('延伸成語', '每個成語都藏著一個本課生字。先看動畫，再讀解釋，最後挑一句造句抄在本子上。', idioms, 'idiom')}
     <div class="submit-row">${rec.done ? '<span class="pill ok">已完成這一關</span>' : '<button class="primary" type="submit">完成這一關</button>'}<span class="muted" id="left"></span></div>
   </form>`;
 }
