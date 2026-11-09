@@ -304,6 +304,8 @@ button.opt{justify-content:center;font-size:1.1rem}button.opt .kai{font-size:1.5
 .qr-box svg{width:min(70vmin,460px);height:min(70vmin,460px)}
 .qr-title{font-size:1.5rem;margin:0}.qr-url{font-size:.95rem;word-break:break-all;margin:0}.qr-box .muted{color:#5d6b78;margin:0}
 @media (max-width:640px){.qr-btn svg{width:60px;height:60px}}
+.circle-ans{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 4px}
+.cw{border:2px solid var(--accent);border-radius:999px;padding:.1em .7em;font-size:1.2rem}
 /* 老師檢核 */
 .check-panel{display:grid;gap:12px;width:100%}
 .check-call{background:var(--warn-soft);border-radius:12px;padding:14px 18px;margin:0;font-size:1.15rem}
@@ -1256,7 +1258,7 @@ function tBoard() {
       <p><b>等老師檢核</b>　${seats.filter(n => { const r = recOf(n, 'pre'); return r?.done && !r.extra?.check; }).map(n => n + ' 號').join('、') || '無'}　
         <b>要訂正</b>　${seats.filter(n => { const c = recOf(n, 'pre')?.extra?.check; return c && !c.ok; }).map(n => n + ' 號').join('、') || '無'}　
         <b>檢核通過</b>　${seats.filter(n => recOf(n, 'pre')?.extra?.check?.ok).length} 人</p>
-      <p><b>生字描寫</b>　鉛筆描完 ${seats.filter(n => recOf(n, 'pre')?.extra?.trace1).length} 人　紅筆描部首 ${seats.filter(n => recOf(n, 'pre')?.extra?.trace2).length} 人</p></div>`;
+      <p><b>生字描寫</b>　鉛筆描完 ${seats.filter(n => recOf(n, 'pre')?.extra?.trace1).length} 人　紅筆描部首 ${seats.filter(n => recOf(n, 'pre')?.extra?.trace2).length} 人　圈詞 ${seats.filter(n => recOf(n, 'pre')?.extra?.circle).length} 人</p></div>`;
   }
   if (sid === 'bonus') {
     return `<section class="panel"><div class="row wrap-row"><label class="field inline"><span>關卡</span><select id="bsel">${opts}</select></label></div>
@@ -1285,7 +1287,7 @@ function showDetail(seat, sid) {
         ${hn ? `<span class="pill">用了 ${hn} 層提示</span>` : ''}</p>
         ${it.ref ? `<p class="muted">參考：${esc(it.ref)}</p>` : ''}</div>`; }).join('')}
     ${sid === 'pre' && r?.extra?.check ? `<p><b>老師檢核：</b>${CHECK_ITEMS.map(([k, n]) => `${n}：${r.extra.check.items[k]}`).join('；')}</p>` : ''}
-    ${sid === 'pre' && r ? `<p><b>生字描寫：</b>鉛筆${r.extra?.trace1 ? '✓' : '✗'}　紅筆部首${r.extra?.trace2 ? '✓' : '✗'}</p>` : ''}
+    ${sid === 'pre' && r ? `<p><b>生字描寫：</b>鉛筆${r.extra?.trace1 ? '✓' : '✗'}　紅筆部首${r.extra?.trace2 ? '✓' : '✗'}　圈詞${r.extra?.circle ? '✓' : '✗'}</p>` : ''}
     ${sid === 'pre' && r?.extra?.reads ? `<p><b>讀課文：</b>${r.extra.reads} 遍</p>` : ''}
     ${sid === 'pre' && r?.extra?.marked?.length ? `<p><b>不懂的語詞：</b>${r.extra.marked.join('、')}</p>` : ''}
   </div></div>`;
@@ -1432,7 +1434,8 @@ function togglePlay(key) {
   } catch (e) {}
 }
 // 老師檢核：學生按完成後，帶課本和平板舉手，老師在學生平板上勾選
-const CHECK_ITEMS = [['trace', '課本生字：鉛筆描筆順、紅筆描部首'], ['para', '課本上標好自然段'], ['genre', '課本標題旁寫上文體']];
+const CHECK_ITEMS = [['trace', '課本生字：鉛筆描筆順、紅筆描部首'], ['circle', '課文裡圈好生字語詞'], ['para', '課本上標好自然段'], ['genre', '課本標題旁寫上文體']];
+const CIRCLE_WORDS = ['手背', '斑點', '皺紋', '淘氣', '不懂', '凡事', '又梳又夾', '藏寶', '捏', '摺', '仔細', '藝術家', '創意'];
 const checkDraft = {};
 function teacherCheckPanel(rec) {
   const ck = rec.extra.check;
@@ -1485,9 +1488,12 @@ function preReviewBody(s) {
   const step = (n, title, inner, done) => `<section class="step ${done ? 'is-done' : ''}"><header class="step-head"><span class="step-no">${n}</span><h2>${title}</h2>${done ? '<span class="pill ok">完成</span>' : ''}</header>${inner}</section>`;
   return `
   <div class="steps">
-  ${step(1, '生字描寫', `<p>翻到課本生字那一頁（加油小站），描完一項就打勾。</p>
+  ${step(1, '生字描寫與圈詞', `<p>翻到課本生字那一頁（加油小站）描字，再到課文裡圈出有生字的語詞。做完一項就打勾。</p>
     <label class="check-row"><input type="checkbox" id="tr1" ${rec.extra.trace1 ? 'checked' : ''}><span>我用鉛筆，照筆順把 15 個字描了一次</span></label>
-    <label class="check-row"><input type="checkbox" id="tr2" ${rec.extra.trace2 ? 'checked' : ''}><span>我用紅筆，把部首再描了一次</span></label>`, rec.extra.trace1 && rec.extra.trace2)}
+    <label class="check-row"><input type="checkbox" id="tr2" ${rec.extra.trace2 ? 'checked' : ''}><span>我用紅筆，把部首再描了一次</span></label>
+    <label class="check-row"><input type="checkbox" id="tr3" ${rec.extra.circle ? 'checked' : ''}><span>我在課文裡，把有生字的語詞圈起來了</span></label>
+    <button type="button" class="ghost sm" id="showCircle">${rec.extra.showCircle ? '隱藏圈詞答案' : '對對看：圈詞答案'}</button>
+    ${rec.extra.showCircle ? `<div class="circle-ans">${CIRCLE_WORDS.map(w => `<span class="cw kai">${w}</span>`).join('')}</div><p class="muted">一共 ${CIRCLE_WORDS.length} 個。漏圈的，在課本上補圈。</p>` : ''}`, rec.extra.trace1 && rec.extra.trace2 && rec.extra.circle)}
   <div class="vwrap">${vText(!!rec.extra.showNo, gv != null)}
   <p class="muted vhint">課文往左邊滑，可以看到後面的段落。</p></div>
   ${step(2, '念課文', `<p>按一下開始朗讀，再按一下暫停。先聽一次，再自己大聲念，念完一遍點一下。</p>
@@ -1534,6 +1540,8 @@ function bindPreReview(s) {
   });
   $('#tr1').onchange = () => { rec.extra.trace1 = $('#tr1').checked; queueSave(s.id); };
   $('#tr2').onchange = () => { rec.extra.trace2 = $('#tr2').checked; queueSave(s.id); };
+  $('#tr3').onchange = () => { rec.extra.circle = $('#tr3').checked; queueSave(s.id); };
+  $('#showCircle').onclick = () => { rec.extra.showCircle = !rec.extra.showCircle; queueSave(s.id); rerender(); };
   bindTeacherCheck(s);
   $('#toBonus') && ($('#toBonus').onclick = () => { if (isOpen('bonus')) { st.stage = 'bonus'; go('stage'); } else { $('#toBonus').textContent = '老師還沒打開，等一下喔'; } });
   $('#preDone') && ($('#preDone').onclick = () => {
