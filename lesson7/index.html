@@ -370,6 +370,7 @@ button.opt{justify-content:center;font-size:1.1rem}button.opt .kai{font-size:1.5
 .ws-explain .zy{font-size:1.15em}
 .ws-tip{font-weight:700}
 .ws-n{color:var(--accent);font-size:1.4em}
+.cmp-note{font-size:1.2rem;line-height:1.8}.cmp-note .up,.num.up{color:var(--ok);font-weight:700}.cmp-note .up{font-size:1.5em}.num.down{color:var(--no)}
 .ws-ans{font-size:1.25rem;padding:.75em 1.2em;justify-self:start}
 .ws-nav{display:flex;align-items:center;justify-content:space-between;gap:10px;border-top:1px dashed var(--line);padding-top:12px}
 .ws-big{display:inline-flex;align-items:center;justify-content:center;gap:.35em;font-size:1.5rem;padding:.45em 1.2em;min-width:7em;border-radius:14px}.ws-big small{font-size:.8rem;color:var(--muted)}.ws-big:disabled{opacity:.3}
@@ -644,6 +645,17 @@ const STAGES = [
       { id: 'r5', t: 'tap', label: '點句子', tag: '想一想', q: '第三段哪一句，看得出奶奶很疼愛作者？點一點。', para: 2, a: [1], ex: '奶奶捏捏作者的臉說「你才是我的寶貝呀！」，作者比任何寶物都重要。' },
       { id: 'r6', t: 'order', label: '排一排', tag: '整理', q: '依照課文的順序，把每一段的大意排好。', cards: ['奶奶的手背上有好多斑點和皺紋。', '斑點像星星；奶奶凡事努力，做得快又好。', '皺紋像群山；奶奶會剪窗花，像大藝術家。', '奶奶充滿活力和創意，是最年輕的奶奶。'], ex: '開頭介紹手背 → 活力 → 創意 → 結語。' },
       { id: 'r7', t: 'mc', tag: '說說看', q: '奶奶的手上已經有斑點和皺紋，作者為什麼還說她是「最年輕的奶奶」？', o: ['因為奶奶的年紀最小', '因為奶奶充滿活力和創意，心不老', '因為奶奶很會看星座', '因為奶奶沒有白頭髮'], a: 1, ex: '奶奶年紀大了，可是人老心不老，像年輕人一樣有活力、有創意。' }
+    ] },
+  { id: 'preB', sec: '課文內容', name: '課文內容後測', when: '第3節', test: true, cmp: 'pre',
+    intro: '預習單的 B 卷：題目和預習單考一樣的重點，看看上完課文以後，你懂得更多了沒有。做完一起交卷，交卷後可以看答案。',
+    items: [
+      { id: 'b1', from: 'genre', t: 'mc', q: '〈最年輕的奶奶〉記下作者和奶奶相處的事情，這種文章是什麼文體？', o: ['童詩', '記敘文', '應用文'], a: 1, ex: '記下發生過的人、事、物，是記敘文。' },
+      { id: 'b2', from: 'para', t: 'mc', q: '課文的最後一段，是第幾自然段？', o: ['第三段', '第四段', '第五段'], a: 1, ex: '課文共有四個自然段，最後一段是第四段。' },
+      { id: 'b3', from: 'q1', t: 'mc', q: '課文每一段都在寫誰的手、誰做的事？', o: ['作者', '媽媽', '奶奶'], a: 2, ex: '每一段都在寫奶奶的手和奶奶做的事。' },
+      { id: 'b4', from: 'q2', t: 'mc', q: '奶奶手上的什麼，被作者當成「星星」？', o: ['皺紋', '斑點', '銀髮'], a: 1, ex: '第二段：我把奶奶手上的斑點當成星星，連出奇特的星座。' },
+      { id: 'b5', from: 'q3', t: 'mc', q: '作者把奶奶手上的皺紋當成群山，連出了什麼？', o: ['一條藏寶路線', '奇特的星座', '回家的路'], a: 0, ex: '第三段：我把奶奶手上的皺紋當成群山，連出一條藏寶路線。' },
+      { id: 'b6', from: 'q4', t: 'mc', q: '一張紙在奶奶手中摺摺剪剪，不一會兒變成了什麼？', o: ['紙飛機', '一張藏寶圖', '美麗的窗花'], a: 2, ex: '第三段：一張紙在手中摺摺剪剪，不一會兒就變成美麗的窗花。' },
+      { id: 'b7', from: 'q5', t: 'mc', q: '作者說奶奶是「全世界最年輕的奶奶」，是因為奶奶怎麼樣？', o: ['年紀最小', '充滿活力和創意', '很會看星座'], a: 1, ex: '第四段：在我心中，她充滿活力和創意，是全世界最年輕的奶奶！' }
     ] },
   { id: 'stest', sec: '修辭句型', name: '句型修辭檢測', when: '第3節', group: 's',
     intro: '6 題小檢測。交卷後先看檢討，看完網站會自動分組，打開你這一組的分組任務。',
@@ -1154,6 +1166,15 @@ function itemsBody(s) {
         <p class="ex"><b>${ok ? '說明' : '為什麼'}</b>${esc(it.ex || '')}</p></div>`; }).join('')}</div>
       <div class="submit-row"><button class="primary" type="button" id="reviewed">我檢討完了，幫我分組</button></div>`;
     }
+    if (s.cmp) {
+      const A = preFirst(st.recs[s.cmp]); const B = rec.score;
+      const line = A == null ? `這次答對 <b>${B} / ${rec.max}</b> 題。` : `預習單第一次答對 <b>${A}</b> 題 → 這次答對 <b>${B}</b> 題。${B > A ? `<br>進步了 <b class="up">${B - A}</b> 題，上課真的有學到！` : B === A ? (B === rec.max ? '<br>兩次都全對，太厲害了！' : '<br>和預習時一樣，看看下面哪裡還可以更好。') : '<br>這次少對了幾題，看看下面的答案，再讀一次課文。'}`;
+      return top + `<div class="notice done cmp-note">${line}</div>
+      <div class="qlist">${items.map((it, i) => { const v = rec.ans[it.id]; const ok = v === it.a; return `<div class="q rv ${ok ? 'is-ok' : 'is-no'}">
+        <p class="sq"><span class="qno">${i + 1}</span>${esc(it.q)}</p>
+        <p class="rv-line"><span class="mark ${ok ? 'ok' : 'no'}">${ok ? '答對' : '答錯'}</span>你選：${esc(it.o[v] ?? '沒作答')}${ok ? '' : `　正確答案：<b>${esc(it.o[it.a])}</b>`}</p>
+        <p class="ex"><b>說明</b>${esc(it.ex || '')}</p></div>`; }).join('')}</div>`;
+    }
     const g = next ? myGroup(s.group) : null;
     const msg = s.test ? '後測已交卷。到「後測檢討」看看每一題的詳解。'
       : next && g ? `檢討完成！你被分到 <b class="g-${GROUPS[g].tone} gchip">${GROUPS[g].name}</b>，「${next.name}」已經打開了。<button class="primary" type="button" id="goNext" data-next="${next.id}">開始${next.name}</button>`
@@ -1164,7 +1185,7 @@ function itemsBody(s) {
   return top + doneNote + `<form class="qlist" id="qform">
     ${items.map((it, i) => qHtml(s, it, i, rec)).join('')}
     <div class="submit-row">
-      ${isTest ? `<button class="primary" type="submit">交出${s.test ? '後測' : '檢測'}</button>` : rec.done ? '' : `<button class="primary" type="submit">完成這一關</button>`}
+      ${isTest ? `<button class="primary" type="submit">交出${s.cmp ? '' : s.test ? '後測' : '檢測'}${s.cmp ? '課文內容後測' : ''}</button>` : rec.done ? '' : `<button class="primary" type="submit">完成這一關</button>`}
       <span class="muted" id="left"></span>
     </div>
   </form>`;
@@ -1790,6 +1811,28 @@ function bWall() {
   $('#wanon').onchange = () => { st.t.anonOverride = $('#wanon').checked; renderTeacher(true); };
   $('#wproj').onclick = () => { st.t.proj = !st.t.proj; renderTeacher(); };
 }
+function preFirst(r) {
+  if (!r) return null; const its = stageById('pre').items; if (!its.some(it => r.first?.[it.id] != null)) return null;
+  return its.filter(it => r.first?.[it.id] === true).length;
+}
+function tPreCmp(seats) {
+  const B = stageById('preB'); const A = stageById('pre');
+  const rows = seats.map(n => ({ n, a: preFirst(recOf(n, 'pre')), b: recOf(n, 'preB')?.done ? recOf(n, 'preB').score : null }));
+  const both = rows.filter(r => r.a != null && r.b != null);
+  const av = k => both.length ? (both.reduce((x, r) => x + r[k], 0) / both.length).toFixed(1) : '—';
+  const rate = (st_, id, key) => { const rs = seats.map(n => recOf(n, st_)).filter(r => r && (key === 'first' ? r.first?.[id] != null : r.done)); return rs.length ? Math.round(rs.filter(r => key === 'first' ? r.first[id] === true : r.ok?.[id]).length / rs.length * 100) : null; };
+  const pc = v => v == null ? '<td class="num muted">·</td>' : `<td class="num"><span class="bar" style="--w:${v}%"></span>${v}</td>`;
+  const up = r => r.a == null || r.b == null ? '<td class="num muted">·</td>' : `<td class="num ${r.b > r.a ? 'up' : r.b < r.a ? 'down' : ''}">${r.b > r.a ? '+' : ''}${r.b - r.a}</td>`;
+  return `<section class="panel"><h2>預習前後：預習單 vs 課文內容後測（B卷）</h2>
+    <p class="muted">預習單用「第一次作答」計分；兩份都做完的人才算平均（${both.length} 人）。共 ${B.items.length} 題。</p>
+    <div class="avgs"><div><span>預習單（前）</span><b>${av('a')}<small> 題</small></b></div><div><span>B 卷（後）</span><b>${av('b')}<small> 題</small></b></div><div><span>進步的人數</span><b>${both.filter(r => r.b > r.a).length}<small> 人</small></b></div></div>
+    <div class="scroll"><table class="tbl"><thead><tr><th>考的重點</th><th>預習單答對率</th><th>B 卷答對率</th></tr></thead><tbody>
+    ${B.items.map(it => { const ai = A.items.find(x => x.id === it.from); return `<tr><td>${esc(ai ? ai.q : it.q)}</td>${pc(rate('pre', it.from, 'first'))}${pc(rate('preB', it.id, 'ok'))}</tr>`; }).join('')}
+    </tbody></table></div>
+    <div class="scroll"><table class="tbl"><thead><tr><th>座號</th><th>預習單（前）</th><th>B 卷（後）</th><th>進步</th></tr></thead><tbody>
+    ${rows.map(r => `<tr><td class="num">${r.n}</td><td class="num">${r.a ?? '<span class="muted">·</span>'}</td><td class="num">${r.b ?? '<span class="muted">·</span>'}</td>${up(r)}</tr>`).join('')}
+    </tbody></table></div></section>`;
+}
 function tCompare() {
   const seats = seatsList(); const post = stageById('post');
   const pct = r => r?.done && r.max ? Math.round(r.score / r.max * 100) : null;
@@ -1800,7 +1843,7 @@ function tCompare() {
   const itemRate = it => { const rs = rows.map(r => r.pr).filter(r => r?.done); return rs.length ? Math.round(rs.filter(r => r.ok[it.id]).length / rs.length * 100) : null; };
   const ranked = post.items.map(it => ({ it, r: itemRate(it) })).filter(x => x.r != null).sort((a, b) => a.r - b.r);
   const cell = v => v == null ? '<td class="num muted">·</td>' : `<td class="num"><span class="bar" style="--w:${v}%"></span>${v}</td>`;
-  return `
+  return tPreCmp(seats) + `
   <section class="panel"><h2>全班平均</h2>
     <div class="avgs"><div><span>生字語詞檢測</span><b>${avg('v') ?? '—'}<small>%</small></b></div><div><span>句型修辭檢測</span><b>${avg('s') ?? '—'}<small>%</small></b></div><div><span>後測</span><b>${avg('p') ?? '—'}<small>%</small></b></div></div>
   </section>
