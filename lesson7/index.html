@@ -318,6 +318,18 @@ button.opt{justify-content:center;font-size:1.1rem}button.opt .kai{font-size:1.5
 .ws-cells>span+span{border-left:1px solid var(--ink)}
 .ws-w{font-size:1.05rem}.ws-z{font-size:1.1rem}
 .ws-notes{margin:.5em 0;padding-left:1.2em;color:var(--muted)}
+.ws-step{display:grid;gap:12px;margin:10px 0}
+.ws-dots{display:flex;flex-wrap:wrap;gap:6px}
+.ws-dot{min-width:2.4em;height:2.4em;border-radius:999px;border:1.5px solid var(--line,var(--muted));background:var(--card);color:var(--ink);font-size:1.1rem;padding:0 .4em;cursor:pointer}
+.ws-dot.seen{border-color:var(--accent)}
+.ws-dot.on{background:var(--ink);color:var(--card);border-color:var(--ink)}
+.ws-stage{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end}
+.ws-stage>.ws-card{min-width:220px}.ws-stage>.ws-card .ws-c{font-size:3.4rem}
+.ws-pal{display:grid;gap:4px;opacity:.85}.ws-pal .ws-card{min-width:150px}
+.ws-explain{border-left:4px solid var(--accent);background:var(--card);padding:.5em .9em;border-radius:4px;font-size:1.05rem}
+.ws-explain p{margin:.25em 0}.ws-explain ul{margin:.25em 0;padding-left:1.2em}
+.ws-tip{font-weight:600}
+.ws-nav{display:flex;flex-wrap:wrap;gap:8px}
 .teach-sec>button{justify-self:start}
 .vthumb{position:relative;border:0;padding:0;border-radius:10px;overflow:hidden;background:#000;margin-bottom:6px;display:block;width:100%}
 .vthumb img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;opacity:.85;max-width:100%}
@@ -1040,15 +1052,31 @@ function teachBody(s, rec) {
   const ws = (c, rows, open) => `<div class="ws-card"><div class="ws-row ws-head"><span class="ws-lab">國字</span><span class="kai ws-c">${c}</span></div>
       <div class="ws-row"><span class="ws-lab">讀音</span><span class="ws-cells">${rows.map(r => `<span class="zy ws-z">${open ? r[0] : '　'}</span>`).join('')}</span></div>
       <div class="ws-row"><span class="ws-lab">造詞</span><span class="ws-cells">${rows.map(r => `<span class="kai ws-w">${open ? r[1] : ''}</span>`).join('')}</span></div></div>`;
-  const openP = !!rec.extra.wsPoly, openL = !!rec.extra.wsLook;
-  const poly = `<p class="muted">先在學習單上寫注音、造詞，寫好再按「看答案」對對看。</p>
-    <div class="ws-grid">${POLY.map(([c, rs]) => ws(c, rs, openP)).join('')}</div>
-    <button type="button" class="ghost sm" data-ws="wsPoly">${openP ? '隱藏答案' : '看答案'}</button>
-    ${openP ? `<ul class="ws-notes">${POLY.map(([c, rs]) => `<li><b class="kai">${c}</b>：${rs.map(r => `${r[0]} ${esc(r[2])}`).join('；')}</li>`).join('')}</ul>` : ''}`;
-  const look = `<p class="muted">先在學習單上寫注音、造詞，寫好再按「看答案」對對看。</p>
-    <div class="ws-grid">${LOOKALIKE.map(([a, b]) => `<div class="ws-pair">${ws(a[0], [[a[1], a[2]]], openL)}${ws(b[0], [[b[1], b[2]]], openL)}</div>`).join('')}</div>
-    <button type="button" class="ghost sm" data-ws="wsLook">${openL ? '隱藏答案' : '看答案'}</button>
-    ${openL ? `<ul class="ws-notes">${LOOKALIKE.map(([a, b, tip]) => `<li><b class="kai">${a[0]}／${b[0]}</b>：${esc(tip)}</li>`).join('')}</ul>` : ''}`;
+  // 一個字一個字講：每次只出現一張卡，看完答案再按「下一個字」
+  const wo = rec.extra.wsOpen = rec.extra.wsOpen || {};
+  const stepper = (key, steps) => {
+    const i = Math.min(rec.extra[key] || 0, steps.length - 1), cur = steps[i], open = !!wo[cur.c];
+    return `<div class="ws-step">
+      <div class="ws-dots" aria-label="第 ${i + 1} 個字，共 ${steps.length} 個">${steps.map((t, k) => `<button type="button" class="ws-dot${k === i ? ' on' : ''}${wo[t.c] ? ' seen' : ''}" data-wsgo="${key}" data-i="${k}"><span class="kai">${t.c}</span></button>`).join('')}</div>
+      <div class="ws-stage">${ws(cur.c, cur.rows, open)}${cur.pal ? `<div class="ws-pal"><span class="muted">比一比</span>${ws(cur.pal.c, cur.pal.rows, !!wo[cur.pal.c])}</div>` : ''}</div>
+      ${open ? `<div class="ws-explain">${cur.note}</div>` : ''}
+      <div class="ws-nav">
+        <button type="button" class="ghost sm" data-wsgo="${key}" data-i="${i - 1}" ${i === 0 ? 'disabled' : ''}>← 上一個字</button>
+        <button type="button" class="${open ? 'ghost' : 'primary'} sm" data-wsopen="${cur.c}">${open ? '隱藏答案' : `看「${cur.c}」的答案`}</button>
+        <button type="button" class="ghost sm" data-wsgo="${key}" data-i="${i + 1}" ${i === steps.length - 1 ? 'disabled' : ''}>下一個字 →</button>
+      </div></div>`;
+  };
+  const polySteps = POLY.map(([c, rs]) => ({ c, rows: rs,
+    note: `<p><b class="kai">${c}</b>有 ${rs.length} 種念法：</p><ul>${rs.map(r => `<li><span class="zy">${r[0]}</span>：${esc(r[2])}。例如 <span class="kai">${esc(r[1])}</span></li>`).join('')}</ul>` }));
+  const lookSteps = [];
+  LOOKALIKE.forEach(([a, b, tip]) => {
+    const A = { c: a[0], rows: [[a[1], a[2]]] }, B = { c: b[0], rows: [[b[1], b[2]]] };
+    lookSteps.push({ ...A, note: `<p><b class="kai">${a[0]}</b> 念 <span class="zy">${a[1]}</span>，可以造：<span class="kai">${esc(a[2])}</span></p><p class="muted">下一個字是長得很像的「${b[0]}」，先猜猜哪裡不一樣？</p>` });
+    lookSteps.push({ ...B, pal: A, note: `<p><b class="kai">${b[0]}</b> 念 <span class="zy">${b[1]}</span>，可以造：<span class="kai">${esc(b[2])}</span></p><p class="ws-tip">🔍 「${a[0]}」和「${b[0]}」：${esc(tip)}</p>` });
+  });
+  const tip1 = '<p class="muted">先在學習單上寫注音、造詞，老師講一個字，再按「看答案」對一個字。</p>';
+  const poly = tip1 + stepper('wsPi', polySteps);
+  const look = tip1 + stepper('wsLi', lookSteps);
   const words = `<div class="word-grid">${WORDS.map(([w, m, e]) => `<div class="word"><div class="word-top"><b class="kai">${esc(w)}</b><button type="button" class="say" data-say="${esc(w + '。' + (e || ''))}" aria-label="念「${esc(w)}」">念</button></div><span>${esc(m)}</span>${e ? `<span class="eg kai">${esc(e)}</span>` : ''}</div>`).join('')}</div>`;
   const idioms = `<div class="idiom-grid">${IDIOMS.map(([w, m, e]) => `<div class="idiom-card">${IDIOM_VIDEO[w] ? `<button type="button" class="vthumb" data-video="${w}" aria-label="看「${w}」動畫"><img src="${VIDEO_BASE}${IDIOM_VIDEO[w]}.jpg" alt="" loading="lazy"><span>🎬 看動畫</span></button>` : ''}<b class="kai">${w}</b><span>${esc(m)}</span><p class="copy-lab">造句（可以抄寫）</p><ol class="copy-list kai">${e.map(x => `<li>${esc(x)}</li>`).join('')}</ol></div>`).join('')}</div>`;
   return `<form id="qform">
@@ -1107,7 +1135,9 @@ function bindItems(s) {
   const rv = $('#reviewed'); if (rv) rv.onclick = () => { const r = myRec(s.id); r.extra.reviewed = true; queueSave(s.id, true); try { sfx('win'); confetti(); } catch (e) {} renderStage(); scrollTo(0, 0); };
   const gn = $('#goNext'); if (gn) gn.onclick = () => { st.stage = gn.dataset.next; go('stage'); scrollTo(0, 0); };
   document.querySelectorAll('[data-pvg]').forEach(b => b.onclick = () => { st.pvGroup = b.dataset.pvg; const y = scrollY; renderStage(); scrollTo(0, y); });
-  document.querySelectorAll('[data-ws]').forEach(b => b.onclick = () => { const r = myRec(s.id); r.extra[b.dataset.ws] = !r.extra[b.dataset.ws]; queueSave(s.id); const y = scrollY; renderStage(); scrollTo(0, y); });
+  const wsRe = () => { queueSave(s.id); const y = scrollY; renderStage(); scrollTo(0, y); };
+  document.querySelectorAll('[data-wsgo]').forEach(b => b.onclick = () => { myRec(s.id).extra[b.dataset.wsgo] = +b.dataset.i; wsRe(); });
+  document.querySelectorAll('[data-wsopen]').forEach(b => b.onclick = () => { const r = myRec(s.id); r.extra.wsOpen = r.extra.wsOpen || {}; const c = b.dataset.wsopen; r.extra.wsOpen[c] = !r.extra.wsOpen[c]; wsRe(); });
   const form = $('#qform'); if (!form) return;
   const rec = myRec(s.id);
   const isTest = !!(s.group || s.test);
