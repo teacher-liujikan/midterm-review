@@ -137,6 +137,40 @@ textarea{font-size:1.15rem;line-height:1.7;resize:vertical;clear:both;display:bl
 .huge{font-size:4rem;line-height:1}.zy.lg{font-size:1.4rem}
 .facts{display:flex;gap:18px;margin:.6em 0;flex-wrap:wrap}.facts div{display:grid}.facts dt{font-size:.8rem;color:var(--muted)}.facts dd{margin:0;font-size:1.2rem;font-weight:700;font-variant-numeric:tabular-nums}
 .words-inline{font-size:1.3rem;margin:0}.idiom{font-size:1rem;color:var(--accent)}
+/* 生字：左筆順、右小百科（平板橫拿左右並排，直拿上下排） */
+.char-grid{grid-template-columns:repeat(auto-fill,minmax(58px,1fr))}
+.char .big{font-size:1.9rem}
+.cc2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:20px;background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:18px;margin-top:16px;scroll-margin-top:72px}
+.cc-left,.cc-right{min-width:0;display:grid;gap:10px;align-content:start}
+.cc-head{display:flex;align-items:center;gap:14px;flex-wrap:wrap}.cc-head .huge{font-size:4.6rem}.cc-head .facts{margin:0}
+.cc2 .trace-box{max-width:none;margin:0}
+.cc-book summary{cursor:pointer;color:var(--muted);padding:.4em 0}.cc-book .stroke-img{max-width:360px}
+.cc-act button{font-size:1.1rem;padding:.6em 1.1em}
+.cc-nav{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;gap:10px;border-top:1px dashed var(--line);padding-top:12px}
+.big-nav{font-size:1.25rem;padding:.55em 1.2em;min-width:6em}.big-nav:disabled{opacity:.35}
+.wiki-top{display:flex;align-items:center;justify-content:space-between;gap:8px}.wiki-top h3{margin:0;font-size:1.3rem}
+.wk-poly{margin:0;background:var(--warn-soft);border-radius:10px;padding:.6em .9em;font-size:1.05rem}
+.wiki{border:1.5px solid var(--line);border-radius:12px;background:var(--paper);overflow:hidden}
+.wiki[open]{border-color:var(--accent)}
+.wiki summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:12px;min-height:56px;padding:0 14px;font-size:1.15rem;font-weight:700}
+.wiki summary::-webkit-details-marker{display:none}
+.wiki summary::after{content:"＋";margin-left:auto;color:var(--muted);font-weight:400}.wiki[open] summary::after{content:"－"}
+.wiki-ic{width:36px;height:36px;border-radius:50%;background:var(--card);display:grid;place-items:center;font-size:1.15rem}
+.wiki-body{padding:2px 16px 14px;font-size:1.1rem;line-height:1.7}.wiki-body p{margin:.3em 0}
+.wk-tag{display:inline-block;background:var(--accent-soft);color:var(--accent);border-radius:999px;padding:0 .7em;font-size:.95rem;font-weight:700}
+.wk-small{font-size:.95rem}
+.wk-rad .kai{font-size:2.4rem;color:var(--accent);margin-right:.2em}
+.wk-list{margin:.2em 0;padding-left:1.2em}
+.wk-words{display:flex;flex-wrap:wrap;gap:8px;margin:.3em 0 .5em}.wk-words span{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:.15em .6em;font-size:1.25rem}
+.wk-words .wk-idiom{color:var(--accent);border-color:var(--accent)}
+.wk-eg{list-style:none;margin:0;padding:0;display:grid;gap:6px}.wk-eg li{display:flex;gap:8px;align-items:center;justify-content:space-between;background:var(--card);border-radius:8px;padding:.35em .7em;font-size:1.2rem}
+.wk-like{display:flex;flex-wrap:wrap;gap:10px;margin:.3em 0}
+.wk-lc{display:grid;justify-items:center;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:.4em .9em;min-width:5.5em}
+.wk-lc>span:first-child{font-size:2rem;line-height:1.2}.wk-lc .zy{font-size:.9rem;color:var(--muted)}
+.wk-pairs{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:.5em}.wk-lab{font-weight:700;font-size:1rem;margin-right:4px}
+.wk-pair{background:var(--card);border-radius:8px;padding:.15em .6em;font-size:1.2rem}.wk-pair i{font-style:normal;color:var(--accent)}
+@media (max-width:760px){.cc2{grid-template-columns:1fr}}
+
 /* 檢討 */
 .score-strip{display:flex;gap:14px;align-items:baseline;background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:12px 18px;margin-top:12px}
 .score-strip strong{font-size:1.8rem;font-variant-numeric:tabular-nums}
@@ -663,6 +697,90 @@ const STAGES = [
   { id: 'review', sec: '後測檢討', name: '後測檢討', when: '第5節',
     intro: '看看每一題的詳解，給自己打個勾。答錯的題目可以再挑戰一次。' }
 ];
+
+// 生字小百科：字的由來只放有可靠說法的字；o 為 null 的字不顯示「字的由來」
+// o:[說明, 造字方法]  r:部首的意思  m:易錯提醒(另加 CHARS 的寫字提醒)  w:更多造詞  e:例句
+// l:相似字 [[字,注音,造詞]]  syn:近義詞  ant:反義詞  p:多音字提醒
+const CHAR_INFO = {
+  '背': { o: ['很久以前，「北」畫的就是兩個人背對背站著，意思就是「背」。後來「北」被借去當方向，大家就在下面加上「月（肉）」，表示身體的背。', '形聲字'],
+    r: '「月」在這裡其實是「肉」，跟身體有關，像「胸」、「腳」、「臂」。',
+    m: ['上面是「北」，下面是「月」，上下要對齊，「北」不要寫太寬。'],
+    w: ['背面', '背部', '手背', '背景', '背包', '背書'], e: ['他把背包背在背上，準備去郊遊。', '這張圖片的背面寫著名字。'],
+    l: [['北', 'ㄅㄟˇ', '北方'], ['肯', 'ㄎㄣˇ', '肯定']], syn: [['背面', '反面']], ant: [['手背', '手心'], ['背面', '正面']],
+    p: '「背」是多音字：ㄅㄟˋ（手背、背景）、ㄅㄟ（背包、背書包）。' },
+  '斑': { o: null,
+    r: '「文」本來的意思是「花紋」，所以「斑」是雜色的花紋、小點點。',
+    m: ['中間是「文」，不是一把刀（那是「班」）。'],
+    w: ['斑點', '斑馬', '雀斑', '斑紋', '斑駁'], e: ['斑馬身上有黑白相間的斑紋。', '老牆上的油漆變得斑駁了。'],
+    l: [['班', 'ㄅㄢ', '班級'], ['辨', 'ㄅㄧㄢˋ', '分辨']], syn: [['斑點', '斑紋']], ant: [] },
+  '皺': { o: ['左邊「芻」表示讀音，右邊「皮」表示意思：皮膚上凹凸的紋路。', '形聲字'],
+    r: '「皮」和皮膚、表面有關，像「皮膚」、「皺紋」。',
+    m: ['左邊「芻」筆畫多，要寫窄一點，右邊的「皮」才放得下。'],
+    w: ['皺紋', '皺眉', '皺褶', '皺巴巴'], e: ['媽媽一生氣就會皺起眉頭。', '衣服放太久，變得皺巴巴的。'],
+    l: [['鄒', 'ㄗㄡ', '姓鄒'], ['趨', 'ㄑㄩ', '趨勢']], syn: [['皺巴巴', '皺皺的']], ant: [['皺巴巴', '平平整整']] },
+  '淘': { o: ['左邊「氵」表示和水有關，右邊「匋」表示讀音。「淘」就是用水把東西沖洗、把不要的去掉，像「淘米」、「淘金」。', '形聲字'],
+    r: '「氵」是水，和水有關的動作，像「洗」、「淘」、「游」。',
+    m: ['右邊「勹」裡面是「缶」，不要寫成「午」。'],
+    w: ['淘氣', '淘米', '淘金', '淘汰'], e: ['淘氣的小狗把拖鞋咬走了。', '比賽輸了就會被淘汰。'],
+    l: [['陶', 'ㄊㄠˊ', '陶土'], ['掏', 'ㄊㄠ', '掏出'], ['萄', 'ㄊㄠˊ', '葡萄']], syn: [['淘氣', '頑皮、調皮']], ant: [['淘氣', '乖巧']] },
+  '懂': { o: ['左邊「忄」表示和心裡想有關，右邊「董」表示讀音。心裡明白了，就是「懂」。', '形聲字'],
+    r: '「忄」是心，和想法、心情有關，像「快」、「怕」、「懂」。',
+    m: ['右邊是「董」：「艹」下面是「重」。'],
+    w: ['懂事', '聽懂', '看懂', '懂得'], e: ['姊姊很懂事，會幫忙照顧弟弟。', '老師再講一次，我就聽懂了。'],
+    l: [['董', 'ㄉㄨㄥˇ', '董事長'], ['重', 'ㄓㄨㄥˋ', '重要']], syn: [['懂', '明白、了解']], ant: [['懂', '不懂']] },
+  '凡': { o: null,
+    r: '課本上「凡」的部首是「丶」（點）；有些字典把它放在「几」部，查不到時兩個都找找看。',
+    m: ['裡面的「點」不要碰到旁邊的筆畫。'],
+    w: ['平凡', '非凡', '凡事', '自命不凡'], e: ['凡事都要先想一想再做。', '這場表演非常精彩，真是非凡。'],
+    l: [['几', 'ㄐㄧ', '茶几'], ['丸', 'ㄨㄢˊ', '肉丸']], syn: [['平凡', '普通']], ant: [['平凡', '非凡']] },
+  '梳': { o: ['左邊「木」表示意思，以前的梳子多半是木頭做的；右邊表示讀音。', '形聲字'],
+    r: '「木」和樹、木頭有關，像「桌」、「椅」、「梳」。',
+    m: ['右上是「𠫓」，不要寫成「亡」；右下是三筆像「川」。'],
+    w: ['梳子', '梳頭', '梳妝', '梳理'], e: ['奶奶每天早上都用木梳子梳頭。', '他把亂掉的頭髮梳理整齊。'],
+    l: [['流', 'ㄌㄧㄡˊ', '流水'], ['疏', 'ㄕㄨ', '疏忽']], syn: [['梳理', '整理']], ant: [] },
+  '夾': { o: ['中間的「大」是一個大人，兩邊各有一個小「人」，像大人用手臂把兩個人夾在身邊，所以是「夾」。', '會意字'],
+    r: '「大」本來就是一個人張開手腳的樣子。',
+    m: ['兩邊是兩個小「人」，不是「來」的兩點。'],
+    w: ['髮夾', '皮夾', '夾子', '夾縫'], e: ['妹妹頭上別著一個粉紅色的髮夾。', '爸爸用筷子夾菜給我。'],
+    l: [['來', 'ㄌㄞˊ', '回來'], ['峽', 'ㄒㄧㄚˊ', '海峽'], ['俠', 'ㄒㄧㄚˊ', '大俠']], syn: [], ant: [] },
+  '藏': { o: ['上面「艹」表示意思，下面「臧」表示讀音。', '形聲字'],
+    r: '「艹」是草，和花草植物有關，像「花」、「草」、「茶」。',
+    m: ['中間是「臣」，不是「巨」。'],
+    w: ['隱藏', '躲藏', '收藏', '寶藏', '冷藏'], e: ['我躲在門後面玩捉迷藏。', '海盜把寶藏埋在島上。'],
+    l: [['臟', 'ㄗㄤˋ', '心臟'], ['贓', 'ㄗㄤ', '贓物']], syn: [['隱藏', '躲藏']], ant: [['藏', '露'], ['隱藏', '顯露']],
+    p: '「藏」是多音字：ㄘㄤˊ（收藏、捉迷藏）、ㄗㄤˋ（寶藏）。' },
+  '捏': { o: ['左邊「扌」表示用手，右邊表示讀音。用手指把東西夾住、壓一壓，就是「捏」。', '形聲字'],
+    r: '「扌」是手，和手的動作有關，像「拿」、「打」、「捏」、「摺」。',
+    m: ['右邊上面「曰」、下面「土」，中間不相接。'],
+    w: ['捏黏土', '捏造', '扭捏', '捏一把冷汗'], e: ['我用黏土捏了一隻小兔子。', '看到他差點跌倒，大家都捏了一把冷汗。'],
+    l: [], syn: [['捏造', '編造']], ant: [] },
+  '摺': { o: ['左邊「扌」表示用手，右邊「習」表示讀音。用手把紙或衣服翻過來對齊，就是「摺」。', '形聲字'],
+    r: '「扌」是手，和手的動作有關。',
+    m: ['右下是「白」，不是「日」。'],
+    w: ['摺紙', '摺疊', '摺衣服', '摺扇'], e: ['我們用色紙摺了一隻紙鶴。', '洗好的衣服要摺好放進衣櫃。'],
+    l: [['褶', 'ㄓㄜˊ', '皺褶（衣服上的）'], ['習', 'ㄒㄧˊ', '學習']], syn: [['摺', '折']], ant: [['摺起來', '攤開']] },
+  '仔': { o: ['左邊「亻」表示人，右邊「子」表示讀音。', '形聲字'],
+    r: '「亻」是人，和人有關，像「你」、「他」、「仔」。',
+    m: ['右邊「子」的第一筆是「橫撇」。'],
+    w: ['仔細', '牛仔', '蚵仔', '公仔'], e: ['寫完考卷要仔細檢查。', '我的書桌上有一個可愛的公仔。'],
+    l: [['好', 'ㄏㄠˇ', '好人'], ['字', 'ㄗˋ', '國字'], ['籽', 'ㄗˇ', '菜籽']], syn: [['仔細', '細心、小心']], ant: [['仔細', '粗心、馬虎']] },
+  '藝': { o: ['很早以前的字，畫的是一個人跪著、雙手捧著小樹苗在種。本來的意思是「種植」，種得好要有本領，後來就變成「技能、才能」的意思。', '會意字'],
+    r: '「艹」是草，和植物有關；「藝」本來的意思就是種植。',
+    m: ['筆畫很多，中間「坴」和「丸」要排緊，最下面是「云」。'],
+    w: ['藝術', '才藝', '陶藝', '手藝', '園藝'], e: ['哥哥的才藝是彈鋼琴。', '阿嬤做粿的手藝很好。'],
+    l: [['勢', 'ㄕˋ', '手勢'], ['熱', 'ㄖㄜˋ', '熱鬧']], syn: [['手藝', '技術']], ant: [] },
+  '術': { o: ['「行」本來畫的是十字路口。「術」最早的意思是城裡的道路，後來才變成「方法、本領」，像「技術」、「魔術」。', '形聲字'],
+    r: '「行」是十字路口，和道路、走路有關，像「街」、「術」。',
+    m: ['中間是「朮」，右上有一點；不要寫成「木」。'],
+    w: ['美術', '魔術', '技術', '藝術', '手術'], e: ['魔術師從帽子裡變出一隻鴿子。', '美術課我們畫了自己的家人。'],
+    l: [['街', 'ㄐㄧㄝ', '街道'], ['述', 'ㄕㄨˋ', '敘述']], syn: [['技術', '本領']], ant: [] },
+  '創': { o: ['左邊「倉」表示讀音，右邊「刂」是刀。「創」本來的意思是被刀弄傷，現在「創傷」還留著這個意思；後來多了「開始做、做出新東西」的意思。', '形聲字'],
+    r: '「刂」是刀，和刀、切割有關，像「刻」、「割」、「創」。',
+    m: ['左邊「倉」下面是「口」，要寫小一點，右邊才放得下「刂」。'],
+    w: ['創意', '創作', '創造', '創新', '首創'], e: ['這個書包的設計很有創意。', '我們一起創作一首班歌。'],
+    l: [['倉', 'ㄘㄤ', '倉庫'], ['槍', 'ㄑㄧㄤ', '水槍'], ['搶', 'ㄑㄧㄤˇ', '搶先']], syn: [['創造', '發明']], ant: [['創新', '模仿']],
+    p: '「創」是多音字：ㄔㄨㄤˋ（創意、創作）、ㄔㄨㄤ（創傷）。' }
+};
 
 // 第七課課文注音（依課本逐字標注，含輕聲與「一」「不」變調）
 const LESSON_ZY=[["ㄋㄞˇ", "˙ㄋㄞ", "˙ㄉㄜ", "ㄕㄡˇ", "ㄅㄟˋ", "ㄕㄤˋ", "ㄧㄡˇ", "ㄏㄠˇ", "ㄉㄨㄛ", "ㄅㄢ", "ㄉㄧㄢˇ", "ㄏㄢˋ", "ㄓㄡˋ", "ㄨㄣˊ", "ㄊㄠˊ", "ㄑㄧˋ", "˙ㄉㄜ", "ㄨㄛˇ", "ㄗㄨㄟˋ", "ㄒㄧˇ", "ㄏㄨㄢ", "ㄅㄚˇ", "ㄕˊ", "ㄓˇ", "ㄈㄤˋ", "ㄗㄞˋ", "ㄕㄤˋ", "˙ㄊㄡ", "ㄨㄢˊ", "ㄌㄧㄢˊ", "ㄌㄧㄢˊ", "ㄎㄢˋ", "ㄧㄡˊ", "ㄒㄧˋ"], ["ㄧㄡˇ", "ㄕˊ", "ㄨㄛˇ", "ㄅㄚˇ", "ㄋㄞˇ", "˙ㄋㄞ", "ㄕㄡˇ", "ㄕㄤˋ", "˙ㄉㄜ", "ㄅㄢ", "ㄉㄧㄢˇ", "ㄉㄤˋ", "ㄔㄥˊ", "ㄒㄧㄥ", "˙ㄒㄧㄥ", "ㄌㄧㄢˊ", "ㄔㄨ", "ㄑㄧˊ", "ㄊㄜˋ", "˙ㄉㄜ", "ㄒㄧㄥ", "ㄗㄨㄛˋ", "ㄋㄞˇ", "˙ㄋㄞ", "ㄒㄧㄠˋ", "ㄕㄨㄛ", "ㄗˋ", "ㄐㄧˇ", "ㄅㄨˋ", "ㄉㄨㄥˇ", "ㄒㄧㄥ", "ㄗㄨㄛˋ", "ㄓˇ", "ㄓ", "ㄉㄠˋ", "ㄈㄢˊ", "ㄕˋ", "ㄋㄨˇ", "ㄌㄧˋ", "ㄗㄨㄛˋ", "ㄊㄚ", "ㄧˋ", "ㄑㄧˇ", "ㄔㄨㄤˊ", "ㄕㄨㄤ", "ㄕㄡˇ", "ㄐㄧㄡˋ", "ㄗㄞˋ", "ㄧㄣˊ", "ㄈㄚˇ", "ㄕㄤˋ", "ㄧㄡˋ", "ㄕㄨ", "ㄧㄡˋ", "ㄐㄧㄚˊ", "ㄈㄚˇ", "ㄕㄤˋ", "˙ㄉㄜ", "ㄧㄣˊ", "ㄍㄨㄤ", "ㄅㄧˇ", "ㄑㄧㄥ", "ㄔㄣˊ", "˙ㄉㄜ", "ㄧㄤˊ", "ㄍㄨㄤ", "ㄏㄞˊ", "ㄇㄧㄥˊ", "ㄌㄧㄤˋ", "ㄋㄞˇ", "˙ㄋㄞ", "ㄔㄤˊ", "ㄔㄤˊ", "ㄕㄨㄛ", "ㄊㄡˊ", "ㄈㄚˇ", "ㄓㄥˇ", "ㄌㄧˇ", "ㄏㄠˇ", "ㄗㄨㄛˋ", "ㄕˋ", "ㄋㄢˊ", "ㄅㄨˋ", "ㄉㄠˇ", "ㄋㄞˇ", "˙ㄋㄞ", "ㄅㄤ", "ㄏㄨㄚ", "ㄔㄨˊ", "ㄨㄢˊ", "ㄔㄨㄥˊ", "ㄓㄨㄢˇ", "ㄕㄣ", "ㄇㄤˊ", "ㄒㄧˇ", "ㄧ", "ㄗㄨㄛˋ", "˙ㄉㄜ", "ㄎㄨㄞˋ", "ㄧㄡˋ", "ㄏㄠˇ"], ["ㄧㄡˇ", "ㄕˊ", "ㄨㄛˇ", "ㄅㄚˇ", "ㄋㄞˇ", "˙ㄋㄞ", "ㄕㄡˇ", "ㄕㄤˋ", "˙ㄉㄜ", "ㄓㄡˋ", "ㄨㄣˊ", "ㄉㄤˋ", "ㄔㄥˊ", "ㄑㄩㄣˊ", "ㄕㄢ", "ㄌㄧㄢˊ", "ㄔㄨ", "ㄧˋ", "ㄊㄧㄠˊ", "ㄘㄤˊ", "ㄅㄠˇ", "ㄌㄨˋ", "ㄒㄧㄢˋ", "ㄋㄞˇ", "˙ㄋㄞ", "ㄒㄧㄠˋ", "˙ㄓㄜ", "ㄋㄧㄝ", "ㄋㄧㄝ", "ㄨㄛˇ", "˙ㄉㄜ", "ㄌㄧㄢˇ", "ㄕㄨㄛ", "ㄋㄧˇ", "ㄘㄞˊ", "ㄕˋ", "ㄨㄛˇ", "˙ㄉㄜ", "ㄅㄠˇ", "ㄅㄟˋ", "˙ㄧㄚ", "ㄊㄚ", "˙ㄉㄜ", "ㄕㄡˇ", "ㄓㄣ", "˙ㄉㄜ", "ㄏㄨㄟˋ", "ㄅㄧㄢˋ", "ㄔㄨ", "ㄅㄠˇ", "ㄨˋ", "ㄧˋ", "ㄓㄤ", "ㄓˇ", "ㄗㄞˋ", "ㄕㄡˇ", "ㄓㄨㄥ", "ㄓㄜˊ", "ㄓㄜˊ", "ㄐㄧㄢˇ", "ㄐㄧㄢˇ", "ㄅㄨˋ", "ㄧˋ", "ㄏㄨㄟˇ", "ㄦ", "ㄐㄧㄡˋ", "ㄅㄧㄢˋ", "ㄔㄥˊ", "ㄇㄟˇ", "ㄌㄧˋ", "˙ㄉㄜ", "ㄔㄨㄤ", "ㄏㄨㄚ", "ㄋㄞˇ", "˙ㄋㄞ", "ㄉㄧ", "˙ㄓㄜ", "ㄊㄡˊ", "ㄇㄧ", "˙ㄓㄜ", "ㄧㄢˇ", "ㄗˇ", "ㄒㄧˋ", "ㄐㄧㄢˇ", "ㄔㄨ", "ㄏㄨㄚ", "ㄧㄤˋ", "ㄐㄧㄡˋ", "ㄒㄧㄤˋ", "ㄧˊ", "ㄨㄟˋ", "ㄉㄚˋ", "ㄧˋ", "ㄕㄨˋ", "ㄐㄧㄚ"], ["ㄙㄨㄟ", "ㄖㄢˊ", "ㄋㄞˇ", "˙ㄋㄞ", "ㄕㄨㄛ", "ㄕㄡˇ", "ㄅㄟˋ", "ㄕㄤˋ", "˙ㄉㄜ", "ㄅㄨˊ", "ㄕˋ", "ㄒㄧㄥ", "ㄗㄨㄛˋ", "ㄧㄝˇ", "ㄅㄨˊ", "ㄕˋ", "ㄘㄤˊ", "ㄅㄠˇ", "ㄊㄨˊ", "ㄕˋ", "ㄨㄛˇ", "ㄌㄠˇ", "˙ㄌㄜ", "˙ㄌㄚ", "ㄎㄜˇ", "ㄕˋ", "ㄗㄞˋ", "ㄨㄛˇ", "ㄒㄧㄣ", "ㄓㄨㄥ", "ㄊㄚ", "ㄔㄨㄥ", "ㄇㄢˇ", "ㄏㄨㄛˊ", "ㄌㄧˋ", "ㄏㄢˋ", "ㄔㄨㄤˋ", "ㄧˋ", "ㄕˋ", "ㄑㄩㄢˊ", "ㄕˋ", "ㄐㄧㄝˋ", "ㄗㄨㄟˋ", "ㄋㄧㄢˊ", "ㄑㄧㄥ", "˙ㄉㄜ", "ㄋㄞˇ", "˙ㄋㄞ"]];
@@ -1286,27 +1404,41 @@ function strokeBody() {
   </div>
   <div id="charDetail"></div>`;
 }
+function charWiki(c) {
+  const I = CHAR_INFO[c[0]] || {}; const say = t => `<button type="button" class="say" data-say="${esc(t)}" aria-label="念出來">念</button>`;
+  const words = [...new Set([...c[5], ...(I.w || [])])];
+  const sec = (k, ic, title, body) => `<details class="wiki" data-k="${k}"><summary><span class="wiki-ic" aria-hidden="true">${ic}</span>${title}</summary><div class="wiki-body">${body}</div></details>`;
+  const pairs = (lab, arr, sep) => arr && arr.length ? `<div class="wk-pairs"><span class="wk-lab">${lab}</span>${arr.map(([x, y]) => `<span class="wk-pair kai">${esc(x)} <i>${sep}</i> ${esc(y)}</span>`).join('')}</div>` : '';
+  return `<div class="wiki-top"><h3>📖 生字小百科</h3><button type="button" class="ghost sm" id="wikiAll">全部打開</button></div>
+    ${I.p ? `<p class="wk-poly">🔔 ${esc(I.p)}</p>` : ''}
+    ${I.o ? sec('o', '📜', '字的由來', `<p class="wk-tag">${esc(I.o[1])}</p><p>${esc(I.o[0])}</p>${I.o[1] === '形聲字' ? '<p class="muted wk-small">形聲字：一半表示意思，一半表示讀音。</p>' : ''}`) : ''}
+    ${sec('r', '🧩', '部首的意思', `<p class="wk-rad"><span class="kai">${c[2]}</span>部</p><p>${esc(I.r || '')}</p>`)}
+    ${sec('m', '⚠️', '易錯提醒', `<ul class="wk-list"><li>${esc(c[7])}</li>${(I.m || []).map(x => `<li>${esc(x)}</li>`).join('')}</ul>`)}
+    ${sec('w', '📝', '造詞和例句', `<div class="wk-words">${words.map(x => `<span class="kai">${esc(x)}</span>`).join('')}${c[6] ? `<span class="kai wk-idiom">成語：${c[6]}</span>` : ''}</div>
+      <ul class="wk-eg">${(I.e || []).map(x => `<li><span class="kai">${esc(x)}</span>${say(x)}</li>`).join('')}</ul>`)}
+    ${sec('l', '🔍', '相似字・近義詞・反義詞', `${I.l && I.l.length ? `<div class="wk-like">${I.l.map(([x, z, w]) => `<div class="wk-lc"><span class="kai">${x}</span><span class="zy">${z}</span><span class="kai">${esc(w)}</span></div>`).join('')}</div>` : ''}
+      ${pairs('近義詞', I.syn, '≈')}${pairs('反義詞', I.ant, '↔')}`)}`;
+}
 function charDetail(i) {
   const c = CHARS[i]; const rec = myRec('stroke'); const got = (rec.extra.written || []).includes(c[0]);
-  return `<article class="char-card" id="cc">
-    <img src="${STROKE_IMG[i]}" alt="「${c[0]}」的筆順圖" class="stroke-img">
-    <div class="char-info">
-      <p class="char-head"><span class="kai huge">${c[0]}</span><span class="zy lg">${c[1]}</span></p>
-      <dl class="facts">
-        <div><dt>部首</dt><dd class="kai">${c[2]}</dd></div>
-        <div><dt>部首外</dt><dd>${c[3]} 畫</dd></div>
-        <div><dt>總筆畫</dt><dd>${c[4]} 畫</dd></div>
-      </dl>
-      <p class="label">造詞</p><p class="kai words-inline">${c[5].join('、')}${c[6] ? `　<span class="idiom">延伸成語：${c[6]}</span>` : ''}</p>
-      <p class="label">寫字提醒</p><p>${esc(c[7])}</p>
+  return `<article class="cc2" id="cc">
+    <div class="cc-left">
+      <div class="cc-head"><span class="kai huge">${c[0]}</span><span class="zy lg">${c[1]}</span>
+        <dl class="facts"><div><dt>部首</dt><dd class="kai">${c[2]}</dd></div><div><dt>部首外</dt><dd>${c[3]} 畫</dd></div><div><dt>總筆畫</dt><dd>${c[4]} 畫</dd></div></dl></div>
       <div class="trace-box"><p class="label">描一描（跟著灰色的字，照筆順寫）</p>
         <canvas id="pad" class="pad" aria-label="「${c[0]}」描字板"></canvas>
         <p class="game-msg" id="skMsg">從第一筆開始描。</p>
         <div class="row"><span class="sk-count muted">第 <b>1</b> / ${STROKE_DATA[c[0]].length} 筆</span><button class="ghost sm" id="traceAgain">重描</button></div></div>
-      <div class="row"><button class="ghost" id="say">念念看</button>
-      <button class="${got ? 'ghost' : 'primary'}" id="wrote">${got ? '已寫好 ✓' : '我寫好了'}</button>
-      ${i < CHARS.length - 1 ? `<button class="ghost" id="next">下一個字 →</button>` : ''}</div>
+      <details class="cc-book"><summary>看課本筆順圖</summary><img src="${STROKE_IMG[i]}" alt="「${c[0]}」的筆順圖" class="stroke-img"></details>
+      <div class="row cc-act"><button class="ghost" id="say">🔊 念念看</button>
+        <button class="${got ? 'ghost' : 'primary'}" id="wrote">${got ? '已寫好 ✓' : '我寫好了'}</button></div>
     </div>
+    <div class="cc-right">${charWiki(c)}</div>
+    <nav class="cc-nav">
+      <button class="ghost big-nav" id="prev" ${i === 0 ? 'disabled' : ''}>← ${i > 0 ? CHARS[i - 1][0] : ''}</button>
+      <span class="muted">第 ${i + 1} / ${CHARS.length} 個字</span>
+      <button class="ghost big-nav" id="next" ${i === CHARS.length - 1 ? 'disabled' : ''}>${i < CHARS.length - 1 ? CHARS[i + 1][0] : ''} →</button>
+    </nav>
   </article>`;
 }
 function bindStroke() {
@@ -1333,7 +1465,9 @@ function bindStroke() {
       document.querySelector(`.char[data-i="${i}"]`).classList.add('got');
       open(Math.min(i + 1, CHARS.length - 1));
     };
-    $('#next') && ($('#next').onclick = () => open(i + 1));
+    $('#next').onclick = () => open(i + 1); $('#prev').onclick = () => open(i - 1);
+    document.querySelectorAll('#cc [data-say]').forEach(b => b.onclick = () => speak(b.dataset.say));
+    $('#wikiAll').onclick = () => { const ds = [...document.querySelectorAll('.wiki')]; const op = !ds.every(d => d.open); ds.forEach(d => d.open = op); $('#wikiAll').textContent = op ? '全部收起' : '全部打開'; };
     $('#cc').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   };
   document.querySelectorAll('.char').forEach(b => b.onclick = () => open(+b.dataset.i));
