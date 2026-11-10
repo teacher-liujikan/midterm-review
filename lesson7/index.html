@@ -810,6 +810,9 @@ const LESSON_ZY=[["ㄋㄞˇ", "˙ㄋㄞ", "˙ㄉㄜ", "ㄕㄡˇ", "ㄅㄟˋ", "�
 // ===== 設定 =====
 // 把 Google Apps Script 部署後的網址貼在這裡；留空就是「示範模式」（資料只存在這台裝置）。
 const API_URL = 'https://script.google.com/macros/s/AKfycbyoSQ0PFM7eRq8a8eDGYRLeTn0GZBrHux7NgDvZ9lbIc-O2waCgfzcoCTk6Rp9nocqK/exec';
+// Supabase 後台（優先使用）：填好這兩行就會改用 Supabase
+const SUPA_URL = 'https://mxlncjevvlzhlmuorxuf.supabase.co';
+const SUPA_KEY = 'sb_publishable_TlY2OXAKYSqVD2wHspDe8Q_LRRMo_NI';
 const DEMO_KEY = '1234';
 // 連不上後台時的備用設定：預設開放第 1 節的關卡；老師檢核改用下面這組檢核碼
 const OFFLINE_UNLOCK = STAGES.map(s => s.id); // 後台沒接通時：全部關卡一開始就打開
@@ -887,8 +890,22 @@ const Local = {
 function pubCfg(cfg, s) {
   return { unlocked: cfg.unlocked || [], size: cfg.size, ov: { v: (cfg.ov?.v || {})[s] || null, s: (cfg.ov?.s || {})[s] || null } };
 }
-const API = API_URL ? Remote : Local;
-const DEMO = !API_URL;
+const Supa = {
+  async rpc(fn, body) {
+    const r = await fetch(SUPA_URL.replace(/\/$/, '') + '/rest/v1/rpc/' + fn, { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: SUPA_KEY, Authorization: 'Bearer ' + SUPA_KEY }, body: JSON.stringify(body) });
+    if (!r.ok) throw new Error('http ' + r.status);
+    const j = await r.json();
+    if (!j || !j.ok) throw new Error((j && j.err) || 'error');
+    return j;
+  },
+  mine: (c, s) => Supa.rpc('l_mine', { p_c: c, p_s: String(s) }),
+  all: (c, k) => Supa.rpc('l_all', { p_c: c, p_k: k }),
+  save: (c, s, stage, rec) => Supa.rpc('l_save', { p_c: c, p_s: String(s), p_stage: stage, p_rec: rec }),
+  setCfg: (c, k, cfg) => Supa.rpc('l_set_cfg', { p_c: c, p_k: k, p_cfg: cfg }),
+  check: (c, k) => Supa.rpc('l_check', { p_c: c, p_k: k })
+};
+const API = SUPA_URL ? Supa : API_URL ? Remote : Local;
+const DEMO = !SUPA_URL && !API_URL;
 
 // ===== 狀態 =====
 const st = {
