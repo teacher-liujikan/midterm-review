@@ -352,18 +352,28 @@ button.opt{justify-content:center;font-size:1.1rem}button.opt .kai{font-size:1.5
 .ws-cells>span+span{border-left:1px solid var(--ink)}
 .ws-w{font-size:1.05rem}.ws-z{font-size:1.1rem}
 .ws-notes{margin:.5em 0;padding-left:1.2em;color:var(--muted)}
-.ws-step{display:grid;gap:12px;margin:10px 0}
-.ws-dots{display:flex;flex-wrap:wrap;gap:6px}
-.ws-dot{min-width:2.4em;height:2.4em;border-radius:999px;border:1.5px solid var(--line,var(--muted));background:var(--card);color:var(--ink);font-size:1.1rem;padding:0 .4em;cursor:pointer}
+.ws-step{display:grid;gap:16px;margin:12px 0;background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:16px;touch-action:pan-y}
+.ws-dots{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.ws-dot{min-width:2.8em;height:2.8em;border-radius:999px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);font-size:1.35rem;padding:0 .4em;cursor:pointer}
 .ws-dot.seen{border-color:var(--accent)}
 .ws-dot.on{background:var(--ink);color:var(--card);border-color:var(--ink)}
+.ws-count{margin-left:auto;font-size:1rem}
+.ws-main{display:grid;grid-template-columns:minmax(0,auto) minmax(0,1fr);gap:22px;align-items:start}
 .ws-stage{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end}
-.ws-stage>.ws-card{min-width:220px}.ws-stage>.ws-card .ws-c{font-size:3.4rem}
-.ws-pal{display:grid;gap:4px;opacity:.85}.ws-pal .ws-card{min-width:150px}
-.ws-explain{border-left:4px solid var(--accent);background:var(--card);padding:.5em .9em;border-radius:4px;font-size:1.05rem}
-.ws-explain p{margin:.25em 0}.ws-explain ul{margin:.25em 0;padding-left:1.2em}
-.ws-tip{font-weight:600}
-.ws-nav{display:flex;flex-wrap:wrap;gap:8px}
+.ws-stage>.ws-card{min-width:300px}.ws-stage>.ws-card .ws-c{font-size:5rem;line-height:1.2}
+.ws-stage>.ws-card .ws-lab{font-size:1.05rem}.ws-stage>.ws-card .ws-cells>span{min-height:3em;font-size:1.35rem}
+.ws-pal{display:grid;gap:4px;opacity:.85}.ws-pal .ws-card{min-width:170px}.ws-pal .ws-c{font-size:2.6rem}
+.ws-side{display:grid;gap:14px;align-content:start;min-width:0}
+.ws-explain,.ws-wait{border-left:5px solid var(--accent);background:var(--paper);padding:.8em 1.1em;border-radius:6px;font-size:1.3rem;line-height:1.75}
+.ws-wait{border-left-color:var(--line)}
+.ws-explain p,.ws-wait p{margin:.3em 0}.ws-explain ul{margin:.3em 0;padding-left:1.2em}
+.ws-explain .zy{font-size:1.15em}
+.ws-tip{font-weight:700}
+.ws-ans{font-size:1.25rem;padding:.75em 1.2em;justify-self:start}
+.ws-nav{display:flex;align-items:center;justify-content:space-between;gap:10px;border-top:1px dashed var(--line);padding-top:12px}
+.ws-big{display:inline-flex;align-items:center;justify-content:center;gap:.35em;font-size:1.5rem;padding:.45em 1.2em;min-width:7em;border-radius:14px}.ws-big small{font-size:.8rem;color:var(--muted)}.ws-big:disabled{opacity:.3}
+.ws-hint{font-size:.95rem}
+@media (max-width:760px){.ws-main{grid-template-columns:1fr}.ws-stage>.ws-card{min-width:240px}.ws-hint{display:none}}
 .teach-sec>button{justify-self:start}
 .vthumb{position:relative;border:0;padding:0;border-radius:10px;overflow:hidden;background:#000;margin-bottom:6px;display:block;width:100%}
 .vthumb img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;opacity:.85;max-width:100%}
@@ -1174,15 +1184,17 @@ function teachBody(s, rec) {
   const wo = rec.extra.wsOpen = rec.extra.wsOpen || {};
   const stepper = (key, steps) => {
     const i = Math.min(rec.extra[key] || 0, steps.length - 1), cur = steps[i], open = !!wo[cur.c];
-    return `<div class="ws-step">
-      <div class="ws-dots" aria-label="第 ${i + 1} 個字，共 ${steps.length} 個">${steps.map((t, k) => `<button type="button" class="ws-dot${k === i ? ' on' : ''}${wo[t.c] ? ' seen' : ''}" data-wsgo="${key}" data-i="${k}"><span class="kai">${t.c}</span></button>`).join('')}</div>
-      <div class="ws-stage">${ws(cur.c, cur.rows, open)}${cur.pal ? `<div class="ws-pal"><span class="muted">比一比</span>${ws(cur.pal.c, cur.pal.rows, !!wo[cur.pal.c])}</div>` : ''}</div>
-      ${open ? `<div class="ws-explain">${cur.note}</div>` : ''}
-      <div class="ws-nav">
-        <button type="button" class="ghost sm" data-wsgo="${key}" data-i="${i - 1}" ${i === 0 ? 'disabled' : ''}>← 上一個字</button>
-        <button type="button" class="${open ? 'ghost' : 'primary'} sm" data-wsopen="${cur.c}">${open ? '隱藏答案' : `看「${cur.c}」的答案`}</button>
-        <button type="button" class="ghost sm" data-wsgo="${key}" data-i="${i + 1}" ${i === steps.length - 1 ? 'disabled' : ''}>下一個字 →</button>
-      </div></div>`;
+    const nb = (d, lab) => { const k = i + d, t = steps[k]; return `<button type="button" class="ghost ws-big" data-wsgo="${key}" data-i="${k}" ${t ? '' : 'disabled'}>${d < 0 ? `← ${t ? `<span class="kai">${t.c}</span>` : ''}` : `${t ? `<span class="kai">${t.c}</span>` : ''} →`}<small>${lab}</small></button>`; };
+    return `<div class="ws-step" data-swipe="${key}" data-n="${steps.length}" data-i="${i}">
+      <div class="ws-dots" aria-label="第 ${i + 1} 個字，共 ${steps.length} 個">${steps.map((t, k) => `<button type="button" class="ws-dot${k === i ? ' on' : ''}${wo[t.c] ? ' seen' : ''}" data-wsgo="${key}" data-i="${k}"><span class="kai">${t.c}</span></button>`).join('')}<span class="muted ws-count">第 ${i + 1} / ${steps.length} 個字</span></div>
+      <div class="ws-main">
+        <div class="ws-stage">${ws(cur.c, cur.rows, open)}${cur.pal ? `<div class="ws-pal"><span class="muted">比一比</span>${ws(cur.pal.c, cur.pal.rows, true)}</div>` : ''}</div>
+        <div class="ws-side">
+          ${open ? `<div class="ws-explain">${cur.note}</div>` : `<div class="ws-wait"><p>先在學習單上寫「<span class="kai">${cur.c}</span>」的注音和造詞。</p><p class="muted">寫好了，再按下面的按鈕對答案。</p></div>`}
+          <button type="button" class="${open ? 'ghost' : 'primary'} ws-ans" data-wsopen="${cur.c}">${open ? '隱藏答案' : `看「${cur.c}」的答案`}</button>
+        </div>
+      </div>
+      <div class="ws-nav">${nb(-1, '上一個字')}<span class="muted ws-hint">可以左右滑動換字</span>${nb(1, '下一個字')}</div></div>`;
   };
   const polySteps = POLY.map(([c, rs]) => ({ c, rows: rs,
     note: `<p><b class="kai">${c}</b>有 ${rs.length} 種念法：</p><ul>${rs.map(r => `<li><span class="zy">${r[0]}</span>：${esc(r[2])}。例如 <span class="kai">${esc(r[1])}</span></li>`).join('')}</ul>` }));
@@ -1255,6 +1267,11 @@ function bindItems(s) {
   document.querySelectorAll('[data-pvg]').forEach(b => b.onclick = () => { st.pvGroup = b.dataset.pvg; const y = scrollY; renderStage(); scrollTo(0, y); });
   const wsRe = () => { queueSave(s.id); const y = scrollY; renderStage(); scrollTo(0, y); };
   document.querySelectorAll('[data-wsgo]').forEach(b => b.onclick = () => { myRec(s.id).extra[b.dataset.wsgo] = +b.dataset.i; wsRe(); });
+  document.querySelectorAll('[data-swipe]').forEach(el => { let x0 = null, y0 = 0;
+    el.addEventListener('pointerdown', e => { if (e.target.closest('button')) return; x0 = e.clientX; y0 = e.clientY; });
+    el.addEventListener('pointerup', e => { if (x0 == null) return; const dx = e.clientX - x0, dy = e.clientY - y0; x0 = null;
+      if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.5) return; const k = +el.dataset.i + (dx < 0 ? 1 : -1);
+      if (k < 0 || k >= +el.dataset.n) return; myRec(s.id).extra[el.dataset.swipe] = k; wsRe(); }); });
   document.querySelectorAll('[data-wsopen]').forEach(b => b.onclick = () => { const r = myRec(s.id); r.extra.wsOpen = r.extra.wsOpen || {}; const c = b.dataset.wsopen; r.extra.wsOpen[c] = !r.extra.wsOpen[c]; wsRe(); });
   const form = $('#qform'); if (!form) return;
   const rec = myRec(s.id);
