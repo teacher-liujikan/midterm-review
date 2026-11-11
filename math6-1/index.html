@@ -1,0 +1,441 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>三年級面積</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Huninn&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<style>
+/* Layout: textbook-order lesson — question chips on top, one question per page, big tappable cells for the classroom TV */
+:root{
+  --paper:#f7f9fc; --sheet:#ffffff; --ink:#1f2d3d; --muted:#5b6b7d;
+  --grid:#9cc3e8; --grid-strong:#3d8bd4; --mark:#ff8a65; --ok:#2e9d5b; --bad:#d64545;
+  --chip:#e8f1fb; --note:#fde8ee; --note-ink:#c2185b; --qnum:#f26b3a; --plate:rgba(120,180,235,.16);
+  --display:"Huninn","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+  --body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+  --cell:clamp(40px,min(9.5vh,7vw),90px);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#121a24; --sheet:#1a2533; --ink:#e8eef5; --muted:#9fb0c3;
+  --grid:#2f4d6b; --grid-strong:#6db3f2; --mark:#ff9e80; --ok:#5cc98a; --bad:#ff7b7b;
+  --chip:#21344a; --note:#3a2230; --note-ink:#ff9ec4; --qnum:#ff8a5c; --plate:rgba(120,180,235,.12); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#121a24; --sheet:#1a2533; --ink:#e8eef5; --muted:#9fb0c3;
+  --grid:#2f4d6b; --grid-strong:#6db3f2; --mark:#ff9e80; --ok:#5cc98a; --bad:#ff7b7b;
+  --chip:#21344a; --note:#3a2230; --note-ink:#ff9ec4; --qnum:#ff8a5c; --plate:rgba(120,180,235,.12); color-scheme:dark}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:18px;line-height:1.55;overflow:hidden;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:10px}
+.wrap{max-width:1280px;height:100%;margin:0 auto;display:flex;flex-direction:column;gap:10px}
+header{display:flex;align-items:center;gap:12px;flex:none;min-width:0}
+.unitTag{font:700 24px var(--display);color:#fff;background:var(--qnum);border-radius:10px;padding:0 12px;flex:none}
+h1{font-family:var(--display);font-size:24px;margin:0;white-space:nowrap;flex:none}
+nav{display:flex;gap:6px;flex:1;min-width:0;overflow-x:auto;justify-content:center}
+nav button{font:700 22px var(--display);min-width:54px;height:54px;border:2px solid var(--grid);background:var(--sheet);color:var(--ink);border-radius:12px;cursor:pointer;padding:0 10px;flex:none}
+nav button[aria-selected="true"]{background:var(--qnum);border-color:var(--qnum);color:#fff}
+.pager{display:flex;gap:6px;flex:none}
+.pager .btn{padding:0 16px;font-size:24px}
+button:focus-visible,input:focus-visible{outline:3px solid var(--mark);outline-offset:2px}
+section{flex:1;min-height:0;overflow:auto;background:var(--sheet);border:2px solid var(--grid);border-radius:18px;padding:14px 22px;display:flex;flex-direction:column;gap:12px}
+.qhead{display:flex;gap:12px;align-items:flex-start}
+.qn{flex:none;font:700 22px var(--display);color:#fff;background:var(--qnum);border-radius:8px;min-width:38px;text-align:center;padding:0 8px;line-height:1.5}
+.qtext{font-size:23px;margin:0;font-weight:500}
+.sub{font-family:var(--display);font-size:20px;color:var(--qnum);margin:0}
+.hint{margin:0;color:var(--muted);font-size:18px}
+.row{display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start}
+.row>*{min-width:0}
+.two{display:grid;grid-template-columns:auto minmax(0,1fr);gap:28px;align-items:start}
+.col{display:flex;flex-direction:column;gap:10px;min-width:0}
+.btns{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.btn{font:700 20px var(--body);border:none;border-radius:14px;padding:0 20px;min-height:54px;min-width:54px;cursor:pointer;background:var(--grid-strong);color:#fff}
+.btn.soft{background:var(--chip);color:var(--ink)}
+.btn.pick{background:var(--qnum);color:#fff}
+.btn:disabled{opacity:.4;cursor:default}
+.btn:active{transform:translateY(1px)}
+input.num{font:700 28px var(--display);width:2.8em;height:54px;text-align:center;border:2px solid var(--grid);border-radius:10px;padding:0 4px;background:var(--paper);color:var(--ink);font-variant-numeric:tabular-nums}
+input.num.right{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,var(--paper))}
+input.num.wrong{border-color:var(--bad)}
+.say{font-size:22px;display:flex;flex-wrap:wrap;align-items:center;gap:6px;line-height:1.9}
+.fb{min-height:1.5em;font-weight:700;margin:0;font-size:20px}
+.fb.ok{color:var(--ok)} .fb.bad{color:var(--bad)}
+.note{background:var(--note);border-radius:14px;padding:10px 16px;font-size:19px}
+.note b{color:var(--note-ink)}
+.bubble{background:var(--chip);border-radius:14px;padding:8px 14px;font-size:18px}
+.mini{display:inline-block;width:1.2em;height:1.2em;background:#fff;box-shadow:inset 0 0 0 2px var(--grid-strong);vertical-align:-.2em;border-radius:2px}
+.rotate{display:none;background:var(--note);color:var(--note-ink);border-radius:10px;padding:4px 12px;font-weight:700;flex:none;text-align:center}
+@media (orientation:portrait){.rotate{display:block}}
+
+section[data-q="1"]{--cell:clamp(44px,min(14vh,9vw),120px)}
+section[data-q="4"],section[data-q="do"]{--cell:clamp(44px,min(13vh,8vw),110px)}
+section[data-q="7"]{--cell:clamp(44px,min(12vh,7.6vw),100px)}
+section[data-q="8"]{--cell:clamp(40px,min(11vh,6.2vw),90px)}
+section[data-q="2"]{--cell:clamp(44px,min(12vh,8vw),100px)}
+section[data-q="6"]{--cell:clamp(40px,min(9vh,7vw),86px)}
+/* grids */
+.scroll{overflow-x:auto;max-width:100%;padding:4px}
+.board{display:grid;grid-template-columns:repeat(var(--cols),var(--cell));grid-auto-rows:var(--cell);width:max-content;position:relative}
+.cell{display:flex;align-items:center;justify-content:center;font:700 calc(var(--cell)*.42) var(--display);color:var(--ink);user-select:none;transition:background .15s}
+.cell.in{background:var(--shape,#ffd95a);color:#1f2d3d}
+.cell.tap{cursor:pointer}
+.cell.tile{background:#fff;color:#1f2d3d;box-shadow:inset 0 0 0 1.5px var(--grid-strong);animation:drop .25s ease-out}
+@keyframes drop{from{transform:translateY(-12px) scale(1.12);opacity:0}to{transform:none;opacity:1}}
+.plate .board{background:var(--plate);outline:2px solid var(--grid-strong)}
+.plate .cell{box-shadow:inset 0 0 0 .75px var(--grid-strong)}
+.plate .cell.in{background:color-mix(in srgb,var(--shape,#ffd95a) 85%,#9cc3e8)}
+.cell.cnt{background:var(--mark)!important;color:#fff!important}
+.cell.lit{background:color-mix(in srgb,var(--mark) 60%,transparent)!important}
+@media (prefers-reduced-motion:reduce){.cell,.piece{transition:none!important;animation:none!important}}
+
+/* picture cards */
+.pcard{position:relative;width:max-content;line-height:0;box-shadow:0 4px 14px rgba(0,0,0,.18)}
+.pcard svg{position:absolute;inset:0;width:100%;height:100%}
+.pcard .cell{line-height:1}
+.pcard.plate .cell{box-shadow:inset 0 0 0 1px rgba(30,90,160,.8)}
+.pcard.plate .board{background:rgba(120,180,235,.18);outline:2px solid #3d8bd4}
+
+/* tile + ruler */
+.tile1{width:var(--cell);height:var(--cell);background:#fff;box-shadow:inset 0 0 0 2px var(--grid-strong);display:flex;align-items:center;justify-content:center;font:700 13px var(--display);color:#1f2d3d}
+.rulerBox{display:flex;flex-direction:column;gap:0;width:max-content}
+.ruler{position:relative;width:calc(var(--cell)*2.6);height:46px;background:#bfe0f5;border:2px solid #6aa8d6;border-radius:4px;
+  background-image:repeating-linear-gradient(90deg,#1f2d3d 0 1px,transparent 1px calc(var(--cell)/10));background-size:100% 9px;background-repeat:no-repeat;background-position:calc(var(--cell)*.2) 0}
+.ruler .big{position:absolute;top:0;width:2px;height:18px;background:#1f2d3d}
+.ruler .lab{position:absolute;top:18px;font:700 16px var(--display);color:#1f2d3d;transform:translateX(-50%)}
+.cmTag{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.sqDemo{position:relative;width:80px;height:80px;margin:24px 0 0 48px;background:#fff;box-shadow:inset 0 0 0 3px var(--grid-strong);display:flex;align-items:center;justify-content:center;font:700 24px var(--display);color:#1f2d3d}
+.sqDemo .t{position:absolute;top:-28px;left:0;right:0;text-align:center;color:var(--muted);font-size:16px}
+.sqDemo .s{position:absolute;left:-50px;top:0;bottom:0;display:flex;align-items:center;color:var(--muted);font-size:16px}
+
+.pad{background:#fff;border:2px solid var(--grid);border-radius:12px;overflow:hidden}
+.pad canvas{display:block;width:100%;height:180px;touch-action:none;cursor:crosshair}
+/* cut & move */
+.stage{position:relative}
+.piece{position:absolute;transition:transform .9s cubic-bezier(.5,0,.2,1)}
+.cutline{position:absolute;border:0 dashed #d64545;pointer-events:none;transition:opacity .3s}
+.scissor{position:absolute;font-size:24px;line-height:1;color:var(--bad)}
+.combo{display:flex;gap:4px;align-items:center}
+</style>
+
+<div class="wrap">
+  <header><span class="unitTag">6-1</span><h1>認識平方公分</h1><nav id="nav" role="tablist"></nav>
+    <div class="pager"><button class="btn soft" id="prev" aria-label="上一題">←</button><button class="btn soft" id="next" aria-label="下一題">→</button></div></header>
+  <div class="rotate">請把平板轉成橫的</div>
+
+  <!-- 1 -->
+  <section data-q="1">
+    <div class="qhead"><span class="qn">1</span><p class="qtext">子晴有一張小卡片，它的面積和幾個白色方瓦 <span class="mini"></span> 一樣大？拿出白色方瓦排排看。</p></div>
+    <div class="two">
+      <div class="pcard" id="q1card"></div>
+      <div class="col">
+        <div class="note" style="display:flex;gap:14px;align-items:center"><div class="tile1" style="flex:none">方瓦</div><div style="min-width:0"><b>什麼是方瓦？</b>「方」是正方形的方，「瓦」是屋頂上一片一片的瓦片。方瓦就是<b>一片一片正方形的小板子</b>，可以像鋪瓦片、鋪地磚一樣，一片接一片排得整整齊齊，所以叫做方瓦。</div></div>
+        <p class="hint">點卡片上的位置，或按按鈕放方瓦。</p>
+        <div class="btns"><button class="btn" id="q1add">放一個方瓦</button><button class="btn soft" id="q1reset">重來</button></div>
+        <p class="fb" id="q1count"></p>
+        <div class="say">這張小卡片用 <input class="num" id="q1a"> 個 <span class="mini"></span> 排滿，它的面積和 <input class="num" id="q1b"> 個 <span class="mini"></span> 的面積合起來一樣大。</div>
+        <div class="btns"><button class="btn" data-check="1">對答案</button></div>
+        <p class="fb" id="q1fb"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section data-q="2" hidden>
+    <div class="qhead"><span class="qn">2</span><p class="qtext"><span class="mini"></span> 是什麼形狀？用尺量量看，它的邊長是多少公分？</p></div>
+    <div class="two">
+      <div class="col">
+        <div class="btns" id="q2shape"><button class="btn soft" data-v="正方形">正方形</button><button class="btn soft" data-v="長方形">長方形</button><button class="btn soft" data-v="三角形">三角形</button><button class="btn soft" data-v="圓形">圓形</button></div>
+        <p class="fb" id="q2fb1"></p>
+        <div class="rulerBox" id="q2ruler">
+          <div class="tile1" style="margin-left:calc(var(--cell)*.2)"></div>
+          <div class="ruler"><span class="big" style="left:calc(var(--cell)*.2)"></span><span class="lab" style="left:calc(var(--cell)*.2)">0<small>cm</small></span>
+            <span class="big" style="left:calc(var(--cell)*1.2)"></span><span class="lab" style="left:calc(var(--cell)*1.2)">1</span>
+            <span class="big" style="left:calc(var(--cell)*2.2)"></span><span class="lab" style="left:calc(var(--cell)*2.2)">2</span></div>
+        </div>
+        <div class="say">邊長是 <input class="num" id="q2a"> 公分 <button class="btn" data-check="2">對答案</button></div>
+        <p class="fb" id="q2fb"></p>
+      </div>
+      <div class="col">
+        <div class="note" id="q2note" hidden>
+          <div class="cmTag">
+            <div class="sqDemo"><span class="t">1 公分</span><span class="s">1 公分</span>1 cm²</div>
+            <div style="flex:1 1 200px;min-width:0">邊長 1 公分的正方形，我們說它的面積是 <b>1 平方公分</b>，也可以記成 <b style="font-size:26px">1 cm²</b>。<br><span class="hint">cm² 讀作「平方公分」。</span></div>
+          </div>
+        </div>
+        <p class="sub">練習寫寫看 cm²</p>
+        <p class="hint">c 和 m 寫在中間的兩條線之間，小小的 2 寫在 m 的右上角。先描灰色的字，再自己寫在後面空白的地方。</p>
+        <div class="pad"><canvas id="pad" aria-label="cm² 書寫練習格"></canvas></div>
+        <div class="btns"><button class="btn soft" id="padClear">擦掉重寫</button><button class="btn soft" id="padGuide">隱藏描寫字</button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section data-q="3" hidden>
+    <div class="qhead"><span class="qn">3</span><div class="col">
+      <div class="say"><span class="combo"><span class="tile1"></span><span class="tile1" style="margin-left:-4px"></span></span> 是 2 個 1 平方公分合起來的，它的面積是 <input class="num" id="q3a"> 平方公分？</div>
+      <div class="say"><span class="combo"><span class="tile1"></span><span class="tile1" style="margin-left:-4px"></span><span class="tile1" style="margin-left:-4px"></span></span> 是 3 個 1 平方公分合起來的，它的面積是 <input class="num" id="q3b"> 平方公分？</div>
+      <div class="bubble say" style="align-self:flex-start">說說看，第 1 題中小卡片的面積是 <input class="num" id="q3c"> 平方公分？</div>
+      <div class="btns"><button class="btn" data-check="3">對答案</button></div>
+      <p class="fb" id="q3fb"></p>
+    </div></div>
+  </section>
+
+  <!-- 4 -->
+  <section data-q="4" hidden>
+    <div class="qhead"><span class="qn">4</span><p class="qtext">下面圖形的面積各是幾平方公分？用白色方瓦排排看。<br><span class="hint">點圖形，把白色方瓦一個一個排上去。</span></p></div>
+    <div class="row" id="q4"></div>
+  </section>
+
+  <!-- 做做看 -->
+  <section data-q="do" hidden>
+    <div class="qhead"><span class="qn">做做看</span><p class="qtext">下面圖形的面積各是幾平方公分？用白色方瓦排排看。<br><span class="hint">點圖形，把白色方瓦一個一個排上去。</span></p></div>
+    <div class="row" id="qdo"></div>
+  </section>
+
+  <!-- 5 -->
+  <section data-q="5" hidden>
+    <div class="qhead"><span class="qn">5</span><p class="qtext">透明板每個方格面積有多大？用白色方瓦比比看。</p></div>
+    <div class="two">
+      <div class="col">
+        <div class="hint">每格 1 cm × 1 cm</div>
+        <div class="scroll plate"><div class="board" id="q5board"></div></div>
+      </div>
+      <div class="col">
+        <p class="hint">點透明板上的任一格，把方瓦放上去比比看。</p>
+        <div class="say">每個方格面積是 <input class="num" id="q5a"> 平方公分</div>
+        <div class="btns"><button class="btn" data-check="5">對答案</button><button class="btn soft" id="q5clear">拿掉方瓦</button></div>
+        <p class="fb" id="q5fb"></p>
+        <div class="note">每格面積都是 1 平方公分的透明方格板，叫做 <b>平方公分板</b>。</div>
+        <div class="bubble">我們可以用平方公分板來覆蓋圖形，直接點算圖形的面積。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section data-q="6" hidden>
+    <div class="qhead"><span class="qn">6</span><p class="qtext">下圖的面積各是多少平方公分？用平方公分板量量看。<br><span class="hint">先按「放上平方公分板」，格線要和圖形的邊對齊，再點格子數數看。</span></p></div>
+    <div class="row" id="q6"></div>
+  </section>
+
+  <!-- 7 -->
+  <section data-q="7" hidden>
+    <div class="qhead"><span class="qn">7</span><p class="qtext">把平方公分板放在右邊的卡片上。說說看，卡片的面積有多大？</p></div>
+    <div class="two">
+      <div class="col">
+        <div class="btns"><button class="btn" id="q7plate">放上平方公分板</button></div>
+        <div class="scroll"><div class="pcard" id="q7card"></div></div>
+      </div>
+      <div class="col">
+        <div class="btns"><button class="btn pick" id="q7m1">一格一格數</button><button class="btn soft" id="q7m2">一排一排算</button></div>
+        <div id="q7p1" class="col">
+          <p class="hint">點格子，1、2、3、4……一格一格數。</p>
+          <div class="btns"><button class="btn soft" id="q7clr">清除</button><p class="fb" id="q7cnt"></p></div>
+        </div>
+        <div id="q7p2" class="col" hidden>
+          <button class="btn soft" id="q7rows" style="align-self:flex-start">一排一排亮起來</button>
+          <div class="say">一排有 <input class="num" id="q7a"> 個 1 平方公分，一共有 <input class="num" id="q7b"> 排，</div>
+          <div class="say"><span id="q7f">□ × □</span> = <input class="num" id="q7c"></div>
+        </div>
+        <div class="say">卡片的面積是 <input class="num" id="q7d"> 平方公分 <button class="btn" data-check="7">對答案</button></div>
+        <p class="fb" id="q7fb"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section data-q="8" hidden>
+    <div class="qhead"><span class="qn">8</span><p class="qtext">把一張圖形切割成 2 片，再拼排成另一個圖形。它們的面積會不會一樣大？用平方公分板量量看。</p></div>
+    <div class="btns"><span id="q8pick" class="btns"><button class="btn pick" data-i="0">①</button><button class="btn soft" data-i="1">②</button></span>
+      <span style="margin-left:16px">先猜猜看：</span><button class="btn soft" data-g="same">一樣大</button><button class="btn soft" data-g="diff">不一樣大</button></div>
+    <div class="two">
+      <div class="scroll"><div class="stage" id="stage"></div></div>
+      <div class="col">
+        <div class="btns"><button class="btn" id="q8go">剪開，拼排</button><button class="btn soft" id="q8plate">放上平方公分板</button><button class="btn soft" id="q8back">放回原樣</button></div>
+        <div class="say">原來的圖形 <input class="num" id="q8a"> 平方公分</div>
+        <div class="say">拼好的圖形 <input class="num" id="q8b"> 平方公分</div>
+        <div class="btns"><button class="btn" data-check="8">對答案</button></div>
+        <p class="fb" id="q8fb"></p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+const ORDER=['1','2','3','4','do','5','6','7','8'];
+const LABEL={do:'做做看'};
+function say(id,t,ok){const e=$(id);e.textContent=t;e.className='fb'+(ok===true?' ok':ok===false?' bad':'')}
+function mark(inp,ok){inp.classList.toggle('right',ok);inp.classList.toggle('wrong',!ok)}
+function val(id){return parseInt($(id).value,10)}
+function mkBoard(el,rows,cols){el.style.setProperty('--cols',cols);el.innerHTML='';const cs=[];
+  for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){const d=document.createElement('div');d.className='cell';d.dataset.r=r;d.dataset.c=c;el.appendChild(d);cs.push(d)}return cs}
+
+/* nav */
+let cur='1';
+ORDER.forEach(q=>{const b=document.createElement('button');b.textContent=LABEL[q]||q;b.dataset.q=q;b.setAttribute('role','tab');b.onclick=()=>go(q);$('#nav').appendChild(b)});
+function go(q){cur=q;document.querySelectorAll('section').forEach(s=>s.hidden=s.dataset.q!==q);
+  document.querySelectorAll('#nav button').forEach(b=>b.setAttribute('aria-selected',b.dataset.q===q));
+  const i=ORDER.indexOf(q);$('#prev').disabled=i===0;$('#next').disabled=i===ORDER.length-1;
+  try{history.replaceState(null,'','#q'+q)}catch(e){} if(q==='2')requestAnimationFrame(()=>window.padSize&&window.padSize());}
+$('#prev').onclick=()=>go(ORDER[ORDER.indexOf(cur)-1]);
+$('#next').onclick=()=>go(ORDER[ORDER.indexOf(cur)+1]);
+const hq=location.hash.replace('#q','');go(ORDER.includes(hq)?hq:'1');
+
+/* pictures */
+const BEAR=`<circle cx="112" cy="58" r="22" fill="#c8895a"/><circle cx="188" cy="58" r="22" fill="#c8895a"/><circle cx="112" cy="58" r="11" fill="#f2c9a5"/><circle cx="188" cy="58" r="11" fill="#f2c9a5"/><circle cx="150" cy="108" r="62" fill="#d89a66"/><ellipse cx="150" cy="128" rx="30" ry="22" fill="#f6dcc0"/><circle cx="127" cy="98" r="7" fill="#3a2a20"/><circle cx="173" cy="98" r="7" fill="#3a2a20"/><circle cx="129.5" cy="95.5" r="2.5" fill="#fff"/><circle cx="175.5" cy="95.5" r="2.5" fill="#fff"/><ellipse cx="150" cy="119" rx="9" ry="6" fill="#3a2a20"/><path d="M141 131 Q150 140 159 131" fill="none" stroke="#3a2a20" stroke-width="3" stroke-linecap="round"/><ellipse cx="109" cy="122" rx="10" ry="6" fill="#ff9e9e" opacity=".75"/><ellipse cx="191" cy="122" rx="10" ry="6" fill="#ff9e9e" opacity=".75"/>`;
+const CARD1=`<svg viewBox="0 0 300 400" preserveAspectRatio="none" aria-hidden="true"><rect width="300" height="400" fill="#bfe6ff"/><circle cx="250" cy="50" r="24" fill="#ffd95a"/><path d="M0 320 Q75 290 150 320 T300 320 V400 H0Z" fill="#9ed98a"/><circle cx="40" cy="350" r="9" fill="#ff9ec4"/><circle cx="40" cy="350" r="4" fill="#ffd95a"/><circle cx="262" cy="362" r="9" fill="#fff"/><circle cx="262" cy="362" r="4" fill="#ffd95a"/><g transform="translate(0,110)">${BEAR}</g></svg>`;
+const CARD7=`<svg viewBox="0 0 300 200" preserveAspectRatio="none" aria-hidden="true"><rect width="300" height="200" fill="#ffd36b"/>
+<text x="40" y="60" font-size="30" font-weight="700" fill="#fff" font-family="sans-serif">Z</text><text x="62" y="40" font-size="22" font-weight="700" fill="#fff" font-family="sans-serif">z</text><text x="78" y="26" font-size="16" font-weight="700" fill="#fff" font-family="sans-serif">z</text>
+<ellipse cx="170" cy="150" rx="105" ry="42" fill="#fff"/><circle cx="92" cy="125" r="38" fill="#fff"/><circle cx="68" cy="94" r="12" fill="#fff"/><circle cx="68" cy="94" r="6" fill="#f3d6dc"/>
+<path d="M78 124 q8 6 16 0" fill="none" stroke="#3a2a20" stroke-width="3" stroke-linecap="round"/><path d="M104 124 q8 6 16 0" fill="none" stroke="#3a2a20" stroke-width="3" stroke-linecap="round"/><ellipse cx="99" cy="138" rx="5" ry="3.5" fill="#3a2a20"/><ellipse cx="80" cy="140" rx="6" ry="4" fill="#ff9e9e" opacity=".7"/>
+<ellipse cx="200" cy="112" rx="58" ry="30" fill="#7a5a4a"/><circle cx="246" cy="98" r="20" fill="#7a5a4a"/><circle cx="234" cy="80" r="7" fill="#7a5a4a"/><path d="M240 100 q6 4 12 0" fill="none" stroke="#2b1d16" stroke-width="2.5" stroke-linecap="round"/><ellipse cx="262" cy="104" rx="4" ry="3" fill="#2b1d16"/>
+</svg>`;
+
+/* 1 */
+const Q1R=4,Q1C=3;let q1n=0;
+$('#q1card').innerHTML=CARD1+'<div class="board" id="q1board"></div>';
+const q1cells=mkBoard($('#q1board'),Q1R,Q1C);
+function q1draw(){q1cells.forEach((c,i)=>{const on=i<q1n;if(on&&!c.classList.contains('tile')){c.classList.add('tile');c.textContent=i+1}if(!on){c.classList.remove('tile');c.textContent=''}});
+  $('#q1add').disabled=q1n>=Q1R*Q1C;
+  say('#q1count',q1n===0?'':q1n<Q1R*Q1C?`已經放了 ${q1n} 個方瓦`:`剛好排滿了！一共放了 ${q1n} 個方瓦。`,q1n>=Q1R*Q1C?true:undefined)}
+q1cells.forEach(c=>{c.classList.add('tap');c.onclick=()=>{if(q1n<Q1R*Q1C){q1n++;q1draw()}}});
+$('#q1add').onclick=()=>{if(q1n<Q1R*Q1C)q1n++;q1draw()};
+$('#q1reset').onclick=()=>{q1n=0;q1draw()};
+q1draw();
+
+/* 2 */
+let q2shape=null;
+document.querySelectorAll('#q2shape button').forEach(b=>b.onclick=()=>{q2shape=b.dataset.v;
+  document.querySelectorAll('#q2shape button').forEach(x=>x.className='btn '+(x===b?'pick':'soft'));
+  if(q2shape==='正方形')say('#q2fb1','對！四個邊一樣長、四個角都是直角，是正方形。',true);
+  else say('#q2fb1','再看看：它的四個邊是不是一樣長？',false)});
+
+/* 3 */
+
+/* shape exercises */
+function area(g){return g.join('').split('#').length-1}
+function shapeTask(host,label,g,color,mode){
+  const wrap=document.createElement('div');wrap.className='col';
+  const R=g.length,C=g[0].length,A=area(g);
+  wrap.innerHTML=`<div class="sub">${label}</div><div class="scroll"><div class="board"></div></div>
+  <div class="btns">${mode==='plate'?'<button class="btn soft" data-a="plate">放上平方公分板</button>':''}<button class="btn soft" data-a="clr">重來</button></div>
+  <div class="say">( <input class="num"> ) 平方公分 <button class="btn" data-a="chk">對答案</button></div><p class="fb"></p>`;
+  const board=wrap.querySelector('.board');board.style.setProperty('--shape',color);
+  const scr=wrap.querySelector('.scroll');
+  const cells=mkBoard(board,R,C);let n=0;
+  cells.forEach(c=>{if(g[c.dataset.r][c.dataset.c]==='#'){c.classList.add('in','tap');
+    c.onclick=()=>{if(c.textContent)return;
+      if(mode==='plate'&&!scr.classList.contains('plate')){fb('先放上平方公分板，再數數看。',false);return}
+      n++;c.textContent=n;c.classList.add(mode==='plate'?'cnt':'tile');if(n===A)fb(`排滿了，一共 ${n} 格。`)}}});
+  const inp=wrap.querySelector('input'),f=wrap.querySelector('.fb');
+  function fb(t,ok){f.textContent=t;f.className='fb'+(ok===true?' ok':ok===false?' bad':'')}
+  wrap.querySelector('[data-a="clr"]').onclick=()=>{n=0;cells.forEach(c=>{c.textContent='';c.classList.remove('tile','cnt')});scr.classList.remove('plate');inp.value='';inp.className='num';fb('')};
+  const pb=wrap.querySelector('[data-a="plate"]');if(pb)pb.onclick=()=>scr.classList.toggle('plate');
+  wrap.querySelector('[data-a="chk"]').onclick=()=>{const v=parseInt(inp.value,10);if(isNaN(v))return fb('先填上答案喔！',false);
+    mark(inp,v===A);v===A?fb(`答對了！面積是 ${A} 平方公分。`,true):fb('再數一次看看，數過的格子會留下數字。',false)};
+  host.appendChild(wrap)}
+shapeTask($('#q4'),'①',['.###.','#####'],'#f6dcbc','tile');
+shapeTask($('#q4'),'②',['..#','.##','###'],'#ffe766','tile');
+shapeTask($('#qdo'),'①',['.##.','####','.##.'],'#9fd3f5','tile');
+shapeTask($('#qdo'),'②',['.#.#.','#####'],'#b7e3a0','tile');
+shapeTask($('#q6'),'①',['...###','.#####','######','######'],'#ffe766','plate');
+shapeTask($('#q6'),'②',['..#..','.###.','#####','.###.','..#..'],'#ffc98a','plate');
+
+/* 5 */
+const q5cells=mkBoard($('#q5board'),7,5);
+q5cells.forEach(c=>{c.classList.add('tap');c.onclick=()=>{c.classList.toggle('tile');c.textContent=c.classList.contains('tile')?'1':'';
+  if(c.classList.contains('tile'))say('#q5fb','方瓦放上去，剛好和一格一樣大！');}});
+$('#q5clear').onclick=()=>{q5cells.forEach(c=>{c.classList.remove('tile');c.textContent=''});say('#q5fb','')};
+
+/* 7 */
+const Q7R=4,Q7C=6;let q7n=0,q7t=null;
+$('#q7card').innerHTML=CARD7+'<div class="board" id="q7board"></div>';
+const q7cells=mkBoard($('#q7board'),Q7R,Q7C);
+$('#q7plate').onclick=()=>{const p=$('#q7card').classList.toggle('plate');$('#q7plate').textContent=p?'拿掉平方公分板':'放上平方公分板'};
+q7cells.forEach(c=>{c.classList.add('tap');c.onclick=()=>{
+  if(!$('#q7card').classList.contains('plate'))return say('#q7cnt','先放上平方公分板喔！',false);
+  if($('#q7p1').hidden||c.textContent)return;q7n++;c.textContent=q7n;c.classList.add('cnt');say('#q7cnt',`數到 ${q7n}`)}});
+function q7clear(){clearInterval(q7t);q7n=0;q7cells.forEach(c=>{c.textContent='';c.style.fontSize='';c.classList.remove('cnt','lit')});say('#q7cnt','')}
+$('#q7clr').onclick=q7clear;
+$('#q7m1').onclick=()=>{q7clear();$('#q7p1').hidden=false;$('#q7p2').hidden=true;$('#q7m1').className='btn pick';$('#q7m2').className='btn soft'};
+$('#q7m2').onclick=()=>{q7clear();$('#q7p1').hidden=true;$('#q7p2').hidden=false;$('#q7m2').className='btn pick';$('#q7m1').className='btn soft'};
+function q7f(){$('#q7f').textContent=`${$('#q7a').value||'□'} × ${$('#q7b').value||'□'}`}
+$('#q7a').oninput=q7f;$('#q7b').oninput=q7f;
+$('#q7rows').onclick=()=>{q7clear();$('#q7card').classList.add('plate');$('#q7plate').textContent='拿掉平方公分板';
+  let r=0;const step=()=>{if(r>=Q7R){clearInterval(q7t);return}
+    q7cells.filter(c=>+c.dataset.r===r).forEach(c=>{c.classList.add('lit');c.textContent=c.dataset.c==Q7C-1?Q7C:''});
+    const lab=q7cells[r*Q7C];lab.textContent=`${r+1}排`;lab.style.fontSize='calc(var(--cell)*.3)';r++};
+  step();q7t=setInterval(step,700)};
+
+/* 8 */
+const CUTS=[
+ {orig:{W:4,H:4},a:{w:4,h:2,x:0,y:0},b:{w:4,h:2,x:0,y:2},cut:'h',cutAt:2,stage:{W:8,H:4},move:'translate(calc(var(--cell)*4),calc(var(--cell)*-2))',color:'#cfe8a8',A:16},
+ {orig:{W:4,H:3},a:{w:2,h:3,x:0,y:0},b:{w:2,h:3,x:2,y:0},cut:'v',cutAt:2,stage:{W:5,H:3},move:'translate(calc(var(--cell)*.5),calc(var(--cell)*.5)) rotate(90deg)',color:'#f6b7a3',A:12}
+];
+let q8i=0,q8g=null;
+function piece(p,color){const d=document.createElement('div');d.className='piece';d.style.left=`calc(var(--cell)*${p.x})`;d.style.top=`calc(var(--cell)*${p.y})`;
+  const b=document.createElement('div');b.className='board';b.style.setProperty('--shape',color);d.appendChild(b);mkBoard(b,p.h,p.w).forEach(c=>c.classList.add('in'));return d}
+function q8draw(){const k=CUTS[q8i],st=$('#stage');st.innerHTML='';st.classList.remove('plate');
+  st.style.width=`calc(var(--cell)*${k.stage.W})`;st.style.height=`calc(var(--cell)*${k.stage.H})`;
+  st.appendChild(piece(k.a,k.color));const pb=piece(k.b,k.color);pb.id='pb';st.appendChild(pb);
+  const cl=document.createElement('div');cl.className='cutline';cl.id='cutl';
+  if(k.cut==='h'){Object.assign(cl.style,{left:'-6px',width:`calc(var(--cell)*${k.orig.W} + 12px)`,top:`calc(var(--cell)*${k.cutAt} - 1px)`,borderTopWidth:'3px'})}
+  else{Object.assign(cl.style,{top:'-6px',height:`calc(var(--cell)*${k.orig.H} + 12px)`,left:`calc(var(--cell)*${k.cutAt} - 1px)`,borderLeftWidth:'3px'})}
+  st.appendChild(cl);
+  $('#q8plate').textContent='放上平方公分板';
+  ['#q8a','#q8b'].forEach(i=>{$(i).value='';$(i).className='num'});say('#q8fb','');
+  q8g=null;document.querySelectorAll('[data-g]').forEach(b=>b.className='btn soft');
+  document.querySelectorAll('#q8pick button').forEach(b=>b.className='btn '+(+b.dataset.i===q8i?'pick':'soft'))}
+document.querySelectorAll('#q8pick button').forEach(b=>b.onclick=()=>{q8i=+b.dataset.i;q8draw()});
+document.querySelectorAll('[data-g]').forEach(b=>b.onclick=()=>{q8g=b.dataset.g;document.querySelectorAll('[data-g]').forEach(x=>x.className='btn '+(x===b?'pick':'soft'))});
+$('#q8go').onclick=()=>{$('#pb').style.transform=CUTS[q8i].move;$('#cutl').style.opacity=0};
+$('#q8plate').onclick=()=>{const p=$('#stage').classList.toggle('plate');$('#q8plate').textContent=p?'拿掉平方公分板':'放上平方公分板'};
+$('#q8back').onclick=q8draw;
+q8draw();
+
+/* cm² writing pad */
+(function(){const cv=$('#pad'),ctx=cv.getContext('2d');let strokes=[],cur=null,guide=true,W=0;const H=180,L={top:24,mid:74,base:126,bot:162};
+  function draw(){const d=window.devicePixelRatio||1;ctx.setTransform(d,0,0,d,0,0);ctx.clearRect(0,0,W,H);
+    ctx.lineWidth=1.5;
+    [['top','#6aa8d6',[]],['mid','#6aa8d6',[6,6]],['base','#e06666',[]],['bot','#6aa8d6',[]]].forEach(([k,c,dash])=>{ctx.strokeStyle=c;ctx.setLineDash(dash);ctx.beginPath();ctx.moveTo(0,L[k]);ctx.lineTo(W,L[k]);ctx.stroke()});
+    ctx.setLineDash([]);
+    if(guide){ctx.font='96px Arial, Helvetica, sans-serif';const cmW=ctx.measureText('cm').width;const gw=cmW+60;let x=16,i=0;
+      const n=Math.max(1,Math.floor((W-16)/gw)-1);
+      for(;i<n;i++){ctx.fillStyle=i===0?'#5b6b7d':'#cfd8e3';ctx.font='96px Arial, Helvetica, sans-serif';ctx.fillText('cm',x,L.base);ctx.font='40px Arial, Helvetica, sans-serif';ctx.fillText('2',x+cmW+3,L.mid-1);x+=gw}}
+    ctx.strokeStyle='#1f2d3d';ctx.lineWidth=6;ctx.lineCap='round';ctx.lineJoin='round';
+    strokes.forEach(s=>{ctx.beginPath();s.forEach((p,j)=>j?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));if(s.length===1)ctx.lineTo(s[0][0]+.1,s[0][1]);ctx.stroke()})}
+  window.padSize=function(){const w=cv.clientWidth;if(!w)return;W=w;const d=window.devicePixelRatio||1;cv.width=w*d;cv.height=H*d;draw()};
+  function pt(e){const r=cv.getBoundingClientRect();return[(e.clientX-r.left)*W/r.width,(e.clientY-r.top)*H/r.height]}
+  cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId);cur=[pt(e)];strokes.push(cur);draw()});
+  cv.addEventListener('pointermove',e=>{if(!cur)return;cur.push(pt(e));draw()});
+  ['pointerup','pointercancel','pointerleave'].forEach(t=>cv.addEventListener(t,()=>cur=null));
+  $('#padClear').onclick=()=>{strokes=[];draw()};
+  $('#padGuide').onclick=()=>{guide=!guide;$('#padGuide').textContent=guide?'隱藏描寫字':'顯示描寫字';draw()};
+  window.addEventListener('resize',()=>{if(cur===null)window.padSize()});
+  window.padSize();
+})();
+
+/* checks */
+const CHECK={
+ 1(){const a=val('#q1a'),b=val('#q1b'),ok=a===12&&b===12;mark($('#q1a'),a===12);mark($('#q1b'),b===12);
+   ok?say('#q1fb','答對了！小卡片的面積和 12 個白色方瓦合起來一樣大。',true):say('#q1fb','先把方瓦排滿卡片，再數數看用了幾個。',false)},
+ 2(){const a=val('#q2a');mark($('#q2a'),a===1);
+   if(a===1){say('#q2fb','答對了！邊長是 1 公分。',true);$('#q2note').hidden=false}else say('#q2fb','看看方瓦的左邊對齊 0，右邊對到幾？',false)},
+ 3(){const r=[val('#q3a')===2,val('#q3b')===3,val('#q3c')===12];['#q3a','#q3b','#q3c'].forEach((i,k)=>mark($(i),r[k]));
+   r.every(Boolean)?say('#q3fb','全對！2 個 1 平方公分是 2 平方公分，3 個是 3 平方公分，小卡片是 12 平方公分。',true):say('#q3fb','紅框的再想一想。第 1 題的小卡片用了幾個方瓦？',false)},
+ 5(){const a=val('#q5a');mark($('#q5a'),a===1);a===1?say('#q5fb','答對了！每一格都是 1 平方公分。',true):say('#q5fb','把方瓦放上去比比看，一格和方瓦一樣大嗎？',false)},
+ 7(){const d=val('#q7d');mark($('#q7d'),d===24);
+   if(!$('#q7p2').hidden){const a=val('#q7a'),b=val('#q7b'),c=val('#q7c');mark($('#q7a'),a===6);mark($('#q7b'),b===4);mark($('#q7c'),c===24)}
+   d===24?say('#q7fb','答對了！一排有 6 個 1 平方公分，共有 4 排，6 × 4 = 24，卡片的面積是 24 平方公分。',true):say('#q7fb','放上平方公分板，一格一格數，或一排一排算算看。',false)},
+ 8(){const A=CUTS[q8i].A,a=val('#q8a'),b=val('#q8b');mark($('#q8a'),a===A);mark($('#q8b'),b===A);
+   if(a===A&&b===A){say('#q8fb',`都是 ${A} 平方公分，面積一樣大！只是形狀變了，格子數沒有變。`+(q8g==='same'?'你猜對了！':''),true)}
+   else say('#q8fb','放上平方公分板，數數看剪開前和拼好後各有幾格。',false)}
+};
+document.querySelectorAll('[data-check]').forEach(b=>b.onclick=()=>CHECK[b.dataset.check]());
+</script>
+
+</html>
