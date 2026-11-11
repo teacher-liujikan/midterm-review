@@ -929,7 +929,22 @@ const st = {
   cfg: null, recs: {}, view: 'home', stage: null, sync: 'ok',
   t: { tab: 'control', cfg: null, recs: [], stageSel: 'vtest', wallSel: null, proj: false, detail: null }
 };
-const pending = LS.get('l7-pending', {});
+// 每一台平板、每一個座號各自的待存清單（同一台電腦開好幾個分頁也不會互相蓋掉）
+const PKEY = () => `${'l7'}-pending-${st.cls}-${st.seat}`;
+let pending = {};
+function loadPending() {
+  pending = LS.get(PKEY(), {});
+  const old = LS.get('l7-pending', null); // 舊版共用的待存清單：只撿回自己座號的
+  if (old && Object.keys(old).length) {
+    for (const k of Object.keys(old)) if (String(old[k]?.seat) === String(st.seat)) { pending[k] = old[k]; delete old[k]; }
+    LS.set('l7-pending', old); LS.set(PKEY(), pending);
+  }
+}
+// 登入狀態：先看這個分頁自己的，再看整台裝置的（老師和學生在同一台電腦開不同分頁也不會互相換身分）
+const LOGIN = {
+  get() { try { const v = sessionStorage.getItem('l7-login'); if (v) return JSON.parse(v); } catch (e) {} return LS.get('l7-login', null); },
+  set(v) { LS.set('l7-login', v); try { v ? sessionStorage.setItem('l7-login', JSON.stringify(v)) : sessionStorage.removeItem('l7-login'); } catch (e) {} }
+};
 
 // ===== 學生端：資料存取 =====
 function myRec(stageId) {
@@ -940,7 +955,7 @@ let saveTimers = {};
 function queueSave(stageId, now) {
   const rec = myRec(stageId); rec.t = Date.now();
   if (st.preview) return;
-  pending[stageId] = rec; LS.set('l7-pending', pending);
+  pending[stageId] = rec; LS.set(PKEY(), pending);
   LS.set(`l7-me-${st.cls}-${st.seat}`, st.recs);
   clearTimeout(saveTimers[stageId]);
   saveTimers[stageId] = setTimeout(flush, now ? 0 : 900);
@@ -950,7 +965,7 @@ async function flush() {
   const ids = Object.keys(pending);
   if (!ids.length) { setSync('ok'); return; }
   for (const id of ids) {
-    try { await API.save(st.cls, st.seat, id, pending[id]); delete pending[id]; LS.set('l7-pending', pending); }
+    try { await API.save(st.cls, st.seat, id, pending[id]); delete pending[id]; LS.set(PKEY(), pending); }
     catch (e) { setSync('err'); setTimeout(flush, 5000); return; }
   }
   setSync('ok');
@@ -1030,7 +1045,8 @@ function renderLogin() {
   </section>`;
   app.querySelectorAll('.seat').forEach(b => b.onclick = async () => {
     st.cls = $('#cls').value.trim() || DEFAULT_CLASS; st.seat = +b.dataset.seat; st.role = 'student';
-    LS.set('l7-login', { cls: st.cls, seat: st.seat, role: 'student' });
+    LOGIN.set({ cls: st.cls, seat: st.seat, role: 'student' });
+    loadPending();
     st.recs = LS.get(`l7-me-${st.cls}-${st.seat}`, {});
     await refreshMine(); go('home'); startStudentPoll();
   });
@@ -1102,7 +1118,7 @@ function bindTop() {
   $('#home').onclick = () => go('home');
   $('#qrTop').onclick = showQR;
   $('#refreshTop') && ($('#refreshTop').onclick = () => { const b = $('#refreshTop'); b.disabled = true; b.textContent = '更新中…'; doUpdate(); });
-  $('#logout').onclick = () => { LS.set('l7-login', null); st.role = null; st.preview = false; renderLogin(); };
+  $('#logout').onclick = () => { LOGIN.set(null); st.role = null; st.preview = false; renderLogin(); };
   setSync(st.sync);
 }
 
@@ -1596,7 +1612,7 @@ function go(view) {
   if (view !== 'stage') scrollTo(0, 0);
 }
 // ===== 新版本偵測：答案都先存在平板，重新載入不會不見 =====
-const BUILD = '20261111213745';
+const BUILD = '20261111214125';
 async function checkVer() {
   if (!/^https?:/.test(location.protocol) || BUILD.startsWith('/*')) return;
   try {
@@ -1646,7 +1662,7 @@ function renderTeacherLogin() {
     const c = $('#tcls').value.trim() || DEFAULT_CLASS; const k = $('#tkey').value;
     try { await API.check(c, k); } catch (er) { $('#terr').textContent = '密碼不對，或連不上試算表。'; return; }
     st.role = 'teacher'; st.cls = c; st.key = k;
-    LS.set('l7-login', { cls: c, role: 'teacher', key: k });
+    LOGIN.set({ cls: c, role: 'teacher', key: k });
     await tLoad(); renderTeacher(); startTeacherPoll();
   };
 }
@@ -1692,7 +1708,7 @@ function renderTeacher(soft) {
   </main>
   <div id="modal"></div>`;
   $('#qrTop').onclick = showQR;
-  $('#tout').onclick = () => { LS.set('l7-login', null); st.role = null; clearInterval(pollT); renderLogin(); };
+  $('#tout').onclick = () => { LOGIN.set(null); st.role = null; clearInterval(pollT); renderLogin(); };
   document.querySelectorAll('.tab').forEach(b => b.onclick = () => { t.tab = b.dataset.tab; renderTeacher(); });
   ({ control: bControl, board: bBoard, groups: bGroups, wall: bWall, compare: () => {} })[t.tab]();
   if (soft) scrollTo(0, y);
@@ -2489,9 +2505,10 @@ function setupPad(K) {
 
 // ===== 啟動 =====
 (async function boot() {
-  const saved = LS.get('l7-login', null);
+  const saved = LOGIN.get();
   if (saved?.role === 'student') {
     st.role = 'student'; st.cls = saved.cls; st.seat = saved.seat;
+    loadPending();
     st.recs = LS.get(`l7-me-${st.cls}-${st.seat}`, {});
     await refreshMine(); go('home'); flush();
   } else if (saved?.role === 'teacher') {
