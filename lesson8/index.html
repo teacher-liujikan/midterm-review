@@ -387,6 +387,13 @@ button.opt{justify-content:center;font-size:1.1rem}button.opt .kai{font-size:1.5
 .pq-texts{display:grid;gap:8px;font-size:1.25rem}.pq-texts p{margin:0;background:var(--paper);border-radius:8px;padding:.4em .8em}
 .pq-bar{display:flex;gap:10px;flex-wrap:wrap;justify-content:space-between;border-top:1px dashed var(--line);padding-top:12px;margin-top:8px}
 .pq-bar button{font-size:1.1rem}
+.pq-match{display:grid;grid-template-columns:1fr 1fr;gap:16px}.pq-match .pq-opts{list-style:none;padding-left:0}
+.pq-pairs{list-style:none;padding-left:0}.pq-pairs li{justify-content:flex-start;align-items:center}.pq-arrow{color:var(--ok);font-weight:700}
+.pq-pic{max-width:460px;margin:0 auto 1em}.pq-pic .hand-svg{cursor:default}
+.pq-tap{display:flex;flex-wrap:wrap;gap:8px;font-size:1.45rem;line-height:1.7;margin-bottom:1em}.pq-tap span{background:var(--paper);border:2px solid var(--line);border-radius:10px;padding:.2em .6em}.pq-tap span.right{border-color:var(--ok);background:var(--ok-soft)}
+.pq-cards{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:.8em}.pq-card{background:var(--card);border:2px solid var(--line);border-radius:10px;padding:.3em .8em;font-size:1.3rem}
+.pq-buckets{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:1em}.pq-buckets>div{border:2px dashed var(--line);border-radius:12px;padding:.6em;min-height:4em;display:flex;flex-wrap:wrap;gap:8px;align-content:flex-start;font-size:1.2rem}.pq-buckets>div>b{flex-basis:100%}.pq-buckets>div.right{border-style:solid;border-color:var(--ok)}
+.pq-unordered{list-style:none;padding-left:0}.pq-unordered li{justify-content:flex-start}
 .ver-bar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:50;background:var(--card);border:2px solid var(--accent);border-radius:14px;padding:.7em 1em;box-shadow:0 6px 24px rgba(0,0,0,.18);display:flex;gap:10px;align-items:center;flex-wrap:wrap;max-width:calc(100% - 32px);font-size:1.05rem}
 .cmp-note{font-size:1.2rem;line-height:1.8}.cmp-note .up,.num.up{color:var(--ok);font-weight:700}.cmp-note .up{font-size:1.5em}.num.down{color:var(--no)}
 .ws-ans{font-size:1.25rem;padding:.75em 1.2em;justify-self:start}
@@ -1660,7 +1667,7 @@ function go(view) {
   if (view !== 'stage') scrollTo(0, 0);
 }
 // ===== 新版本偵測：答案都先存在平板，重新載入不會不見 =====
-const BUILD = '20261111214147';
+const BUILD = '20261111220851';
 async function checkVer() {
   if (!/^https?:/.test(location.protocol) || BUILD.startsWith('/*')) return;
   try {
@@ -1863,6 +1870,34 @@ function bBoard() {
   document.querySelectorAll('tr.clickable').forEach(tr => tr.onclick = () => showDetail(+tr.dataset.seat, st.t.stageSel));
   document.querySelectorAll('.qh').forEach(b => b.onclick = e => { e.stopPropagation(); showQ(st.t.stageSel, b.dataset.g || null, +b.dataset.qi, false); });
 }
+// 投影時題目照學生看到的樣子呈現（圖、句子、卡片、配對），按「顯示答案」才標出正解
+function pqMix(arr, seed) { // 固定的打亂順序：同一題每次打開都一樣
+  let h = 0; for (const ch of String(seed)) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  return arr.map((x, i) => [x, ((h ^ (i * 2654435761)) >>> 0) % 9973]).sort((a, b) => a[1] - b[1]).map(x => x[0]);
+}
+function pqBody(it, reveal) {
+  if (it.t === 'match') {
+    const right = pqMix(it.pairs.map((p, i) => i), it.id);
+    return reveal
+      ? `<ul class="pq-opts pq-pairs">${it.pairs.map(p => `<li class="right"><span class="pq-o ${it.kaiL ? 'kai' : ''}">${esc(p[0])}</span><span class="pq-arrow">→</span><span class="pq-o ${/^[ㄅ-ㄩ]/.test(p[1]) ? 'zy' : ''}">${esc(p[1])}</span></li>`).join('')}</ul>`
+      : `<div class="pq-match"><ul class="pq-opts">${it.pairs.map(p => `<li><span class="pq-o ${it.kaiL ? 'kai' : ''}">${esc(p[0])}</span></li>`).join('')}</ul><ul class="pq-opts">${right.map(i => `<li><span class="pq-o ${/^[ㄅ-ㄩ]/.test(it.pairs[i][1]) ? 'zy' : ''}">${esc(it.pairs[i][1])}</span></li>`).join('')}</ul></div>`;
+  }
+  if (it.t === 'hotspot') return `<div class="pq-pic">${HAND_SVG(reveal ? it.target : '')}</div>`;
+  if (it.t === 'tap') {
+    const sents = splitSents(LESSON.paras[it.para]);
+    return `<p class="muted">第${ZH_NUM[it.para]}段：</p><div class="pq-tap kai">${sents.map((x, k) => `<span class="${reveal && it.a.includes(k) ? 'right' : ''}">${esc(x)}</span>`).join('')}</div>`;
+  }
+  if (it.t === 'sort') {
+    if (!reveal) return `<div class="pq-cards">${pqMix(it.cards.map((c, i) => i), it.id).map(i => `<span class="pq-card">${esc(it.cards[i][0])}</span>`).join('')}</div><div class="pq-buckets">${it.buckets.map(b => `<div><b>${esc(b)}</b></div>`).join('')}</div>`;
+    return `<div class="pq-buckets">${it.buckets.map((b, bi) => `<div class="right"><b>${esc(b)}</b>${it.cards.filter(c => c[1] === bi).map(c => `<span class="pq-card">${esc(c[0])}</span>`).join('')}</div>`).join('')}</div>`;
+  }
+  if (it.t === 'order') {
+    const ord = reveal ? it.cards.map((c, i) => i) : pqMix(it.cards.map((c, i) => i), it.id);
+    return `<ol class="pq-opts ${reveal ? 'pq-ordered' : 'pq-unordered'}">${ord.map(i => `<li class="${reveal ? 'right' : ''}"><span class="pq-o">${esc(it.cards[i])}</span></li>`).join('')}</ol>`;
+  }
+  if (it.t === 'text') return `${it.topics ? `<div class="pq-cards">${it.topics.map(t => `<span class="pq-card">${esc(t[0])}</span>`).join('')}</div>` : ''}${it.hint ? `<p class="muted">${esc(it.hint)}</p>` : ''}${it.ref && reveal ? `<p class="ex"><b>參考</b>${esc(it.ref)}</p>` : ''}`;
+  return '';
+}
 // 題目投影：先只放題目，再按鈕顯示答案、各選項人數、誰答對誰答錯
 function showQ(sid, g, qi, reveal, names) {
   const s = stageById(sid); const items = s.byGroup ? s.byGroup[g] || [] : s.items || []; const it = items[qi]; if (!it) return;
@@ -1875,7 +1910,7 @@ function showQ(sid, g, qi, reveal, names) {
   let opts = '';
   if (it.t === 'mc') opts = `<ol class="pq-opts">${it.o.map((o, k) => { const who = recs.filter(x => x.r?.ans?.[it.id] === k).map(x => x.n); const right = reveal && k === it.a;
     return `<li class="${right ? 'right' : ''}"><span class="pq-o ${/^[ㄅ-ㄩ]/.test(o) ? 'zy' : ''}">${esc(o)}</span>${reveal ? `<span class="pq-c">${who.length} 人${names && who.length ? '：' + who.join('、') : ''}</span>` : ''}</li>`; }).join('')}</ol>`;
-  else if (it.t === 'match') opts = `<ul class="pq-opts">${it.pairs.map(p => `<li><span class="pq-o">${esc(p[0])}　—　${reveal ? esc(p[1]) : '？'}</span></li>`).join('')}</ul>`;
+  else opts = pqBody(it, reveal);
   const texts = it.t === 'text' && reveal ? `<div class="pq-texts">${recs.filter(x => x.r?.ans?.[it.id]).map(x => `<p>${names ? `<b>${x.n} 號</b>　` : ''}${esc(x.r.ans[it.id])}</p>`).join('') || '<p class="muted">還沒有人寫。</p>'}</div>` : '';
   $('#modal').innerHTML = `<div class="modal-bg"><div class="modal pq" role="dialog" aria-label="題目投影">
     <header><h2>${esc(s.name)}${g ? `・${GROUPS[g].name}` : ''}　第 ${qi + 1} / ${items.length} 題</h2><button class="ghost sm" id="mclose">關閉</button></header>
