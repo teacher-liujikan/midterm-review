@@ -370,6 +370,7 @@ button.opt{justify-content:center;font-size:1.1rem}button.opt .kai{font-size:1.5
 .ws-explain .zy{font-size:1.15em}
 .ws-tip{font-weight:700}
 .ws-n{color:var(--accent);font-size:1.4em}
+.ver-bar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:50;background:var(--card);border:2px solid var(--accent);border-radius:14px;padding:.7em 1em;box-shadow:0 6px 24px rgba(0,0,0,.18);display:flex;gap:10px;align-items:center;flex-wrap:wrap;max-width:calc(100% - 32px);font-size:1.05rem}
 .cmp-note{font-size:1.2rem;line-height:1.8}.cmp-note .up,.num.up{color:var(--ok);font-weight:700}.cmp-note .up{font-size:1.5em}.num.down{color:var(--no)}
 .ws-ans{font-size:1.25rem;padding:.75em 1.2em;justify-self:start}
 .ws-nav{display:flex;align-items:center;justify-content:space-between;gap:10px;border-top:1px dashed var(--line);padding-top:12px}
@@ -943,7 +944,7 @@ function setSync(s) {
   st.sync = s;
   const el = $('#sync'); if (!el) return;
   el.dataset.s = s;
-  el.textContent = s === 'ok' ? (DEMO ? '示範模式' : '已儲存') : s === 'saving' ? '儲存中…' : '連線中斷，稍後自動補存';
+  el.textContent = s === 'ok' ? (DEMO ? '示範模式' : '已儲存') : s === 'saving' ? '儲存中…' : '答案存在平板裡，連上網路會自動補送';
 }
 async function refreshMine() {
   try {
@@ -1130,7 +1131,8 @@ function bindText() {
 // ===== 關卡頁 =====
 function renderStage() {
   const s = stageById(st.stage);
-  if (!isOpen(s.id)) return go('home');
+  if (!isOpen(s.id) && st.entered !== s.id) return go('home');
+  st.entered = s.id;
   let body = '';
   if (s.id === 'stroke') body = strokeBody();
   else if (s.id === 'review') body = reviewBody();
@@ -1570,11 +1572,35 @@ function bindReview() {
 // ===== 導覽 =====
 function go(view) {
   st.view = view;
+  if (view === 'home') { st.entered = null; if (st.newVer) return doUpdate(); }
   try { speechSynthesis.cancel(); if (typeof player !== 'undefined') { player.key = null; player.state = 'idle'; } } catch (e) {}
   if (st.role === 'teacher') return renderTeacher();
   if (view === 'home') renderHome(); else renderStage();
   if (view !== 'stage') scrollTo(0, 0);
 }
+// ===== 新版本偵測：答案都先存在平板，重新載入不會不見 =====
+const BUILD = '20261111110316';
+async function checkVer() {
+  if (!/^https?:/.test(location.protocol) || BUILD.startsWith('/*')) return;
+  try {
+    const r = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' }); if (!r.ok) return;
+    const v = (await r.json()).v; if (!v || v === BUILD) return;
+    try { if (sessionStorage.getItem('l7-upd') === v) return; } catch (e) {} // 已經為這一版重新載入過，避免一直重整
+    st.newVer = v;
+    if (st.role !== 'student' || st.view === 'home') return doUpdate();
+    if (!$('#verBar')) { const d = document.createElement('div'); d.id = 'verBar'; d.className = 'ver-bar';
+      d.innerHTML = '網頁有新版本。你的答案已經存在平板裡，<button type="button" class="primary sm">按這裡更新</button>'; document.body.appendChild(d);
+      d.querySelector('button').onclick = doUpdate; }
+  } catch (e) {}
+}
+function doUpdate() {
+  try { sessionStorage.setItem('l7-upd', st.newVer || ''); } catch (e) {}
+  try { if (st.role === 'student' && st.seat) LS.set(`l7-me-${st.cls}-${st.seat}`, st.recs); } catch (e) {}
+  const u = new URL(location.href); u.searchParams.set('v', st.newVer || Date.now()); location.replace(u.toString());
+}
+setInterval(checkVer, 60000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) { checkVer(); if (st.role === 'student') flush(); } });
+window.addEventListener('pageshow', e => { if (e.persisted) checkVer(); });
 let pollT = null;
 function startStudentPoll() {
   clearInterval(pollT);
@@ -1687,7 +1713,7 @@ function bControl() {
   });
   document.querySelectorAll('[data-when]').forEach(b => b.onclick = async () => {
     const order = [...new Set(STAGES.map(s => s.when))]; const upto = order.indexOf(b.dataset.when);
-    c.unlocked = STAGES.filter(s => order.indexOf(s.when) <= upto).map(s => s.id);
+    c.unlocked = [...new Set([...(c.unlocked || []), ...STAGES.filter(s => order.indexOf(s.when) <= upto).map(s => s.id)])];
     await tSaveCfg(); renderTeacher(true);
   });
   $('#size').onchange = async () => { c.size = Math.max(1, Math.min(35, +$('#size').value || 16)); await tSaveCfg(); renderTeacher(true); };
@@ -2393,7 +2419,7 @@ function setupPad(K) {
     st.role = 'teacher'; st.cls = saved.cls; st.key = saved.key;
     await tLoad(); renderTeacher(); startTeacherPoll();
   } else renderLogin();
-  startStudentPoll();
+  startStudentPoll(); checkVer();
   try { speechSynthesis.getVoices(); } catch (e) {}
 })();
 
