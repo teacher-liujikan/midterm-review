@@ -370,6 +370,7 @@ button.opt{justify-content:center;font-size:1.1rem}button.opt .kai{font-size:1.5
 .ws-explain .zy{font-size:1.15em}
 .ws-tip{font-weight:700}
 .ws-n{color:var(--accent);font-size:1.4em}
+.topbar .refresh{font-weight:700;border-color:var(--accent);color:var(--accent);white-space:nowrap;min-height:44px}
 .vb .bpm{display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:.5em;line-height:1.05;font-style:normal;font-family:var(--f-ui,sans-serif)}.vb .bpm i{font-style:normal}
 .hand-svg.scene .hs{transition:filter .2s}.hand-svg.scene .hs.hl{filter:drop-shadow(0 0 6px #e0453a) drop-shadow(0 0 2px #e0453a)}
 .qh{border:0;background:var(--accent-soft);color:var(--accent);font-weight:700;border-radius:8px;min-width:2em;padding:.2em .4em;cursor:pointer;font-size:1rem}.qh:hover{background:var(--accent);color:var(--accent-ink)}
@@ -1156,12 +1157,14 @@ function topbar() {
     <span class="me">${st.preview ? '<b class="pv-tag">老師預覽</b>' : `${esc(st.cls)}・${st.seat} 號`}</span>
     <span id="sync" class="sync" data-s="${st.sync}"></span>
     <button class="qr-mini" id="qrTop" aria-label="顯示網址 QR code">${QR_SVG}</button>
+    ${st.role === 'student' && !st.preview ? '<button class="ghost refresh" id="refreshTop" aria-label="重新整理，看老師打開的新關卡">🔄 重新整理</button>' : ''}
     <button class="ghost" id="logout">登出</button>
   </div></header>`;
 }
 function bindTop() {
   $('#home').onclick = () => go('home');
   $('#qrTop').onclick = showQR;
+  $('#refreshTop') && ($('#refreshTop').onclick = () => { const b = $('#refreshTop'); b.disabled = true; b.textContent = '更新中…'; doUpdate(); });
   $('#logout').onclick = () => { LS.set((LESSON.key + '-login'), null); st.role = null; st.preview = false; renderLogin(); };
   setSync(st.sync);
 }
@@ -1641,7 +1644,7 @@ function go(view) {
   if (view !== 'stage') scrollTo(0, 0);
 }
 // ===== 新版本偵測：答案都先存在平板，重新載入不會不見 =====
-const BUILD = '20261111113459';
+const BUILD = '20261111213746';
 async function checkVer() {
   if (!/^https?:/.test(location.protocol) || BUILD.startsWith('/*')) return;
   try {
