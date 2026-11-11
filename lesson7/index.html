@@ -370,6 +370,20 @@ button.opt{justify-content:center;font-size:1.1rem}button.opt .kai{font-size:1.5
 .ws-explain .zy{font-size:1.15em}
 .ws-tip{font-weight:700}
 .ws-n{color:var(--accent);font-size:1.4em}
+.qh{border:0;background:var(--accent-soft);color:var(--accent);font-weight:700;border-radius:8px;min-width:2em;padding:.2em .4em;cursor:pointer;font-size:1rem}.qh:hover{background:var(--accent);color:var(--accent-ink)}
+.modal.pq{max-width:900px;width:calc(100% - 32px)}
+.pq-q{font-size:1.8rem;line-height:1.6;margin:.4em 0 .6em;font-weight:700}
+.pq-opts{display:grid;gap:10px;margin:0 0 1em;padding-left:1.6em;font-size:1.5rem}
+.pq-opts li{background:var(--paper);border:2px solid var(--line);border-radius:12px;padding:.4em .8em;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.pq-opts li.right{border-color:var(--ok);background:var(--ok-soft)}.pq-opts li.right .pq-o::after{content:"  ✓";color:var(--ok)}
+.pq-c{font-size:1.1rem;color:var(--muted)}
+.pq-stat{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:.6em 0}
+.pq-stat>div{border:1.5px solid var(--line);border-radius:12px;padding:.6em .8em;font-size:1.2rem;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.pq-stat>div>span:first-child{font-weight:700;margin-right:6px}.pq-stat .ok{border-color:var(--ok)}.pq-stat .no{border-color:var(--no)}
+.sn{display:inline-grid;place-items:center;min-width:2em;height:2em;border-radius:999px;background:var(--paper);font-weight:700}
+.pq-texts{display:grid;gap:8px;font-size:1.25rem}.pq-texts p{margin:0;background:var(--paper);border-radius:8px;padding:.4em .8em}
+.pq-bar{display:flex;gap:10px;flex-wrap:wrap;justify-content:space-between;border-top:1px dashed var(--line);padding-top:12px;margin-top:8px}
+.pq-bar button{font-size:1.1rem}
 .ver-bar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:50;background:var(--card);border:2px solid var(--accent);border-radius:14px;padding:.7em 1em;box-shadow:0 6px 24px rgba(0,0,0,.18);display:flex;gap:10px;align-items:center;flex-wrap:wrap;max-width:calc(100% - 32px);font-size:1.05rem}
 .cmp-note{font-size:1.2rem;line-height:1.8}.cmp-note .up,.num.up{color:var(--ok);font-weight:700}.cmp-note .up{font-size:1.5em}.num.down{color:var(--no)}
 .ws-ans{font-size:1.25rem;padding:.75em 1.2em;justify-self:start}
@@ -1579,7 +1593,7 @@ function go(view) {
   if (view !== 'stage') scrollTo(0, 0);
 }
 // ===== 新版本偵測：答案都先存在平板，重新載入不會不見 =====
-const BUILD = '20261111110316';
+const BUILD = '20261111110606';
 async function checkVer() {
   if (!/^https?:/.test(location.protocol) || BUILD.startsWith('/*')) return;
   try {
@@ -1745,7 +1759,7 @@ function tBoard() {
       const head = b.g === '?' ? '<h3>尚未分組</h3>' : b.g ? `<h3><span class="gchip g-${GROUPS[b.g].tone}">${GROUPS[b.g].name}</span> ${GROUPS[b.g].level}・${b.seats.length} 人</h3>` : '';
       if (!b.items.length) return head + `<p class="muted">座號：${b.seats.join('、')}</p>`;
       return head + `<div class="scroll"><table class="tbl board"><thead>
-        <tr><th>座號</th>${b.items.map((it, i) => `<th title="${esc(it.q)}">${i + 1}${it.t === 'text' ? '<small>寫</small>' : ''}</th>`).join('')}${s.hints ? '<th>提示</th>' : ''}<th>狀態</th></tr>
+        <tr><th>座號</th>${b.items.map((it, i) => `<th title="${esc(it.q)}"><button type="button" class="qh" data-qi="${i}" data-g="${b.g || ''}" aria-label="看第 ${i + 1} 題">${i + 1}</button>${it.t === 'text' ? '<small>寫</small>' : ''}</th>`).join('')}${s.hints ? '<th>提示</th>' : ''}<th>狀態</th></tr>
         <tr class="rate"><th>答對率</th>${b.items.map(it => `<th>${rate(it)}</th>`).join('')}${s.hints ? '<th></th>' : ''}<th></th></tr></thead><tbody>
         ${b.seats.map(n => { const r = recOf(n, sid); const hn = r ? Object.values(r.hints || {}).reduce((a, x) => a + x, 0) : 0; return `<tr class="clickable" data-seat="${n}"><td class="num">${n}</td>
           ${b.items.map(it => { const [k, v] = cellOf(it, r); return `<td class="c ${k}">${v}</td>`; }).join('')}
@@ -1775,11 +1789,44 @@ function tBoard() {
     </tbody></table></div></section>`;
   }
   return `<section class="panel">${extra}<div class="row wrap-row"><label class="field inline"><span>關卡</span><select id="bsel">${opts}</select></label>
-    <span class="muted">點一列看該生每一題怎麼答。✓ 答對、✗ 答錯（練習題以第一次作答為準）、寫＝已寫簡答。</span></div>${table}</section>`;
+    <span class="muted">點<b>題號</b>可以把題目放大投影、看誰答對答錯；點一列看該生每一題怎麼答。✓ 答對、✗ 答錯（練習題以第一次作答為準）、寫＝已寫簡答。</span></div>${table}</section>`;
 }
 function bBoard() {
   $('#bsel').onchange = () => { st.t.stageSel = $('#bsel').value; renderTeacher(); };
   document.querySelectorAll('tr.clickable').forEach(tr => tr.onclick = () => showDetail(+tr.dataset.seat, st.t.stageSel));
+  document.querySelectorAll('.qh').forEach(b => b.onclick = e => { e.stopPropagation(); showQ(st.t.stageSel, b.dataset.g || null, +b.dataset.qi, false); });
+}
+// 題目投影：先只放題目，再按鈕顯示答案、各選項人數、誰答對誰答錯
+function showQ(sid, g, qi, reveal, names) {
+  const s = stageById(sid); const items = s.byGroup ? s.byGroup[g] || [] : s.items || []; const it = items[qi]; if (!it) return;
+  const seats = seatsList().filter(n => !s.byGroup || tGroupOf(n, s.diff)?.g === g);
+  const recs = seats.map(n => ({ n, r: recOf(n, sid) }));
+  const kind = ({ n, r }) => !r ? 'none' : it.t === 'text' ? (r.ans?.[it.id] ? 'wrote' : 'none') : (it.t === 'mc' ? r.ans?.[it.id] == null : !answered(it, r)) ? 'none' : cellOf(it, r)[0] === 'ok' ? 'ok' : 'no';
+  const by = k => recs.filter(x => kind(x) === k).map(x => x.n);
+  const ok = by('ok'), no = by('no'), none = by('none');
+  const list = arr => arr.length ? (names ? arr.map(n => `<span class="sn">${n}</span>`).join('') : `<b>${arr.length}</b> 人`) : '<span class="muted">—</span>';
+  let opts = '';
+  if (it.t === 'mc') opts = `<ol class="pq-opts">${it.o.map((o, k) => { const who = recs.filter(x => x.r?.ans?.[it.id] === k).map(x => x.n); const right = reveal && k === it.a;
+    return `<li class="${right ? 'right' : ''}"><span class="pq-o ${/^[ㄅ-ㄩ]/.test(o) ? 'zy' : ''}">${esc(o)}</span>${reveal ? `<span class="pq-c">${who.length} 人${names && who.length ? '：' + who.join('、') : ''}</span>` : ''}</li>`; }).join('')}</ol>`;
+  else if (it.t === 'match') opts = `<ul class="pq-opts">${it.pairs.map(p => `<li><span class="pq-o">${esc(p[0])}　—　${reveal ? esc(p[1]) : '？'}</span></li>`).join('')}</ul>`;
+  const texts = it.t === 'text' && reveal ? `<div class="pq-texts">${recs.filter(x => x.r?.ans?.[it.id]).map(x => `<p>${names ? `<b>${x.n} 號</b>　` : ''}${esc(x.r.ans[it.id])}</p>`).join('') || '<p class="muted">還沒有人寫。</p>'}</div>` : '';
+  $('#modal').innerHTML = `<div class="modal-bg"><div class="modal pq" role="dialog" aria-label="題目投影">
+    <header><h2>${esc(s.name)}${g ? `・${GROUPS[g].name}` : ''}　第 ${qi + 1} / ${items.length} 題</h2><button class="ghost sm" id="mclose">關閉</button></header>
+    <p class="pq-q">${esc(it.q)}</p>${opts}
+    ${reveal && it.ex ? `<p class="ex"><b>說明</b>${esc(it.ex)}</p>` : ''}
+    ${reveal ? (it.t === 'text' ? texts : `<div class="pq-stat"><div class="ok"><span>答對</span>${list(ok)}</div><div class="no"><span>答錯</span>${list(no)}</div><div><span>還沒作答</span>${list(none)}</div></div>`) : ''}
+    <div class="pq-bar">
+      <button class="ghost" id="pqPrev" ${qi === 0 ? 'disabled' : ''}>← 上一題</button>
+      <button class="${reveal ? 'ghost' : 'primary'}" id="pqRev">${reveal ? '隱藏答案' : '顯示答案和統計'}</button>
+      ${reveal ? `<button class="ghost" id="pqNames">${names ? '隱藏座號' : '顯示座號'}</button>` : ''}
+      <button class="ghost" id="pqNext" ${qi === items.length - 1 ? 'disabled' : ''}>下一題 →</button>
+    </div></div></div>`;
+  $('#mclose').onclick = () => $('#modal').innerHTML = '';
+  $('.modal-bg').onclick = e => { if (e.target.classList.contains('modal-bg')) $('#modal').innerHTML = ''; };
+  $('#pqPrev').onclick = () => showQ(sid, g, qi - 1, false);
+  $('#pqNext').onclick = () => showQ(sid, g, qi + 1, false);
+  $('#pqRev').onclick = () => showQ(sid, g, qi, !reveal, false);
+  $('#pqNames') && ($('#pqNames').onclick = () => showQ(sid, g, qi, true, !names));
 }
 function showDetail(seat, sid) {
   const s = stageById(sid); const r = recOf(seat, sid);
