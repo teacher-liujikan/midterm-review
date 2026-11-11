@@ -928,6 +928,19 @@ function autoGroup(stage, rec) {
   const [a, b] = stage.cut;
   return rec.score <= a ? 'A' : rec.score <= b ? 'B' : 'C';
 }
+// 分組可以依好幾個檢測合計（例如句型、修辭、縮寫三關）：全部做完、檢討完才分組
+const gTests = g => STAGES.filter(x => x.group === g);
+const gCut = g => (gTests(g).find(t => t.cut) || {}).cut;
+const gNames = g => gTests(g).map(t => `「${t.name}」`).join('、');
+function gRec(g, get) {
+  const rs = gTests(g).map(t => get(t.id));
+  if (!rs.length || rs.some(r => !r || !r.done)) return null;
+  return { done: true, score: rs.reduce((a, r) => a + (r.score || 0), 0), max: rs.reduce((a, r) => a + (r.max || 0), 0), reviewed: rs.every(r => r.extra?.reviewed) };
+}
+function autoGroupG(g, get) {
+  const r = gRec(g, get); if (!r) return null; const [a, b] = gCut(g);
+  return r.score <= a ? 'A' : r.score <= b ? 'B' : 'C';
+}
 function defaultCfg() { return { unlocked: ['pre'], size: 16, ov: { v: {}, s: {} }, anon: true }; }
 
 // ===== 資料後端 =====
@@ -1064,15 +1077,14 @@ function isOpen(id) {
   if (id === 'bonus' && st.recs.pre?.extra?.check?.ok) return true;
   // 分組任務：做完對應的檢測就自動分組並開啟，不用等老師
   const s = stageById(id);
-  if (s?.diff) { const test = STAGES.find(x => x.group === s.diff); return !!(st.recs[test.id]?.done && st.recs[test.id]?.extra?.reviewed); }
+  if (s?.diff) { const r = gRec(s.diff, x => st.recs[x]); return !!(r && r.reviewed); }
   return false;
 }
 function myGroup(diff) {
   if (st.preview) return st.pvGroup || 'A';
   const ov = st.cfg?.ov?.[diff];
   if (ov) return ov;
-  const test = STAGES.find(s => s.group === diff);
-  return autoGroup(test, st.recs[test.id]);
+  return autoGroupG(diff, x => st.recs[x]);
 }
 
 // ===== QR code（投影給學生掃） =====
@@ -1142,7 +1154,7 @@ function stageStatus(s) {
   if (s.review && r?.done && !r.extra?.check?.ok) return ['wait', r.extra?.check ? '要訂正' : '等老師檢核'];
   if (r?.done) return ['done', '完成'];
   if (r && Object.keys(r.ans).length) return ['doing', '進行中'];
-  if (s.diff && (!myGroup(s.diff) || (!st.preview && !st.cfg?.ov?.[s.diff] && !st.recs[STAGES.find(x => x.group === s.diff).id]?.extra?.reviewed))) return ['wait', '先做檢測和檢討'];
+  if (s.diff && (!myGroup(s.diff) || (!st.preview && !st.cfg?.ov?.[s.diff] && !gRec(s.diff, x => st.recs[x])?.reviewed))) return ['wait', '先做檢測和檢討'];
   return ['go', '可以開始'];
 }
 function renderHome() {
@@ -1264,8 +1276,7 @@ function itemsBody(s) {
   let group = null;
   if (s.diff) {
     group = myGroup(s.diff);
-    const t0 = STAGES.find(x => x.group === s.diff); const tr = st.recs[t0.id];
-    if (!group || (!st.preview && !st.cfg?.ov?.[s.diff] && !tr?.extra?.reviewed)) return `<div class="notice">先完成「${t0.name}」並看完檢討，網站會自動幫你分組，再回來這裡。</div>`;
+    if (!group || (!st.preview && !st.cfg?.ov?.[s.diff] && !gRec(s.diff, x => st.recs[x])?.reviewed)) return `<div class="notice">先完成${gNames(s.diff)}並看完檢討，網站會自動幫你分組，再回來這裡。</div>`;
   }
   const pvSwitch = st.preview && s.diff ? `<div class="pv-switch"><span class="label">預覽組別</span>${Object.entries(GROUPS).map(([k, g]) => `<button type="button" class="chip ${group === k ? 'on' : ''}" data-pvg="${k}">${g.name}（${g.level}）</button>`).join('')}</div>` : '';
   const items = itemsFor(s, group);
@@ -1279,14 +1290,14 @@ function itemsBody(s) {
   if (s.teach) return teachBody(s, rec);
   if (locked) {
     const next = s.group ? STAGES.find(x => x.diff === s.group) : null;
+    const lastOne = s.group && gTests(s.group).filter(t => t.id !== s.id).every(t => st.recs[t.id]?.done && st.recs[t.id]?.extra?.reviewed);
     if (s.group && !rec.extra.reviewed) {
-      const CIRC = '①②③④';
-      return top + `<div class="notice">交卷了！你答對 <b>${rec.score} / ${rec.max}</b> 題。先一題一題看檢討，看完再按最下面的按鈕，就會幫你分組。</div>
+      return top + `<div class="notice">交卷了！你答對 <b>${rec.score} / ${rec.max}</b> 題。先一題一題看檢討，看完再按最下面的按鈕${lastOne ? '，就會幫你分組' : ''}。</div>
       <div class="qlist">${items.map((it, i) => { const v = rec.ans[it.id]; const ok = v === it.a; return `<div class="q rv ${ok ? 'is-ok' : 'is-no'}">
         <p class="sq"><span class="qno">${i + 1}</span>${esc(it.q)}</p>
         <p class="rv-line"><span class="mark ${ok ? 'ok' : 'no'}">${ok ? '答對' : '答錯'}</span>你選：${esc(it.o[v] ?? '沒作答')}${ok ? '' : `　正確答案：<b>${esc(it.o[it.a])}</b>`}</p>
         <p class="ex"><b>${ok ? '說明' : '為什麼'}</b>${esc(it.ex || '')}</p></div>`; }).join('')}</div>
-      <div class="submit-row"><button class="primary" type="button" id="reviewed">我檢討完了，幫我分組</button></div>`;
+      <div class="submit-row"><button class="primary" type="button" id="reviewed">${lastOne ? '我檢討完了，幫我分組' : '我檢討完了'}</button></div>`;
     }
     if (s.cmp) {
       const A = preFirst(st.recs[s.cmp]); const B = rec.score;
@@ -1298,7 +1309,9 @@ function itemsBody(s) {
         <p class="ex"><b>說明</b>${esc(it.ex || '')}</p></div>`; }).join('')}</div>`;
     }
     const g = next ? myGroup(s.group) : null;
+    const nextTest = s.group && !g ? gTests(s.group).find(t => !(st.recs[t.id]?.done && st.recs[t.id]?.extra?.reviewed)) : null;
     const msg = s.test ? '後測已交卷。到「後測檢討」看看每一題的詳解。'
+      : nextTest ? `檢討完成！你答對 ${rec.score} / ${rec.max} 題。接著做「${nextTest.name}」，${gNames(s.group)}都做完、檢討完，就會幫你分組。${isOpen(nextTest.id) ? `<button class="primary" type="button" id="goNext" data-next="${nextTest.id}">開始${nextTest.name}</button>` : '（等老師打開這一關）'}`
       : next && g ? `檢討完成！你被分到 <b class="g-${GROUPS[g].tone} gchip">${GROUPS[g].name}</b>，「${next.name}」已經打開了。<button class="primary" type="button" id="goNext" data-next="${next.id}">開始${next.name}</button>`
       : `已完成！你答對 ${rec.score} / ${rec.max} 題。`;
     return top + `<div class="notice done next-row">${msg}</div>`;
@@ -1667,7 +1680,7 @@ function go(view) {
   if (view !== 'stage') scrollTo(0, 0);
 }
 // ===== 新版本偵測：答案都先存在平板，重新載入不會不見 =====
-const BUILD = '20261111220851';
+const BUILD = '20261111223136';
 async function checkVer() {
   if (!/^https?:/.test(location.protocol) || BUILD.startsWith('/*')) return;
   try {
@@ -1742,7 +1755,7 @@ const recOf = (seat, stage) => st.t.recs.find(r => String(r.seat) === String(sea
 function seatsList() { return Array.from({ length: st.t.cfg.size || 16 }, (_, i) => i + 1); }
 function tGroupOf(seat, diff) {
   const ov = st.t.cfg.ov[diff][seat]; if (ov) return { g: ov, by: '老師' };
-  const test = STAGES.find(s => s.group === diff); const g = autoGroup(test, recOf(seat, test.id));
+  const g = autoGroupG(diff, x => recOf(seat, x));
   return g ? { g, by: '自動' } : null;
 }
 const TABS = [['control', '課堂控制'], ['board', '作答看板'], ['groups', '分組'], ['wall', '作品牆'], ['compare', '前後對照']];
@@ -1952,14 +1965,15 @@ function showDetail(seat, sid) {
 function tGroups() {
   const seats = seatsList();
   const panel = (diff) => {
-    const test = STAGES.find(s => s.group === diff); const counts = { A: 0, B: 0, C: 0 };
+    const cut = gCut(diff); const counts = { A: 0, B: 0, C: 0 };
     seats.forEach(n => { const g = tGroupOf(n, diff)?.g; if (g) counts[g]++; });
     return `<section class="panel"><h2>${diff === 'v' ? '分組 ①：生字語詞' : '分組 ②：修辭句型'}</h2>
-      <p class="muted">依「${test.name}」自動分組：${test.cut[0]} 題以下${GROUPS.A.name}、${test.cut[0] + 1}～${test.cut[1]} 題${GROUPS.B.name}、${test.cut[1] + 1} 題以上${GROUPS.C.name}。可以手動調整。</p>
+      <p class="muted">依${gNames(diff)}${gTests(diff).length > 1 ? '合計' : ''}自動分組：${cut[0]} 題以下${GROUPS.A.name}、${cut[0] + 1}～${cut[1]} 題${GROUPS.B.name}、${cut[1] + 1} 題以上${GROUPS.C.name}。可以手動調整。</p>
       <div class="gsum">${Object.entries(GROUPS).map(([k, g]) => `<span class="gchip g-${g.tone}">${g.name}（${g.level}）${counts[k]} 人</span>`).join('')}</div>
       <div class="scroll"><table class="tbl"><thead><tr><th>座號</th><th>檢測</th><th>自動</th><th>組別</th></tr></thead><tbody>
-      ${seats.map(n => { const r = recOf(n, test.id); const auto = autoGroup(test, r); const ov = st.t.cfg.ov[diff][n] || '';
-        return `<tr><td class="num">${n}</td><td class="num">${r?.done ? `${r.score}/${r.max}` : r ? '作答中' : '·'}</td><td>${auto ? GROUPS[auto].name : '—'}</td>
+      ${seats.map(n => { const r = gRec(diff, x => recOf(n, x)); const auto = autoGroupG(diff, x => recOf(n, x)); const ov = st.t.cfg.ov[diff][n] || '';
+        const doneN = gTests(diff).filter(t => recOf(n, t.id)?.done).length; const anyR = gTests(diff).some(t => recOf(n, t.id));
+        return `<tr><td class="num">${n}</td><td class="num">${r ? `${r.score}/${r.max}` : anyR ? (gTests(diff).length > 1 ? `做完 ${doneN}/${gTests(diff).length} 關` : '作答中') : '·'}</td><td>${auto ? GROUPS[auto].name : '—'}</td>
         <td><select data-ov="${diff}" data-seat="${n}"><option value="">${auto ? '跟自動' : '未分組'}</option>${Object.entries(GROUPS).map(([k, g]) => `<option value="${k}" ${ov === k ? 'selected' : ''}>${g.name}</option>`).join('')}</select></td></tr>`; }).join('')}
       </tbody></table></div></section>`;
   };
@@ -2028,7 +2042,7 @@ function tPreCmp(seats) {
 function tCompare() {
   const seats = seatsList(); const post = stageById('post');
   const pct = r => r?.done && r.max ? Math.round(r.score / r.max * 100) : null;
-  const rows = seats.map(n => ({ n, v: pct(recOf(n, 'vtest')), s: pct(recOf(n, 'stest')), p: pct(recOf(n, 'post')), pr: recOf(n, 'post') }));
+  const rows = seats.map(n => ({ n, v: pct(recOf(n, 'vtest')), s: (r => r && r.max ? Math.round(r.score / r.max * 100) : null)(gRec('s', x => recOf(n, x))), p: pct(recOf(n, 'post')), pr: recOf(n, 'post') }));
   const avg = k => { const xs = rows.map(r => r[k]).filter(x => x != null); return xs.length ? Math.round(xs.reduce((a, b) => a + b, 0) / xs.length) : null; };
   const dims = [...new Set(post.items.map(i => i.dim))];
   const dimPct = (pr, d) => { if (!pr?.done) return null; const its = post.items.filter(i => i.dim === d); return Math.round(its.filter(i => pr.ok[i.id]).length / its.length * 100); };
