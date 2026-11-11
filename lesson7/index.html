@@ -385,6 +385,12 @@ button.opt{justify-content:center;font-size:1.1rem}button.opt .kai{font-size:1.5
 .pq-texts{display:grid;gap:8px;font-size:1.25rem}.pq-texts p{margin:0;background:var(--paper);border-radius:8px;padding:.4em .8em}
 .pq-bar{display:flex;gap:10px;flex-wrap:wrap;justify-content:space-between;border-top:1px dashed var(--line);padding-top:12px;margin-top:8px}
 .pq-bar button{font-size:1.1rem}
+.cut-line{display:flex;flex-wrap:wrap;gap:6px;font-size:1.5rem;margin:.4em 0}
+.cut-chip{font:inherit;background:var(--card);border:2px solid var(--line);border-radius:10px;padding:.15em .5em;cursor:pointer;color:var(--ink);min-height:48px}
+.cut-chip.struck{text-decoration:line-through;text-decoration-thickness:3px;text-decoration-color:var(--no);color:var(--muted);background:var(--paper);border-style:dashed}
+.cut-res{font-size:1.2rem;display:flex;gap:10px;align-items:center;flex-wrap:wrap}.cut-res b{font-size:1.35rem;color:var(--accent)}
+.pq-tap span.struck{text-decoration:line-through;text-decoration-color:var(--no);color:var(--muted)}
+.pq-texts p.ok{border-left:4px solid var(--ok)}
 .pq-match{display:grid;grid-template-columns:1fr 1fr;gap:16px}.pq-match .pq-opts{list-style:none;padding-left:0}
 .pq-pairs{list-style:none;padding-left:0}.pq-pairs li{justify-content:flex-start;align-items:center}.pq-arrow{color:var(--ok);font-weight:700}
 .pq-pic{max-width:460px;margin:0 auto 1em}.pq-pic .hand-svg{cursor:default}
@@ -699,15 +705,16 @@ const STAGES = [
       { id: 'x5', t: 'mc', q: '「天上的白雲像一團團棉花糖。」這句用了什麼寫法？', o: ['把東西比喻成另一樣東西（譬喻）', '說得比實際更誇張（誇飾）'], a: 0, ex: '用「像」把白雲比喻成棉花糖。' },
       { id: 'x6', t: 'mc', q: '「我餓得可以吃下一整頭牛。」這句用了什麼寫法？', o: ['把東西比喻成另一樣東西（譬喻）', '說得比實際更誇張（誇飾）'], a: 1, ex: '人不可能吃下一整頭牛，是誇張的說法。' }
     ] },
-  { id: 'ss', sec: '修辭句型', name: '縮寫檢測', when: '第3節', group: 's',
-    intro: '把長句子縮短：留下「誰＋做了什麼」，刪掉時間、地點和形容的部分。交卷後先看檢討。',
+  { id: 'ss', sec: '修辭句型', name: '縮寫檢測', when: '第3節', group: 's', holdReview: true,
+    intro: '把長句子縮短：點一下要刪掉的部分，留下「誰＋做了什麼」。做完交給老師，老師公布答案後，大家再一起對答案。',
     items: [
-      { id: 'y1', t: 'mc', q: '「奶奶低著頭，瞇著眼，仔細剪出花樣，就像一位大藝術家。」縮寫後是哪一句？', o: ['奶奶低著頭。', '奶奶就像一位大藝術家。', '奶奶瞇著眼剪花樣。'], a: 1, ex: '刪掉動作細節「低著頭，瞇著眼，仔細剪出花樣」，留下主要意思。' },
-      { id: 'y2', t: 'mc', q: '「奶奶一起床，雙手就在銀髮上又梳又夾。」縮寫後是哪一句？', o: ['奶奶一起床。', '奶奶在銀髮上又梳又夾。', '雙手在銀髮上。'], a: 1, ex: '「一起床」是時間，可以刪掉；留下「奶奶＋做了什麼」。' },
-      { id: 'y3', t: 'mc', q: '「一張紙在奶奶手中摺摺剪剪，不一會兒就變成美麗的窗花。」縮寫後是哪一句？', o: ['一張紙變成窗花。', '奶奶的手。', '不一會兒就變成。'], a: 0, ex: '刪掉「在奶奶手中摺摺剪剪」「不一會兒」「美麗的」，留下「一張紙變成窗花」。' },
-      { id: 'y4', t: 'mc', q: '「淘氣的我最喜歡把食指放在奶奶的手背上，玩連連看遊戲。」縮寫後是哪一句？', o: ['淘氣的我。', '食指放在手背上。', '我玩連連看遊戲。'], a: 2, ex: '刪掉形容「淘氣的」和動作細節，留下「我玩連連看遊戲」。' }
+      { id: 'y1', t: 'cut', q: '把句子縮短：刪掉動作的細節，留下主要的意思。', chunks: ['奶奶', '低著頭，', '瞇著眼，', '仔細剪出花樣，', '就像', '一位', '大藝術家。'], keep: [[0, 4, 5, 6], [0, 4, 6]], ex: '「低著頭，瞇著眼，仔細剪出花樣」都是動作的細節，刪掉後留下「奶奶就像一位大藝術家」。' },
+      { id: 'y2', t: 'cut', q: '把句子縮短：「一起床」是時間，可以刪掉嗎？', chunks: ['奶奶', '一起床，', '雙手', '就', '在銀髮上', '又梳又夾。'], keep: [[0, 4, 5], [0, 5]], ex: '刪掉時間「一起床」和「雙手就」，留下「奶奶在銀髮上又梳又夾」。' },
+      { id: 'y3', t: 'cut', q: '把句子縮短：留下「什麼東西變成了什麼」。', chunks: ['一張紙', '在奶奶手中', '摺摺剪剪，', '不一會兒', '就', '變成', '美麗的', '窗花。'], keep: [[0, 5, 7], [0, 4, 5, 7]], ex: '刪掉「在奶奶手中摺摺剪剪」「不一會兒」和形容的「美麗的」，留下「一張紙變成窗花」。' },
+      { id: 'y4', t: 'cut', q: '把句子縮短：誰在玩什麼？', chunks: ['淘氣的', '我', '最喜歡', '把食指', '放在', '奶奶的手背上，', '玩', '連連看遊戲。'], keep: [[1, 6, 7], [1, 2, 6, 7]], ex: '刪掉形容的「淘氣的」和動作細節「把食指放在奶奶的手背上」，留下「我玩連連看遊戲」。' },
+      { id: 'y5', t: 'cut', q: '把句子縮短：奶奶的手變出了什麼？', chunks: ['她的手', '真的', '會', '變出', '寶物。'], keep: [[0, 3, 4], [0, 2, 3, 4]], ex: '「真的」是加強語氣，可以刪掉，留下「她的手變出寶物」。' }
     ],
-    cut: [7, 11] // 三關合計 15 題：0–7 星星、8–11 群山、12–15 窗花
+    cut: [8, 12] // 三關合計 16 題：0–8 星星、9–12 群山、13–16 窗花
   },
   { id: 'sgroup', sec: '修辭句型', name: '分組任務 ②', when: '第4節', diff: 's',
     intro: '依你的組別完成任務：連連看、選擇，最後照樣寫一個句子，會出現在老師的作品牆上。',
@@ -1245,11 +1252,17 @@ function itemsBody(s) {
   if (locked) {
     const next = s.group ? STAGES.find(x => x.diff === s.group) : null;
     const lastOne = s.group && gTests(s.group).filter(t => t.id !== s.id).every(t => st.recs[t.id]?.done && st.recs[t.id]?.extra?.reviewed);
+    if (s.group && !rec.extra.reviewed && s.holdReview && !revealed(s.id)) {
+      return top + `<div class="notice">交卷了！等老師公布答案，大家再一起對答案。</div>
+      <div class="qlist">${items.map((it, i) => `<div class="q"><p class="sq"><span class="qno">${i + 1}</span>${esc(it.q)}</p>${it.t === 'cut' ? `<p class="rv-line">你縮短的句子：<b class="kai">${esc(cutResult(it, rec.ans[it.id]))}</b></p>` : ''}</div>`).join('')}</div>
+      <p class="muted">老師公布答案後，按右上角「重新整理」就會看到答案。</p>`;
+    }
     if (s.group && !rec.extra.reviewed) {
       return top + `<div class="notice">交卷了！你答對 <b>${rec.score} / ${rec.max}</b> 題。先一題一題看檢討，看完再按最下面的按鈕${lastOne ? '，就會幫你分組' : ''}。</div>
-      <div class="qlist">${items.map((it, i) => { const v = rec.ans[it.id]; const ok = v === it.a; return `<div class="q rv ${ok ? 'is-ok' : 'is-no'}">
+      <div class="qlist">${items.map((it, i) => { const v = rec.ans[it.id]; const ok = it.t === 'cut' ? cutOk(it, v) : v === it.a; return `<div class="q rv ${ok ? 'is-ok' : 'is-no'}">
         <p class="sq"><span class="qno">${i + 1}</span>${esc(it.q)}</p>
-        <p class="rv-line"><span class="mark ${ok ? 'ok' : 'no'}">${ok ? '答對' : '答錯'}</span>你選：${esc(it.o[v] ?? '沒作答')}${ok ? '' : `　正確答案：<b>${esc(it.o[it.a])}</b>`}</p>
+        ${it.t === 'cut' ? `<p class="rv-line"><span class="mark ${ok ? 'ok' : 'no'}">${ok ? '答對' : '再想想'}</span>你縮短的句子：<b class="kai">${esc(cutResult(it, v))}</b></p><p class="rv-line">參考答案：<b class="kai">${cutRef(it).map(esc).join('　或　')}</b></p>`
+        : `<p class="rv-line"><span class="mark ${ok ? 'ok' : 'no'}">${ok ? '答對' : '答錯'}</span>你選：${esc(it.o[v] ?? '沒作答')}${ok ? '' : `　正確答案：<b>${esc(it.o[it.a])}</b>`}</p>`}
         <p class="ex"><b>${ok ? '說明' : '為什麼'}</b>${esc(it.ex || '')}</p></div>`; }).join('')}</div>
       <div class="submit-row"><button class="primary" type="button" id="reviewed">${lastOne ? '我檢討完了，幫我分組' : '我檢討完了'}</button></div>`;
     }
@@ -1328,8 +1341,16 @@ function teachBody(s, rec) {
   </form>`;
 }
 const GAME_T = ['hotspot', 'tap', 'sort', 'order'];
+// 刪減句子（縮寫）：學生點語塊刪掉，剩下的就是縮短後的句子
+const cutStrip = t => String(t).replace(/[，。、：；！？「」『』]/g, '');
+const cutResult = (it, struck) => it.chunks.map((c, k) => (struck || []).includes(k) ? '' : cutStrip(c)).join('') + '。';
+const cutKeep = (it, struck) => it.chunks.map((c, k) => k).filter(k => !(struck || []).includes(k));
+const cutOk = (it, struck) => it.keep.some(ks => ks.join(',') === cutKeep(it, struck).join(','));
+const cutRef = it => it.keep.map(ks => ks.map(k => cutStrip(it.chunks[k])).join('') + '。');
+const revealed = sid => st.preview || (st.cfg?.unlocked || []).includes('reveal:' + sid);
 function answered(it, rec) {
   const v = rec.ans[it.id];
+  if (it.t === 'cut') return Array.isArray(v) && v.length > 0;
   if (GAME_T.includes(it.t)) return v === 'done';
   if (it.t === 'match') return !!v && Object.keys(v).length === it.pairs.length;
   return v != null && String(v).trim() !== '';
@@ -1358,6 +1379,11 @@ function qHtml(s, it, i, rec) {
     <div class="match ${it.wide ? 'wide' : ''}"><div class="mcol">${it.pairs.map((p, k) => `<button type="button" class="mitem L ${m[k] != null ? 'done ' + colors[k % 5] : ''} ${matchSel[it.id] === k ? 'sel' : ''}" data-mid="${it.id}" data-l="${k}" ${m[k] != null ? 'disabled' : ''}><span class="${it.kaiL ? 'kai' : ''}">${esc(p[0])}</span></button>`).join('')}</div>
       <div class="mcol">${ord.map(r => { const lk = Object.keys(m).find(x => m[x] === r); return `<button type="button" class="mitem R ${lk != null ? 'done ' + colors[lk % 5] : ''}" data-mid="${it.id}" data-r="${r}" ${lk != null ? 'disabled' : ''}><span class="${/^[ㄅ-ㄩ˙]/.test(it.pairs[r][1]) ? 'zy' : ''}">${esc(it.pairs[r][1])}</span></button>`; }).join('')}</div></div>
     ${done ? `<p class="fb ok">全部${it.label === '連連看' ? '連' : '配'}對了！${(rec.extra.mmiss || {})[it.id] ? `（錯了 ${(rec.extra.mmiss || {})[it.id]} 次）` : '一次就全對！'}${it.ex ? esc(it.ex) : ''}</p>` : ''}`;
+  } else if (it.t === 'cut') {
+    const struck = Array.isArray(v) ? v : [];
+    input = `<p class="muted">點一下要刪掉的部分（會畫上刪除線），再點一次可以救回來。</p>
+      <div class="cut-line kai">${it.chunks.map((c, k) => `<button type="button" class="cut-chip ${struck.includes(k) ? 'struck' : ''}" data-cut="${it.id}" data-k="${k}">${esc(c)}</button>`).join('')}</div>
+      <p class="cut-res">縮短後：<b class="kai">${esc(cutResult(it, struck))}</b>${struck.length ? `<button type="button" class="ghost sm" data-cutreset="${it.id}">重來</button>` : ''}</p>`;
   } else if (it.t === 'mc') {
     input = `<div class="opts ${it.o.length <= 2 ? 'two' : ''}">${it.o.map((o, k) => `
       <label class="opt ${v === k ? 'sel' : ''} ${!isTest && v === k ? (k === it.a ? 'right' : 'wrong') : ''}">
@@ -1404,6 +1430,15 @@ function bindItems(s) {
       updateLeft();
     }
   });
+  form.querySelectorAll('[data-cut]').forEach(b => b.onclick = () => {
+    const it = items.find(x => x.id === b.dataset.cut); const k = +b.dataset.k;
+    const cur = Array.isArray(rec.ans[it.id]) ? rec.ans[it.id] : [];
+    rec.ans[it.id] = cur.includes(k) ? cur.filter(x => x !== k) : [...cur, k].sort((a, b) => a - b);
+    rec.ok[it.id] = cutOk(it, rec.ans[it.id]);
+    if (s.group) rec.extra.group = s.group;
+    queueSave(s.id); const y = scrollY; renderStage(); scrollTo(0, y);
+  });
+  form.querySelectorAll('[data-cutreset]').forEach(b => b.onclick = () => { const id = b.dataset.cutreset; rec.ans[id] = []; rec.ok[id] = false; queueSave(s.id); const y = scrollY; renderStage(); scrollTo(0, y); });
   bindGames(s, items, rec, () => { const y = scrollY; renderStage(); scrollTo(0, y); });
   form.querySelectorAll('.mitem').forEach(b => b.onclick = () => {
     const id = b.dataset.mid; const it = items.find(x => x.id === id); const m = rec.ans[id] = rec.ans[id] || {};
@@ -1433,7 +1468,7 @@ function bindItems(s) {
       const q = form.querySelector(`.q[data-id="${miss[0].id}"]`); q.classList.add('miss'); q.scrollIntoView({ behavior: 'smooth', block: 'center' });
       $('#left').textContent = `還有 ${miss.length} 題沒寫`; return;
     }
-    const mcs = items.filter(it => it.t === 'mc' || it.t === 'match' || GAME_T.includes(it.t));
+    const mcs = items.filter(it => it.t === 'mc' || it.t === 'cut' || it.t === 'match' || GAME_T.includes(it.t));
     rec.max = mcs.length;
     rec.score = mcs.filter(it => (isTest ? rec.ok[it.id] : rec.first[it.id])).length;
     if (group) rec.extra.group = group;
@@ -1649,7 +1684,7 @@ function go(view) {
   if (view !== 'stage') scrollTo(0, 0);
 }
 // ===== 新版本偵測：答案都先存在平板，重新載入不會不見 =====
-const BUILD = '20261111223136';
+const BUILD = '20261111223626';
 async function checkVer() {
   if (!/^https?:/.test(location.protocol) || BUILD.startsWith('/*')) return;
   try {
@@ -1679,6 +1714,7 @@ function startStudentPoll() {
     const before = JSON.stringify(st.cfg);
     if (await refreshMine()) {
       if (JSON.stringify(st.cfg) !== before && st.view === 'home') renderHome();
+      else if (JSON.stringify(st.cfg) !== before && st.view === 'stage' && stageById(st.stage)?.holdReview && st.recs[st.stage]?.done) renderStage();
     }
   }, 12000);
 }
@@ -1761,7 +1797,7 @@ function tControl() {
     <div class="quick">${whenList.map(w => `<button class="ghost sm" data-when="${w}">開到「${w}」</button>`).join('')}</div>
     <table class="tbl"><thead><tr><th>節次</th><th>關卡</th><th>完成</th><th>開放</th></tr></thead><tbody>
     ${STAGES.map(s => `<tr><td>${esc(s.when)}</td><td>${esc(s.name)}${s.diff ? ' <span class="pill">差異化</span>' : ''}</td>
-      <td class="num">${doneCount(s.id)} / ${seats.length}</td>
+      <td class="num">${doneCount(s.id)} / ${seats.length}${s.holdReview ? `<br><button type="button" class="ghost sm" data-reveal="${s.id}">${c.unlocked.includes('reveal:' + s.id) ? '已公布答案（按此收回）' : '公布答案給學生'}</button>` : ''}</td>
       <td><label class="switch"><input type="checkbox" data-unlock="${s.id}" ${c.unlocked.includes(s.id) ? 'checked' : ''}><span></span></label></td></tr>`).join('')}
     </tbody></table>
   </section>
@@ -1805,6 +1841,11 @@ async function migrateFromSupa() {
 function bControl() {
   const c = st.t.cfg;
   $('#migrate') && ($('#migrate').onclick = migrateFromSupa);
+  document.querySelectorAll('[data-reveal]').forEach(b => b.onclick = async () => {
+    const k = 'reveal:' + b.dataset.reveal;
+    c.unlocked = c.unlocked.includes(k) ? c.unlocked.filter(u => u !== k) : [...c.unlocked, k];
+    await tSaveCfg(); renderTeacher(true);
+  });
   document.querySelectorAll('[data-unlock]').forEach(x => x.onchange = async () => {
     const id = x.dataset.unlock;
     c.unlocked = x.checked ? [...new Set([...c.unlocked, id])] : c.unlocked.filter(u => u !== id);
@@ -1823,6 +1864,7 @@ function cellOf(it, rec) {
   const v = rec.ans?.[it.id];
   if (GAME_T.includes(it.t)) { if (!answered(it, rec)) return ['', '·']; return rec.first?.[it.id] ? ['ok', '✓'] : ['no', '✗']; }
   if (it.t === 'match') { if (!answered(it, rec)) return rec.ans?.[it.id] ? ['', '…'] : ['', '·']; return rec.first?.[it.id] ? ['ok', '✓'] : ['no', '✗']; }
+  if (it.t === 'cut') { if (!answered(it, rec)) return ['', '·']; return cutOk(it, rec.ans[it.id]) ? ['ok', '✓'] : ['no', '✗']; }
   if (it.t === 'self') { const m = rec.self?.[it.id]; return m === '對了' ? ['ok', '✓'] : m === '要訂正' ? ['no', '訂'] : ['', '·']; }
   if (v == null || String(v).trim() === '') return ['', '·'];
   if (it.t === 'text') return ['txt', '寫'];
@@ -1906,6 +1948,7 @@ function pqBody(it, reveal) {
     const ord = reveal ? it.cards.map((c, i) => i) : pqMix(it.cards.map((c, i) => i), it.id);
     return `<ol class="pq-opts ${reveal ? 'pq-ordered' : 'pq-unordered'}">${ord.map(i => `<li class="${reveal ? 'right' : ''}"><span class="pq-o">${esc(it.cards[i])}</span></li>`).join('')}</ol>`;
   }
+  if (it.t === 'cut') return `<div class="pq-tap kai">${it.chunks.map((c, k) => `<span class="${reveal && !it.keep[0].includes(k) ? 'struck' : reveal ? 'right' : ''}">${esc(c)}</span>`).join('')}</div>${reveal ? `<p class="ex"><b>參考答案</b>${cutRef(it).map(esc).join('　或　')}</p>` : ''}`;
   if (it.t === 'text') return `${it.topics ? `<div class="pq-cards">${it.topics.map(t => `<span class="pq-card">${esc(t[0])}</span>`).join('')}</div>` : ''}${it.hint ? `<p class="muted">${esc(it.hint)}</p>` : ''}${it.ref && reveal ? `<p class="ex"><b>參考</b>${esc(it.ref)}</p>` : ''}`;
   return '';
 }
@@ -1922,12 +1965,13 @@ function showQ(sid, g, qi, reveal, names) {
   if (it.t === 'mc') opts = `<ol class="pq-opts">${it.o.map((o, k) => { const who = recs.filter(x => x.r?.ans?.[it.id] === k).map(x => x.n); const right = reveal && k === it.a;
     return `<li class="${right ? 'right' : ''}"><span class="pq-o ${/^[ㄅ-ㄩ]/.test(o) ? 'zy' : ''}">${esc(o)}</span>${reveal ? `<span class="pq-c">${who.length} 人${names && who.length ? '：' + who.join('、') : ''}</span>` : ''}</li>`; }).join('')}</ol>`;
   else opts = pqBody(it, reveal);
+  const cutAns = it.t === 'cut' && reveal ? `<div class="pq-texts">${recs.filter(x => Array.isArray(x.r?.ans?.[it.id]) && x.r.ans[it.id].length).map(x => `<p class="${cutOk(it, x.r.ans[it.id]) ? 'ok' : ''}">${names ? `<b>${x.n} 號</b>　` : ''}${esc(cutResult(it, x.r.ans[it.id]))}${cutOk(it, x.r.ans[it.id]) ? ' ✓' : ''}</p>`).join('') || '<p class="muted">還沒有人作答。</p>'}</div>` : '';
   const texts = it.t === 'text' && reveal ? `<div class="pq-texts">${recs.filter(x => x.r?.ans?.[it.id]).map(x => `<p>${names ? `<b>${x.n} 號</b>　` : ''}${esc(x.r.ans[it.id])}</p>`).join('') || '<p class="muted">還沒有人寫。</p>'}</div>` : '';
   $('#modal').innerHTML = `<div class="modal-bg"><div class="modal pq" role="dialog" aria-label="題目投影">
     <header><h2>${esc(s.name)}${g ? `・${GROUPS[g].name}` : ''}　第 ${qi + 1} / ${items.length} 題</h2><button class="ghost sm" id="mclose">關閉</button></header>
     <p class="pq-q">${esc(it.q)}</p>${opts}
     ${reveal && it.ex ? `<p class="ex"><b>說明</b>${esc(it.ex)}</p>` : ''}
-    ${reveal ? (it.t === 'text' ? texts : `<div class="pq-stat"><div class="ok"><span>答對</span>${list(ok)}</div><div class="no"><span>答錯</span>${list(no)}</div><div><span>還沒作答</span>${list(none)}</div></div>`) : ''}
+    ${cutAns}${reveal ? (it.t === 'text' ? texts : `<div class="pq-stat"><div class="ok"><span>答對</span>${list(ok)}</div><div class="no"><span>答錯</span>${list(no)}</div><div><span>還沒作答</span>${list(none)}</div></div>`) : ''}
     <div class="pq-bar">
       <button class="ghost" id="pqPrev" ${qi === 0 ? 'disabled' : ''}>← 上一題</button>
       <button class="${reveal ? 'ghost' : 'primary'}" id="pqRev">${reveal ? '隱藏答案' : '顯示答案和統計'}</button>
