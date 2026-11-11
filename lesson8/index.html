@@ -937,6 +937,7 @@ function autoGroup(stage, rec) {
 // 分組可以依好幾個檢測合計（例如句型、修辭、縮寫三關）：全部做完、檢討完才分組
 const gTests = g => STAGES.filter(x => x.group === g);
 const gCut = g => (gTests(g).find(t => t.cut) || {}).cut;
+const hasDiff = g => STAGES.some(x => x.diff === g);
 const gNames = g => gTests(g).map(t => `「${t.name}」`).join('、');
 function gRec(g, get) {
   const rs = gTests(g).map(t => get(t.id));
@@ -1296,7 +1297,7 @@ function itemsBody(s) {
   if (s.teach) return teachBody(s, rec);
   if (locked) {
     const next = s.group ? STAGES.find(x => x.diff === s.group) : null;
-    const lastOne = s.group && gTests(s.group).filter(t => t.id !== s.id).every(t => st.recs[t.id]?.done && st.recs[t.id]?.extra?.reviewed);
+    const lastOne = s.group && hasDiff(s.group) && gTests(s.group).filter(t => t.id !== s.id).every(t => st.recs[t.id]?.done && st.recs[t.id]?.extra?.reviewed);
     if (s.group && !rec.extra.reviewed && s.holdReview && !revealed(s.id)) {
       return top + `<div class="notice">交卷了！等老師公布答案，大家再一起對答案。</div>
       <div class="qlist">${items.map((it, i) => `<div class="q"><p class="sq"><span class="qno">${i + 1}</span>${esc(it.q)}</p>${it.t === 'cut' ? `<p class="rv-line">你縮短的句子：<b class="kai">${esc(cutResult(it, rec.ans[it.id]))}</b></p>` : ''}</div>`).join('')}</div>
@@ -1323,7 +1324,7 @@ function itemsBody(s) {
     const g = next ? myGroup(s.group) : null;
     const nextTest = s.group && !g ? gTests(s.group).find(t => !(st.recs[t.id]?.done && st.recs[t.id]?.extra?.reviewed)) : null;
     const msg = s.test ? '後測已交卷。到「後測檢討」看看每一題的詳解。'
-      : nextTest ? `檢討完成！你答對 ${rec.score} / ${rec.max} 題。接著做「${nextTest.name}」，${gNames(s.group)}都做完、檢討完，就會幫你分組。${isOpen(nextTest.id) ? `<button class="primary" type="button" id="goNext" data-next="${nextTest.id}">開始${nextTest.name}</button>` : '（等老師打開這一關）'}`
+      : nextTest ? `檢討完成！你答對 ${rec.score} / ${rec.max} 題。接著做「${nextTest.name}」${hasDiff(s.group) ? `，${gNames(s.group)}都做完、檢討完，就會幫你分組` : ''}。${isOpen(nextTest.id) ? `<button class="primary" type="button" id="goNext" data-next="${nextTest.id}">開始${nextTest.name}</button>` : '（等老師打開這一關）'}`
       : next && g ? `檢討完成！你被分到 <b class="g-${GROUPS[g].tone} gchip">${GROUPS[g].name}</b>，「${next.name}」已經打開了。<button class="primary" type="button" id="goNext" data-next="${next.id}">開始${next.name}</button>`
       : `已完成！你答對 ${rec.score} / ${rec.max} 題。`;
     return top + `<div class="notice done next-row">${msg}</div>`;
@@ -1714,7 +1715,7 @@ function go(view) {
   if (view !== 'stage') scrollTo(0, 0);
 }
 // ===== 新版本偵測：答案都先存在平板，重新載入不會不見 =====
-const BUILD = '20261111223626';
+const BUILD = '20261111230615';
 async function checkVer() {
   if (!/^https?:/.test(location.protocol) || BUILD.startsWith('/*')) return;
   try {
@@ -2020,7 +2021,7 @@ function tGroups() {
         <td><select data-ov="${diff}" data-seat="${n}"><option value="">${auto ? '跟自動' : '未分組'}</option>${Object.entries(GROUPS).map(([k, g]) => `<option value="${k}" ${ov === k ? 'selected' : ''}>${g.name}</option>`).join('')}</select></td></tr>`; }).join('')}
       </tbody></table></div></section>`;
   };
-  return `<div class="two-col">${panel('v')}${panel('s')}</div>`;
+  return `<div class="two-col">${['v', 's'].filter(hasDiff).map(panel).join('')}</div>`;
 }
 function bGroups() {
   document.querySelectorAll('[data-ov]').forEach(sel => sel.onchange = async () => {

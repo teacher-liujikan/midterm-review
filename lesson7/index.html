@@ -687,7 +687,7 @@ const STAGES = [
       { id: 'b7', from: 'q5', t: 'mc', q: '作者說奶奶是「全世界最年輕的奶奶」，是因為奶奶怎麼樣？', o: ['年紀最小', '充滿活力和創意', '很會看星座'], a: 1, ex: '第四段：在我心中，她充滿活力和創意，是全世界最年輕的奶奶！' }
     ] },
   { id: 'sj', sec: '修辭句型', name: '句型檢測', when: '第3節', group: 's',
-    intro: '句型小檢測：比……還……、雖然……可是……、不是……也不是……。交卷後先看檢討。三個檢測（句型、修辭、縮寫）都做完、檢討完，網站會自動分組。',
+    intro: '句型小檢測：比……還……、雖然……可是……、不是……也不是……。交卷後先看檢討。',
     items: [
       { id: 'j1', t: 'mc', q: '哪一句是正確的「比……還……」句子？', o: ['哥哥跑得比還快風。', '哥哥跑得比風還快。', '比哥哥跑得還快。'], a: 1, ex: '比＋事物＋還＋形容詞：比風還快。' },
       { id: 'j2', t: 'mc', q: '「媽媽做的蛋糕＿＿麵包店的＿＿好吃。」空格填什麼？', o: ['比……還……', '雖然……可是……', '不是……也不是……'], a: 0, ex: '拿兩樣東西來比較，用「比……還……」。' },
@@ -716,40 +716,6 @@ const STAGES = [
     ],
     cut: [8, 12] // 三關合計 16 題：0–8 星星、9–12 群山、13–16 窗花
   },
-  { id: 'sgroup', sec: '修辭句型', name: '分組任務 ②', when: '第4節', diff: 's',
-    intro: '依你的組別完成任務：連連看、選擇，最後照樣寫一個句子，會出現在老師的作品牆上。',
-    byGroup: {
-      A: [ // 星星組：學校生活
-        { id: 'ha1', t: 'match', label: '連連看', q: '把句子的前半和後半連起來。', wide: true, pairs: [['雖然功課很多，', '可是我還是認真寫完了。'], ['放學後，我不是去公園，', '也不是去書店，是直接回家。'], ['下課時，弟弟的聲音', '比打雷還大聲。'], ['考試時，教室安靜得', '像圖書館一樣。']] },
-        { id: 'ha2', t: 'mc', q: '「下課時，操場熱鬧得像菜市場。」用了什麼寫法？', o: ['譬喻', '誇飾'], a: 0, ex: '用「像」把操場比喻成菜市場。' },
-        { id: 'ha3', t: 'mc', q: '「我的作業簿疊得比山還高。」用了什麼寫法？', o: ['譬喻', '誇飾'], a: 1, ex: '作業簿不可能比山還高，是誇張的說法。' },
-        { id: 'ha4', t: 'mc', q: '「上課時，小明仔細的抄寫黑板上的生字。」縮寫後是哪一句？', o: ['小明抄寫生字。', '上課時，小明。', '黑板上的生字。'], a: 0, ex: '刪掉補充說明「上課時」和動作細節「仔細的」「黑板上的」。' },
-        { id: 'ha5', t: 'text', q: '照樣寫：比＿＿的＿＿還＿＿（寫學校裡的東西）', wall: true, hint: '例：操場的草比客廳的地毯還軟。' }
-      ],
-      B: [ // 群山組：家人、社區
-        { id: 'hb1', t: 'match', label: '連連看', q: '把句子的前半和後半連起來。', wide: true, pairs: [['雖然爸爸工作很累，', '可是他還是陪我下棋。'], ['週末我們不是去爬山，', '也不是去看電影，是去看外婆。'], ['媽媽煮的湯', '比餐廳的還好喝。'], ['阿姨笑起來', '像太陽一樣溫暖。']] },
-        { id: 'hb2', t: 'mc', q: '「爺爺的手粗得像樹皮。」用了什麼寫法？', o: ['譬喻', '誇飾'], a: 0, ex: '用「像」把爺爺的手比喻成樹皮。' },
-        { id: 'hb3', t: 'mc', q: '「哥哥的打呼聲比火車還大聲。」用了什麼寫法？', o: ['譬喻', '誇飾'], a: 1, ex: '打呼聲不可能比火車還大聲，是誇張的說法。' },
-        { id: 'hb4', t: 'mc', q: '「週末早上，爸爸在廚房裡做了香噴噴的蛋餅。」縮寫後是哪一句？', o: ['爸爸做了蛋餅。', '週末早上在廚房。', '香噴噴的蛋餅。'], a: 0, ex: '刪掉補充說明「週末早上」「在廚房裡」和形容「香噴噴的」。' },
-        { id: 'hb5', t: 'text', q: '照樣寫：比＿＿的＿＿還＿＿（描寫一位家人）', wall: true, hint: '例：媽媽的笑容比春天的陽光還溫暖。' }
-      ],
-      C: [ // 窗花組：議題、國家、時事
-        { id: 'hc1', t: 'match', label: '連連看', q: '把句子的前半和後半連起來。', wide: true, pairs: [['雖然颱風快來了，', '可是救難人員還是上山救人。'], ['減少塑膠不是只靠政府，', '也不是只靠商店，要靠每一個人。'], ['臺灣選手衝向終點，跑得', '比風還快。'], ['玉山上的雲海', '像一大片白色的棉被。']] },
-        { id: 'hc2', t: 'mc', q: '「台北101像一根插進雲裡的竹筍。」用了什麼寫法？', o: ['譬喻', '誇飾'], a: 0, ex: '用「像」把台北101比喻成竹筍。' },
-        { id: 'hc3', t: 'mc', q: '「球迷的加油聲比雷聲還響亮，全世界都聽見了。」用了什麼寫法？', o: ['譬喻', '誇飾'], a: 1, ex: '全世界都聽見，是誇張的說法。' },
-        { id: 'hc4', t: 'mc', q: '「為了保護海洋，許多志工在週末到海邊，撿寶特瓶、吸管和塑膠袋等垃圾。」縮寫後是哪一句？', o: ['許多志工到海邊撿垃圾。', '為了保護海洋。', '寶特瓶、吸管和塑膠袋。'], a: 0, ex: '刪掉補充說明「為了保護海洋」「在週末」和舉例說明「寶特瓶、吸管和塑膠袋等」。' },
-        { id: 'hc5', t: 'text', q: '照樣寫：比＿＿的＿＿還＿＿（寫臺灣的景物，或一則新聞）', wall: true, hint: '例：阿里山的空氣比冰箱裡的水還清涼。' }
-      ]
-    } },
-  { id: 'practice', sec: '習作', name: '課後練習', when: '第5節', hints: true,
-    intro: '卡住的時候，可以按「提示」。提示會一層一層變清楚，先自己想想再按。',
-    items: [
-      { id: 'k1', t: 'mc', q: '「＿＿的秋天」最適合填哪一個形容詞？', o: ['慈祥', '涼爽', '靈活'], a: 1, ex: '秋天的天氣不冷不熱，很涼爽。', hs: ['想一想：秋天給你什麼感覺？', '形容詞要和後面的語詞搭得起來。', '「慈祥」是形容人，秋天的天氣用哪一個？'] },
-      { id: 'k2', t: 'mc', q: '「＿＿的奶奶」最適合填哪一個形容詞？', o: ['豐收', '五顏六色', '慈祥'], a: 2, ex: '慈祥：形容老人家和藹親切。', hs: ['這個形容詞要用來描寫「人」。', '「豐收」常和田地、秋天放在一起。', '哪個詞是在說奶奶的樣子和態度？'] },
-      { id: 'k3', t: 'text', q: '縮寫句子：「奶奶一起床，雙手就在銀髮上又梳又夾。」', ref: '奶奶在銀髮上又梳又夾。（或：奶奶梳頭髮。）', hs: ['先找出：誰？做了什麼？', '「一起床」是時間，可以刪掉嗎？', '留下「奶奶＋做了什麼」，句子要讀得通。'] },
-      { id: 'k4', t: 'text', q: '奶奶手背上的斑點，除了星星，你還能聯想到什麼？', ref: '雪花、泡泡……（答案僅供參考）', hs: ['斑點是一點一點、散開的小圓點。', '天上、水裡、冬天，有什麼東西也是一點一點的？', '例如：雪花……你還想到什麼？'] },
-      { id: 'k5', t: 'text', q: '奶奶手背上的皺紋，除了群山，你還能聯想到什麼？', ref: '地圖、樹皮的紋路、哈密瓜皮……（答案僅供參考）', hs: ['皺紋是一條一條、彎彎曲曲的線。', '水果、樹木、紙上，哪裡有彎彎曲曲的線？', '例如：樹皮的紋路……你還想到什麼？'] }
-    ] },
   { id: 'post', sec: '後測', name: '後測', when: '第5節', test: true,
     intro: '10 題後測。作答時不會顯示對錯，交卷後到「後測檢討」看詳解。',
     items: [
@@ -892,6 +858,7 @@ function autoGroup(stage, rec) {
 // 分組可以依好幾個檢測合計（例如句型、修辭、縮寫三關）：全部做完、檢討完才分組
 const gTests = g => STAGES.filter(x => x.group === g);
 const gCut = g => (gTests(g).find(t => t.cut) || {}).cut;
+const hasDiff = g => STAGES.some(x => x.diff === g);
 const gNames = g => gTests(g).map(t => `「${t.name}」`).join('、');
 function gRec(g, get) {
   const rs = gTests(g).map(t => get(t.id));
@@ -1251,7 +1218,7 @@ function itemsBody(s) {
   if (s.teach) return teachBody(s, rec);
   if (locked) {
     const next = s.group ? STAGES.find(x => x.diff === s.group) : null;
-    const lastOne = s.group && gTests(s.group).filter(t => t.id !== s.id).every(t => st.recs[t.id]?.done && st.recs[t.id]?.extra?.reviewed);
+    const lastOne = s.group && hasDiff(s.group) && gTests(s.group).filter(t => t.id !== s.id).every(t => st.recs[t.id]?.done && st.recs[t.id]?.extra?.reviewed);
     if (s.group && !rec.extra.reviewed && s.holdReview && !revealed(s.id)) {
       return top + `<div class="notice">交卷了！等老師公布答案，大家再一起對答案。</div>
       <div class="qlist">${items.map((it, i) => `<div class="q"><p class="sq"><span class="qno">${i + 1}</span>${esc(it.q)}</p>${it.t === 'cut' ? `<p class="rv-line">你縮短的句子：<b class="kai">${esc(cutResult(it, rec.ans[it.id]))}</b></p>` : ''}</div>`).join('')}</div>
@@ -1278,7 +1245,7 @@ function itemsBody(s) {
     const g = next ? myGroup(s.group) : null;
     const nextTest = s.group && !g ? gTests(s.group).find(t => !(st.recs[t.id]?.done && st.recs[t.id]?.extra?.reviewed)) : null;
     const msg = s.test ? '後測已交卷。到「後測檢討」看看每一題的詳解。'
-      : nextTest ? `檢討完成！你答對 ${rec.score} / ${rec.max} 題。接著做「${nextTest.name}」，${gNames(s.group)}都做完、檢討完，就會幫你分組。${isOpen(nextTest.id) ? `<button class="primary" type="button" id="goNext" data-next="${nextTest.id}">開始${nextTest.name}</button>` : '（等老師打開這一關）'}`
+      : nextTest ? `檢討完成！你答對 ${rec.score} / ${rec.max} 題。接著做「${nextTest.name}」${hasDiff(s.group) ? `，${gNames(s.group)}都做完、檢討完，就會幫你分組` : ''}。${isOpen(nextTest.id) ? `<button class="primary" type="button" id="goNext" data-next="${nextTest.id}">開始${nextTest.name}</button>` : '（等老師打開這一關）'}`
       : next && g ? `檢討完成！你被分到 <b class="g-${GROUPS[g].tone} gchip">${GROUPS[g].name}</b>，「${next.name}」已經打開了。<button class="primary" type="button" id="goNext" data-next="${next.id}">開始${next.name}</button>`
       : `已完成！你答對 ${rec.score} / ${rec.max} 題。`;
     return top + `<div class="notice done next-row">${msg}</div>`;
@@ -1684,7 +1651,7 @@ function go(view) {
   if (view !== 'stage') scrollTo(0, 0);
 }
 // ===== 新版本偵測：答案都先存在平板，重新載入不會不見 =====
-const BUILD = '20261111223626';
+const BUILD = '20261111230627';
 async function checkVer() {
   if (!/^https?:/.test(location.protocol) || BUILD.startsWith('/*')) return;
   try {
@@ -2019,7 +1986,7 @@ function tGroups() {
         <td><select data-ov="${diff}" data-seat="${n}"><option value="">${auto ? '跟自動' : '未分組'}</option>${Object.entries(GROUPS).map(([k, g]) => `<option value="${k}" ${ov === k ? 'selected' : ''}>${g.name}</option>`).join('')}</select></td></tr>`; }).join('')}
       </tbody></table></div></section>`;
   };
-  return `<div class="two-col">${panel('v')}${panel('s')}</div>`;
+  return `<div class="two-col">${['v', 's'].filter(hasDiff).map(panel).join('')}</div>`;
 }
 function bGroups() {
   document.querySelectorAll('[data-ov]').forEach(sel => sel.onchange = async () => {
