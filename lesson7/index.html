@@ -1651,7 +1651,7 @@ function go(view) {
   if (view !== 'stage') scrollTo(0, 0);
 }
 // ===== 新版本偵測：答案都先存在平板，重新載入不會不見 =====
-const BUILD = '20261111230627';
+const BUILD = '20261112224007';
 async function checkVer() {
   if (!/^https?:/.test(location.protocol) || BUILD.startsWith('/*')) return;
   try {
@@ -2027,7 +2027,7 @@ function bWall() {
   $('#wproj').onclick = () => { st.t.proj = !st.t.proj; renderTeacher(); };
 }
 function preFirst(r) {
-  if (!r) return null; const its = stageById('pre').items; if (!its.some(it => r.first?.[it.id] != null)) return null;
+  if (!r) return null; const pair = new Set((stageById('preB')?.items || []).map(b => b.from)); const its = stageById('pre').items.filter(it => !pair.size || pair.has(it.id)); if (!its.some(it => r.first?.[it.id] != null)) return null;
   return its.filter(it => r.first?.[it.id] === true).length;
 }
 function tPreCmp(seats) {
