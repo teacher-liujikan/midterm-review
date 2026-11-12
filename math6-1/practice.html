@@ -90,6 +90,8 @@ nav button.done[aria-selected="true"]{background:var(--qnum);border-color:var(--
 .dropzone,.dropzone .cell{touch-action:none}
 .dropzone .cell.tile{cursor:grab}
 .ghost{position:fixed;z-index:50;pointer-events:none;background:#fff;box-shadow:inset 0 0 0 2px var(--grid-strong),0 8px 18px rgba(0,0,0,.28);opacity:.92}
+.qrwrap{background:#fff;padding:10px;border-radius:10px;width:max-content}
+.qrwrap img,.qrwrap canvas{display:block}
 /* grids */
 .scroll{overflow-x:auto;max-width:100%;padding:4px}
 .board{display:grid;grid-template-columns:repeat(var(--cols),var(--cell));grid-auto-rows:var(--cell);width:max-content;position:relative}
@@ -248,25 +250,32 @@ nav button.done[aria-selected="true"]{background:var(--qnum);border-color:var(--
 
   <!-- result -->
   <section data-q="r" hidden>
-    <div class="qhead"><span class="qn">成績</span><p class="qtext">做完了嗎？把這一頁拿給老師看。</p></div>
+    <div class="qhead"><span class="qn">成績</span><p class="qtext">做完了嗎？填上座號，讓老師掃 QR Code。</p></div>
     <div class="two">
       <div class="col">
         <div class="score" id="score"></div>
-        <p class="hint">⭕ 答對　❌ 答錯　— 還沒做</p>
-        <button class="btn soft" id="redo" style="align-self:flex-start">全部重做</button>
+        <div class="say">我的座號 <input class="num" id="seat" inputmode="numeric" maxlength="2"> 號 <button class="btn" id="mkqr">給老師掃描</button></div>
+        <p class="fb" id="seatfb"></p>
+        <div id="qrbox" hidden><div id="qr" class="qrwrap"></div><p class="hint" style="margin-top:6px">掃不到的話，請老師輸入：<b id="code" style="font-size:22px;color:var(--ink);letter-spacing:.05em"></b></p></div>
       </div>
-      <table class="res" id="res"></table>
+      <div class="col">
+        <table class="res" id="res"></table>
+        <p class="hint">⭕ 答對　❌ 答錯　— 還沒做</p>
+      </div>
     </div>
   </section>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script>
 const $=s=>document.querySelector(s);
 const ORDER=['1','2','3','4','5','6','7','8','r'];
 const LABEL={r:'成績'};
 const ITEMS=[['1','第 1 題'],['2','第 2 題'],['3','第 3 題'],['4-0','第 4 題 ①'],['4-1','第 4 題 ②'],['5','第 5 題'],['6-0','第 6 題 ①'],['6-1','第 6 題 ②'],['7','第 7 題'],['8-0','第 8 題 ①'],['8-1','第 8 題 ②']];
-const first={},done={};
-function record(id,ok){if(id in first)return;first[id]=ok;done[id]=true;updNav()}
+const first={},done={},ANS={};
+function record(id,ok,ans){if(id in first)return;first[id]=ok;done[id]=true;ANS[id]=String(ans??'').replace(/[;|]/g,' ');updNav()}
+function answersOf(sec){const out=[...sec.querySelectorAll('input.num')].map(i=>i.value.trim());
+  sec.querySelectorAll('.choice').forEach(g=>{const v=pickVal[g.id];const b=v&&g.querySelector(`[data-v="${v}"]`);out.push(b?b.textContent:'')});return out.join(',')}
 function lock(box){box.querySelectorAll('input,[data-check],[data-a="chk"],.choice button').forEach(e=>e.disabled=true)}
 function result(id,ok,good,ans){say(id,ok?'⭕ 答對了！'+good:'❌ 答錯了。'+ans,ok)}
 function updNav(){document.querySelectorAll('#nav button').forEach(b=>{const q=b.dataset.q;if(q==='r')return;
@@ -356,7 +365,7 @@ function shapeTask(host,id,label,g,color,mode){
   wrap.querySelector('[data-a="clr"]').onclick=()=>{n=0;cells.forEach(c=>{c.textContent='';c.classList.remove('tile','cnt')})};
   const pb=wrap.querySelector('[data-a="plate"]');if(pb)pb.onclick=()=>scr.classList.toggle('plate');
   wrap.querySelector('[data-a="chk"]').onclick=()=>{const v=parseInt(inp.value,10);if(isNaN(v))return fb('先填上答案喔！',false);
-    const ok=v===A;mark(inp,ok);record(id,ok);lock(wrap);ok?fb(`⭕ 答對了！面積是 ${A} 平方公分。`,true):fb(`❌ 答錯了。正確答案是 ${A} 平方公分。`,false)};
+    const ok=v===A;mark(inp,ok);record(id,ok,v);lock(wrap);ok?fb(`⭕ 答對了！面積是 ${A} 平方公分。`,true):fb(`❌ 答錯了。正確答案是 ${A} 平方公分。`,false)};
   host.appendChild(wrap)}
 shapeTask($('#q4'),'4-0','①',['.#.','###','###'],'#f6dcbc','tile');
 shapeTask($('#q4'),'4-1','②',['##.##','#####'],'#9fd3f5','tile');
@@ -401,7 +410,7 @@ $('#q8back').onclick=q8draw;
 q8draw();
 
 /* checks */
-function settle(q,id,fbid,ok,good,ans){record(id,ok);lock(SEC(q));result(fbid,ok,good,ans)}
+function settle(q,id,fbid,ok,good,ans){record(id,ok,answersOf(SEC(q)));lock(SEC(q));result(fbid,ok,good,ans)}
 const CHECK={
  1(){if(isNaN(val('#q1a'))||isNaN(val('#q1b')))return say('#q1fb','兩個空格都要填喔！',false);
    const a=val('#q1a')===10,b=val('#q1b')===10;mark($('#q1a'),a);mark($('#q1b'),b);
@@ -421,7 +430,7 @@ const CHECK={
  8(){const k=CUTS[q8i],id='8-'+q8i;if(id in first)return;
    if(isNaN(val('#q8a'))||isNaN(val('#q8b'))||!pickVal.q8c)return say('#q8fb','填好兩個空格，也要選面積一不一樣大喔！',false);
    const a=val('#q8a')===k.A,b=val('#q8b')===k.A,c=pickVal.q8c==='same';mark($('#q8a'),a);mark($('#q8b'),b);markChoice('q8c',c);
-   record(id,a&&b&&c);lock(SEC('8'));
+   record(id,a&&b&&c,answersOf(SEC('8')));lock(SEC('8'));
    result('#q8fb',a&&b&&c,`都是 ${k.A} 平方公分，面積一樣大！`+(q8i===0?'接著按 ② 做下一個。':''),`正確答案是：都是 ${k.A} 平方公分，面積一樣大。`+(q8i===0?'接著按 ② 做下一個。':''))}
 };
 document.querySelectorAll('[data-check]').forEach(b=>b.onclick=()=>CHECK[b.dataset.check]());
@@ -431,7 +440,14 @@ function showResult(){let ok=0;
   $('#res').innerHTML=ITEMS.map(([id,name])=>{let r='— 還沒做';if(id in first){if(first[id]){ok++;r='⭕ 答對'}else r='❌ 答錯'}return `<tr><td>${name}</td><td>${r}</td></tr>`}).join('');
   const left=ITEMS.filter(([id])=>!(id in first)).length;
   $('#score').innerHTML=`答對 ${ok} / ${ITEMS.length} 題`+(left?`<br><span style="font-size:24px;color:var(--muted)">還有 ${left} 題沒做</span>`:'')}
-$('#redo').onclick=()=>location.reload();
+function flags(){return ITEMS.map(([id])=>id in first?(first[id]?'1':'0'):'-').join('')}
+$('#mkqr').onclick=()=>{const n=parseInt($('#seat').value,10);
+  if(!(n>=1&&n<=40))return say('#seatfb','請填上你的座號喔！',false);
+  const seat=String(n).padStart(2,'0');say('#seatfb','');
+  const text='M61;'+seat+';'+flags()+';'+ITEMS.map(([id])=>ANS[id]||'').join('|');
+  $('#qr').innerHTML='';try{new QRCode($('#qr'),{text,width:240,height:240,correctLevel:QRCode.CorrectLevel.M})}catch(e){$('#qr').textContent='QR Code 產生失敗，請老師輸入下面的代碼。'}
+  $('#code').textContent=seat+'-'+flags();$('#qrbox').hidden=false};
+$('#seat').oninput=()=>{$('#qrbox').hidden=true};
 go('1');
 </script>
 

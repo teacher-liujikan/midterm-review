@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>平方公分類題統計</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Huninn&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<style>
+/* Layout: teacher tally — scanner strip on top, then per-question review cards sorted by how many got it wrong */
+:root{
+  --paper:#f7f9fc; --sheet:#ffffff; --ink:#1f2d3d; --muted:#5b6b7d; --grid:#9cc3e8; --blue:#3d8bd4;
+  --ok:#2e9d5b; --bad:#d64545; --chip:#e8f1fb; --qnum:#f26b3a; --none:#c9d3de;
+  --display:"Huninn","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+  --body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#121a24;--sheet:#1a2533;--ink:#e8eef5;--muted:#9fb0c3;--grid:#2f4d6b;--blue:#6db3f2;--ok:#5cc98a;--bad:#ff7b7b;--chip:#21344a;--qnum:#ff8a5c;--none:#3a4a5c;color-scheme:dark}}
+:root[data-theme="dark"]{--paper:#121a24;--sheet:#1a2533;--ink:#e8eef5;--muted:#9fb0c3;--grid:#2f4d6b;--blue:#6db3f2;--ok:#5cc98a;--bad:#ff7b7b;--chip:#21344a;--qnum:#ff8a5c;--none:#3a4a5c;color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:18px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 40px}
+.wrap{max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+header{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.tag{font:700 22px var(--display);color:#fff;background:var(--qnum);border-radius:10px;padding:0 12px}
+h1{font-family:var(--display);font-size:28px;margin:0}
+h2{font-family:var(--display);font-size:22px;margin:0}
+.box{background:var(--sheet);border:2px solid var(--grid);border-radius:16px;padding:14px 18px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.btns{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.btn{font:700 18px var(--body);border:none;border-radius:12px;padding:0 18px;min-height:48px;cursor:pointer;background:var(--blue);color:#fff}
+.btn.soft{background:var(--chip);color:var(--ink)}
+.btn.danger{background:var(--bad);color:#fff}
+.btn:focus-visible,input:focus-visible{outline:3px solid var(--qnum);outline-offset:2px}
+input.code{font:700 22px var(--display);border:2px solid var(--grid);border-radius:10px;padding:6px 10px;width:12em;max-width:100%;background:var(--paper);color:var(--ink);letter-spacing:.05em}
+.msg{margin:0;font-weight:700;min-height:1.5em}
+.msg.ok{color:var(--ok)}.msg.bad{color:var(--bad)}
+.hint{margin:0;color:var(--muted);font-size:16px}
+.cam{position:relative;width:100%;max-width:420px;aspect-ratio:4/3;background:#000;border-radius:12px;overflow:hidden}
+.cam video{width:100%;height:100%;object-fit:cover}
+.cam::after{content:"";position:absolute;inset:18%;border:3px solid #fff;border-radius:12px;box-shadow:0 0 0 999px rgba(0,0,0,.25)}
+.top{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
+@media (max-width:760px){.top{grid-template-columns:1fr}}
+.big{font:700 34px var(--display);color:var(--qnum)}
+.seats{display:flex;flex-wrap:wrap;gap:6px}
+.seat{font:700 16px var(--display);min-width:40px;text-align:center;border-radius:8px;padding:2px 6px;background:var(--chip)}
+.seat.in{background:var(--blue);color:#fff}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px}
+.card{background:var(--sheet);border:2px solid var(--grid);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.card.hot{border-color:var(--bad)}
+.card h3{margin:0;font-family:var(--display);font-size:21px;display:flex;justify-content:space-between;gap:8px}
+.card h3 span{color:var(--bad);white-space:nowrap}
+.bar{display:flex;height:16px;border-radius:8px;overflow:hidden;background:var(--none)}
+.bar i{display:block;height:100%}
+.legend{font-size:15px;color:var(--muted);display:flex;gap:12px;flex-wrap:wrap;font-variant-numeric:tabular-nums}
+.ans{font-size:16px;margin:0}
+.ans b{color:var(--ok)}
+.wrong{font-size:16px;margin:0}
+.wrong .w{display:inline-block;background:color-mix(in srgb,var(--bad) 14%,var(--sheet));border-radius:6px;padding:0 6px;margin:2px 4px 2px 0}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;font-size:16px;font-variant-numeric:tabular-nums}
+th,td{padding:4px 8px;border-bottom:1px solid var(--grid);text-align:center;white-space:nowrap}
+th{font-weight:700;color:var(--muted)}
+td.o{color:var(--ok)}td.x{color:var(--bad);font-weight:700}td.n{color:var(--muted)}
+.confirm{background:color-mix(in srgb,var(--bad) 12%,var(--sheet));border-radius:10px;padding:8px 12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><span class="tag">6-1</span><h1>類題作答統計</h1></header>
+
+  <div class="top">
+    <div class="box">
+      <h2>收學生的作答</h2>
+      <p class="hint">學生在「成績」頁填座號、按「給老師掃描」，再用這台裝置掃 QR Code。同一個座號掃第二次會蓋掉舊的。</p>
+      <div class="btns"><button class="btn" id="scanBtn">開始掃描</button><button class="btn soft" id="stopBtn" hidden>停止掃描</button></div>
+      <div class="cam" id="cam" hidden><video id="video" playsinline muted></video></div>
+      <canvas id="cv" hidden></canvas>
+      <p class="hint">掃不到時，輸入學生畫面上的代碼：</p>
+      <div class="btns"><input class="code" id="codeIn" placeholder="例如 05-1101111111-" autocomplete="off"><button class="btn soft" id="addBtn">加入</button></div>
+      <p class="msg" id="msg"></p>
+    </div>
+    <div class="box">
+      <h2>已收到</h2>
+      <div class="big" id="count">0 人</div>
+      <div class="seats" id="seats"></div>
+      <div class="btns"><button class="btn soft" id="clearBtn">清除全部資料</button></div>
+      <div class="confirm" id="confirm" hidden>確定要清除全部學生的作答嗎？清除後不能復原。
+        <div class="btns" style="margin-top:6px"><button class="btn danger" id="yesClear">確定清除</button><button class="btn soft" id="noClear">取消</button></div></div>
+    </div>
+  </div>
+
+  <div class="box">
+    <h2>逐題檢討（答錯最多的排前面）</h2>
+    <div class="cards" id="cards"></div>
+  </div>
+
+  <div class="box">
+    <h2>每位學生</h2>
+    <div class="scroll"><table id="table"></table></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+<script>
+const $=s=>document.querySelector(s);
+const ITEMS=[
+ ['1','第 1 題','小雞卡片排方瓦','10 個、10 個'],
+ ['2','第 2 題','1 平方公分的記法、讀法','1、1 cm²、平方公分'],
+ ['3','第 3 題','幾個 1 平方公分合起來','4；5、5'],
+ ['4-0','第 4 題 ①','用方瓦排圖形','7'],
+ ['4-1','第 4 題 ②','用方瓦排圖形','9'],
+ ['5','第 5 題','平方公分板每格多大、格線對齊','1、對'],
+ ['6-0','第 6 題 ①','用平方公分板量','18'],
+ ['6-1','第 6 題 ②','用平方公分板量','12'],
+ ['7','第 7 題','兔子卡片一排一排算','5、3、15、15'],
+ ['8-0','第 8 題 ①','剪開再拼（長方形）','12、12、一樣大'],
+ ['8-1','第 8 題 ②','剪開再拼（正方形）','16、16、一樣大']];
+const KEY='m61-stats';
+let data={};
+try{data=JSON.parse(localStorage.getItem(KEY)||'{}')||{}}catch(e){data={}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(data))}catch(e){}}
+function msg(t,ok){const m=$('#msg');m.textContent=t;m.className='msg'+(ok===true?' ok':ok===false?' bad':'')}
+const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function parse(text){text=String(text).trim();
+  let m=text.match(/^M61;(\d{1,2});([01-]{11});(.*)$/s);
+  if(m)return{seat:+m[1],flags:m[2],ans:m[3].split('|')};
+  m=text.replace(/\s/g,'').match(/^(\d{1,2})[-－]([01-]{11})$/);
+  if(m)return{seat:+m[1],flags:m[2],ans:[]};
+  return null}
+function add(text){const r=parse(text);if(!r||!(r.seat>=1&&r.seat<=40)){msg('看不懂這個代碼，請再確認一次。',false);return false}
+  const again=r.seat in data;data[r.seat]={flags:r.flags,ans:r.ans};save();render();
+  const ok=[...r.flags].filter(c=>c==='1').length;
+  msg(`${r.seat} 號 收到了（答對 ${ok} / 11）${again?'，已更新':''}`,true);beep();return true}
+function beep(){try{const a=new (window.AudioContext||window.webkitAudioContext)(),o=a.createOscillator(),g=a.createGain();o.frequency.value=880;g.gain.value=.08;o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+.12)}catch(e){}}
+
+function render(){const seats=Object.keys(data).map(Number).sort((a,b)=>a-b);
+  $('#count').textContent=seats.length+' 人';
+  $('#seats').innerHTML=seats.map(s=>`<span class="seat in">${s}</span>`).join('');
+  const N=seats.length;
+  const stats=ITEMS.map(([id,name,desc,key],i)=>{let o=0,x=0,n=0;const wrongs={};
+    seats.forEach(s=>{const f=data[s].flags[i];if(f==='1')o++;else if(f==='0'){x++;const a=(data[s].ans[i]||'').trim()||'（沒有記錄）';(wrongs[a]=wrongs[a]||[]).push(s)}else n++});
+    return{i,name,desc,key,o,x,n,wrongs}});
+  const order=[...stats].sort((a,b)=>b.x-a.x||a.i-b.i);
+  $('#cards').innerHTML=N?order.map(t=>{const pct=v=>N?(v/N*100)+'%':'0';
+    const w=Object.entries(t.wrongs).sort((a,b)=>b[1].length-a[1].length).map(([a,ss])=>`<span class="w">${esc(a)}：${ss.join('、')} 號</span>`).join('');
+    return `<div class="card${t.x&&t.x>=N/3?' hot':''}"><h3>${t.name}<span>${t.x?`錯 ${t.x} 人`:''}</span></h3>
+      <p class="hint">${t.desc}</p>
+      <div class="bar"><i style="width:${pct(t.o)};background:var(--ok)"></i><i style="width:${pct(t.x)};background:var(--bad)"></i></div>
+      <div class="legend"><span>⭕ 對 ${t.o}</span><span>❌ 錯 ${t.x}</span><span>— 沒做 ${t.n}</span></div>
+      <p class="ans">正確答案：<b>${t.key}</b></p>
+      ${t.x?`<p class="wrong">答錯的答案：<br>${w}</p>`:''}</div>`}).join(''):'<p class="hint">還沒有資料。掃描學生的 QR Code 後，這裡會列出每一題對幾人、錯幾人，以及答錯的人寫了什麼。</p>';
+  $('#table').innerHTML=N?`<tr><th>座號</th><th>答對</th>${ITEMS.map(t=>`<th>${t[1].replace('第 ','').replace(' 題','')}</th>`).join('')}</tr>`+
+    seats.map(s=>{const f=data[s].flags;return `<tr><td><b>${s}</b></td><td><b>${[...f].filter(c=>c==='1').length}</b></td>${[...f].map(c=>c==='1'?'<td class="o">⭕</td>':c==='0'?'<td class="x">❌</td>':'<td class="n">—</td>').join('')}</tr>`}).join(''):'';
+}
+
+/* manual */
+$('#addBtn').onclick=()=>{if(add($('#codeIn').value))$('#codeIn').value=''};
+$('#codeIn').onkeydown=e=>{if(e.key==='Enter')$('#addBtn').click()};
+
+/* clear */
+$('#clearBtn').onclick=()=>{$('#confirm').hidden=false};
+$('#noClear').onclick=()=>{$('#confirm').hidden=true};
+$('#yesClear').onclick=()=>{data={};save();render();$('#confirm').hidden=true;msg('已清除全部資料。')};
+
+/* scanner */
+let stream=null,raf=0,detector=null,last='',lastAt=0;
+async function startScan(){
+  try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false})}
+  catch(e){msg('打不開相機。請允許使用相機，或改用下面的代碼輸入。',false);return}
+  const v=$('#video');v.srcObject=stream;await v.play().catch(()=>{});
+  $('#cam').hidden=false;$('#scanBtn').hidden=true;$('#stopBtn').hidden=false;msg('把學生平板上的 QR Code 對準框框。');
+  if('BarcodeDetector' in window){try{detector=new BarcodeDetector({formats:['qr_code']})}catch(e){detector=null}}
+  loop()}
+function stopScan(){cancelAnimationFrame(raf);if(stream)stream.getTracks().forEach(t=>t.stop());stream=null;
+  $('#cam').hidden=true;$('#scanBtn').hidden=false;$('#stopBtn').hidden=true}
+async function loop(){if(!stream)return;const v=$('#video');
+  if(v.readyState>=2){let text=null;
+    try{if(detector){const r=await detector.detect(v);if(r[0])text=r[0].rawValue}
+      else if(window.jsQR){const cv=$('#cv'),w=v.videoWidth,h=v.videoHeight;cv.width=w;cv.height=h;const c=cv.getContext('2d',{willReadFrequently:true});c.drawImage(v,0,0,w,h);
+        const q=jsQR(c.getImageData(0,0,w,h).data,w,h,{inversionAttempts:'dontInvert'});if(q)text=q.data}}catch(e){}
+    if(text&&(text!==last||Date.now()-lastAt>4000)){last=text;lastAt=Date.now();add(text)}}
+  raf=requestAnimationFrame(loop)}
+$('#scanBtn').onclick=startScan;$('#stopBtn').onclick=stopScan;
+render();
+</script>
+</body>
+</html>
