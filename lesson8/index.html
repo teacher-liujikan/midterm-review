@@ -819,6 +819,9 @@ const STAGES = [
     intro: '看看每一題的詳解，給自己打個勾。答錯的題目可以再挑戰一次。' }
 ];
 
+// 只保留網頁上的三關（其餘改用 LoiLoNote）
+for (let i = STAGES.length - 1; i >= 0; i--) if (!['pre', 'bonus', 'stroke'].includes(STAGES[i].id)) STAGES.splice(i, 1);
+
 // 生字小百科（第八課）：字的由來只放有可靠說法的字；o 為 null 的字不顯示「字的由來」
 // o:[說明, 造字方法]  r:部首的意思  m:易錯提醒(另加 CHARS 的寫字提醒)  w:更多造詞  e:例句
 // l:相似字 [[字,注音,造詞]]  syn:近義詞  ant:反義詞  p:多音字提醒
@@ -1022,7 +1025,7 @@ const DEMO = !SUPA_URL && !API_URL;
 const st = {
   role: null, cls: DEFAULT_CLASS, seat: null, key: null,
   cfg: null, recs: {}, view: 'home', stage: null, sync: 'ok',
-  t: { tab: 'control', cfg: null, recs: [], stageSel: 'vtest', wallSel: null, proj: false, detail: null }
+  t: { tab: 'control', cfg: null, recs: [], stageSel: 'pre', wallSel: null, proj: false, detail: null }
 };
 // 每一台平板、每一個座號各自的待存清單（同一台電腦開好幾個分頁也不會互相蓋掉）
 const PKEY = () => `${LESSON.key}-pending-${st.cls}-${st.seat}`;
@@ -1720,7 +1723,7 @@ function go(view) {
   if (view !== 'stage') scrollTo(0, 0);
 }
 // ===== 新版本偵測：答案都先存在平板，重新載入不會不見 =====
-const BUILD = '20261112224007';
+const BUILD = '20261115005830';
 async function checkVer() {
   if (!/^https?:/.test(location.protocol) || BUILD.startsWith('/*')) return;
   try {
@@ -1799,7 +1802,8 @@ function tGroupOf(seat, diff) {
   const g = autoGroupG(diff, x => recOf(seat, x));
   return g ? { g, by: '自動' } : null;
 }
-const TABS = [['control', '課堂控制'], ['board', '作答看板'], ['groups', '分組'], ['wall', '作品牆'], ['compare', '前後對照']];
+const TABS = [['control', '課堂控制'], ['board', '作答看板'], ['groups', '分組'], ['wall', '作品牆'], ['compare', '前後對照']].filter(([k]) =>
+  k === 'groups' ? STAGES.some(s => s.group || s.diff) : k === 'wall' ? wallItems().length > 0 : k === 'compare' ? !!(stageById('post') || stageById('preB')) : true);
 function renderTeacher(soft) {
   const y = scrollY;
   const t = st.t;
@@ -2044,7 +2048,7 @@ function wallItems() {
   return out;
 }
 function tWall() {
-  const list = wallItems(); if (!st.t.wallSel) st.t.wallSel = list.find(x => x.s.id === 'sgroup')?.it.id || list[0].it.id;
+  const list = wallItems(); if (!list.length) return '<section class="panel"><p class="muted">這一課的網頁沒有需要展示的作品。</p></section>'; if (!st.t.wallSel) st.t.wallSel = list.find(x => x.s.id === 'sgroup')?.it.id || list[0].it.id;
   const cur = list.find(x => x.it.id === st.t.wallSel);
   const anon = st.t.anonOverride ?? st.t.cfg.anon;
   const seats = seatsList();
@@ -2071,7 +2075,7 @@ function preFirst(r) {
   return its.filter(it => r.first?.[it.id] === true).length;
 }
 function tPreCmp(seats) {
-  const B = stageById('preB'); const A = stageById('pre');
+  const B = stageById('preB'); const A = stageById('pre'); if (!B) return '';
   const rows = seats.map(n => ({ n, a: preFirst(recOf(n, 'pre')), b: recOf(n, 'preB')?.done ? recOf(n, 'preB').score : null }));
   const both = rows.filter(r => r.a != null && r.b != null);
   const av = k => both.length ? (both.reduce((x, r) => x + r[k], 0) / both.length).toFixed(1) : '—';
@@ -2090,6 +2094,7 @@ function tPreCmp(seats) {
 }
 function tCompare() {
   const seats = seatsList(); const post = stageById('post');
+  if (!post) return tPreCmp(seats) || '<section class="panel"><p class="muted">這一課的網頁只有預習單、加分挑戰、生字筆順，沒有檢測可以比較。</p></section>';
   const pct = r => r?.done && r.max ? Math.round(r.score / r.max * 100) : null;
   const rows = seats.map(n => ({ n, v: pct(recOf(n, 'vtest')), s: (r => r && r.max ? Math.round(r.score / r.max * 100) : null)(gRec('s', x => recOf(n, x))), p: pct(recOf(n, 'post')), pr: recOf(n, 'post') }));
   const avg = k => { const xs = rows.map(r => r[k]).filter(x => x != null); return xs.length ? Math.round(xs.reduce((a, b) => a + b, 0) / xs.length) : null; };
