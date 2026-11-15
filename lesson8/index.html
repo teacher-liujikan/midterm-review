@@ -81,7 +81,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .st-done .tile-st{background:var(--ok-soft);color:var(--ok)}
 .st-lock{opacity:.55;cursor:not-allowed}.st-wait .tile-st{background:var(--warn-soft)}
 .gchip{display:inline-block;border-radius:999px;padding:.1em .7em;font-size:.85rem;font-weight:700;justify-self:start}
-.g-gold{background:var(--gold-soft);color:var(--gold)}.g-teal{background:var(--teal-soft);color:var(--teal)}.g-rose{background:var(--rose-soft);color:var(--rose)}
+.g-gold{background:var(--gold-soft);color:var(--gold)}.g-teal{background:var(--teal-soft);color:var(--teal)}.g-blue{background:#e2e7fb;color:#4258b8}.my-para-text p{margin:.4em 0;line-height:1.9;font-size:1.15rem}.my-para-text .pno{display:inline-block;min-width:2em;color:var(--muted);font-family:var(--sans,sans-serif);font-size:.85rem}.g-rose{background:var(--rose-soft);color:var(--rose)}
 /* 關卡 */
 .crumbs{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;color:var(--muted);font-size:.9rem}
 .stage-title{font-family:var(--f-disp);font-size:1.9rem;margin:.4em 0 .1em}
@@ -604,9 +604,10 @@ const LOOKALIKE = [
 
 // 分組名稱（學生只看得到自己的組名；程度對應只在教師端出現）
 const GROUPS = {
-  A: { name: '剪刀組', level: '基礎', tone: 'gold' },
-  B: { name: '鏡子組', level: '進階', tone: 'teal' },
-  C: { name: '魔法組', level: '挑戰', tone: 'rose' }
+  A: { name: '剪刀組', level: '第一關', tone: 'rose' },
+  B: { name: '梳子組', level: '第二關', tone: 'gold' },
+  C: { name: '吹風機組', level: '第三關', tone: 'teal' },
+  D: { name: '魔鏡組', level: '第四關', tone: 'blue' }
 };
 
 // 預習單：圈詞的答案
@@ -819,8 +820,39 @@ const STAGES = [
     intro: '看看每一題的詳解，給自己打個勾。答錯的題目可以再挑戰一次。' }
 ];
 
+// 第二節：分組刪減大意（四組各負責一個意義段，老師在「分組」分頁指定組別）
+// keepSets：必留的語塊＋可留可刪的語塊，列出所有可接受的組合
+const keepSets = (req, opt = []) => { const out = []; for (let m = 0; m < 1 << opt.length; m++) out.push([...req, ...opt.filter((_, i) => m >> i & 1)].sort((a, b) => a - b)); return out; };
+STAGES.push({ id: 'dayi', sec: '課文內容', name: '分組刪減大意', when: '第2節', diff: 's', holdReview: true, hints: true,
+  intro: '你負責課文的一個段落。點一下不重要的部分把它刪掉，留下這一段最重要的意思。做完交給老師，老師公布答案後，大家再一起對答案，最後四組合起來就是全課大意。',
+  paras: { A: [9, 10], B: [0], C: [1, 2, 3, 4], D: [5, 6, 7, 8] },
+  summary: [['B', '理髮師哥哥很開朗，剪完頭髮心情會很好，所以大家叫他魔髮哥哥。'], ['C', '小飛打籃球輸了，心情不好，哥哥開玩笑說是球有近視眼，想讓小飛開心。'], ['D', '哥哥說出自己頭髮曾經被剪壞的經驗，鼓勵小飛輸了沒關係，下次再努力。'], ['A', '小飛剪完頭髮，看到鏡子裡整齊的頭髮和微笑，覺得哥哥果然有魔法。']],
+  byGroup: {
+    A: [
+      { id: 'da1', t: 'cut', best: [1, 2, 3, 4, 5], q: '第十段：刪掉「什麼時候」，留下小飛在鏡子裡看到什麼。', chunks: ['他解開圍巾時，', '我', '看著', '鏡子中的自己，', '有整齊的頭髮，', '還有微笑。'], keep: keepSets([1, 4, 5], [2, 3]).filter(k => k.includes(2) === k.includes(3)), ex: '「他解開圍巾時」是時間，可以刪掉；最重要的是小飛有整齊的頭髮，還有微笑。', hs: ['「他解開圍巾時」是在說什麼時候？', '留下「我」看到自己有什麼。'] },
+      { id: 'da2', t: 'cut', best: [0, 2], q: '第十一段：刪掉加強語氣的詞。', chunks: ['「魔『髮』哥哥」', '果然', '有魔法！'], keep: [[0, 2]], ex: '「果然」是加強語氣，刪掉後意思不變：魔髮哥哥有魔法。', hs: ['哪一個詞拿掉，意思還是一樣？'] },
+      { id: 'da3', t: 'mc', q: '第十、十一段的大意是哪一句？', o: ['小飛剪完頭髮，心情變好了，覺得哥哥真的有魔法。', '小飛的頭髮被剪壞了，覺得很難過。', '哥哥教小飛怎麼打籃球。'], a: 0, ex: '小飛看到整齊的頭髮和自己的微笑，心情變好，所以說哥哥果然有魔法。' }
+    ],
+    B: [
+      { id: 'db1', t: 'cut', best: [0, 2, 3, 5, 6], q: '刪掉形容笑聲和加強語氣的部分，留下「理髮師是誰」。', chunks: ['理髮師', '的笑聲好響亮，', '是', '一位', '十分', '開朗的', '哥哥。'], keep: keepSets([0, 2, 5, 6], [3, 4]), ex: '「的笑聲好響亮」是形容，「十分」是加強語氣；留下「理髮師是一位開朗的哥哥」。', hs: ['這句話主要在介紹誰？', '「十分」拿掉，意思會改變嗎？'] },
+      { id: 'db2', t: 'cut', best: [2, 3, 4, 5, 6, 7, 9, 10], q: '留下「為什麼大家叫他魔髮哥哥」。', chunks: ['每一次', '讓他', '剪完頭髮，', '心情', '一定會', '很好，', '所以', '大家', '都', '叫他', '「魔『髮』哥哥」。'], keep: keepSets([2, 3, 5, 6, 7, 9, 10], [1, 4, 8]), ex: '原因是「剪完頭髮心情很好」，結果是「大家叫他魔髮哥哥」，「所以」連接原因和結果，要留下來。', hs: ['原因是什麼？結果是什麼？', '「所以」可以刪掉嗎？想想它連接了什麼。'] },
+      { id: 'db3', t: 'mc', q: '第一段的大意是哪一句？', o: ['介紹開朗的理髮師哥哥，大家叫他魔髮哥哥的原因。', '小飛打籃球輸了，心情不好。', '哥哥的頭髮曾經被剪壞。'], a: 0, ex: '第一段介紹理髮師哥哥：他很開朗，剪完頭髮心情會很好，所以大家叫他魔髮哥哥。' }
+    ],
+    C: [
+      { id: 'dc1', t: 'cut', best: [0, 3, 4, 5], q: '第三段：刪掉動作和「說」，留下小飛發生了什麼事。', chunks: ['我', '搖搖頭，', '說：', '「今天', '打籃球', '輸了。」'], keep: keepSets([0, 4, 5], [3]), ex: '留下「我（今天）打籃球輸了」，這是小飛心情不好的原因。', hs: ['「搖搖頭，說」是動作，可以刪掉嗎？'] },
+      { id: 'dc2', t: 'cut', best: [0, 2, 3, 4, 5, 7], q: '第四段：留下哥哥說了什麼好笑的理由。', chunks: ['哥哥說：', '「打輸了？', '一定是', '那顆球', '有近視眼，', '所以', '總是', '對不準籃框，', '對不對？」'], keep: keepSets([0, 3, 4, 5, 7], [2, 6]), ex: '問句「打輸了？」「對不對？」可以刪掉，留下「哥哥說那顆球有近視眼，所以對不準籃框」。', hs: ['「打輸了？」和「對不對？」是問句，刪掉意思會變嗎？'] },
+      { id: 'dc3', t: 'text', q: '用自己的話寫出第二到五段的大意（一到兩句）。', long: true, hint: '小飛怎麼了？哥哥用什麼方法讓他開心？', ref: '小飛打籃球輸了，心情不好，哥哥開玩笑說是球有近視眼，想讓小飛開心。', hs: ['先寫小飛發生了什麼事。', '再寫哥哥說了什麼、為什麼要這樣說。', '對話不用照抄，用「哥哥說……」改寫成一句話。'] }
+    ],
+    D: [
+      { id: 'dd1', t: 'cut', best: [3, 4, 5, 6], q: '第六段：留下哥哥想幫小飛做什麼。', chunks: ['「哦！', '你來我這裡', '就對了，', '我們', '把不愉快', '全數', '剪掉，', '倒進垃圾桶。」'], keep: keepSets([3, 4, 6], [5, 7]), ex: '「哦！你來我這裡就對了」是招呼的話，最重要的是「我們把不愉快全數剪掉」。', hs: ['哥哥說要把什麼剪掉？'] },
+      { id: 'dd2', t: 'cut', best: [5, 6, 7, 8], q: '第七段：刪掉動作和聲音，留下哥哥說的祕密。', chunks: ['他', '拿起剪刀，', 'ㄎㄚ ㄘㄚ ㄎㄚ ㄘㄚ響，', '接著說：', '「告訴你一個祕密——', '我的頭髮', '曾經', '被剪壞，', '讓我很難過。」'], keep: [...keepSets([5, 7], [6, 8]), ...keepSets([0, 3, 5, 7], [6, 8])], ex: '拿剪刀和「ㄎㄚ ㄘㄚ」聲是動作與聲音，祕密是「我的頭髮曾經被剪壞，讓我很難過」。', hs: ['「ㄎㄚ ㄘㄚ」是聲音，對大意重要嗎？', '祕密的內容是哪一句？'] },
+      { id: 'dd3', t: 'cut', best: [5, 6, 7, 8, 9, 10, 11], q: '第九段：只留下哥哥最後鼓勵小飛的話。', chunks: ['他回答說：', '「我沒有難過很久，', '因為頭髮還會長出來呀！', '等頭髮長了再剪，', '不就好了？', '小飛，', '你', '還有機會', '打球，', '下次', '再努力', '就行了！」'], keep: keepSets([6, 7, 9, 10, 11], [5, 8]), ex: '前面是哥哥說自己的經驗，最後一句才是鼓勵：你還有機會，下次再努力就行了。', hs: ['哥哥最後想對小飛說什麼？', '「我沒有難過很久……不就好了？」是在說誰的事？'] },
+      { id: 'dd4', t: 'text', q: '用自己的話寫出第六到九段的大意（一到兩句）。', long: true, hint: '哥哥說了自己的什麼祕密？他想告訴小飛什麼？', ref: '哥哥說出自己頭髮曾經被剪壞的經驗，鼓勵小飛輸了沒關係，還有機會，下次再努力就好。', hs: ['先寫哥哥分享了什麼經驗。', '再寫哥哥想用這個經驗告訴小飛什麼。', '可以用「哥哥用……的經驗，鼓勵小飛……」來寫。'] }
+    ]
+  }
+});
 // 只保留網頁上的三關（其餘改用 LoiLoNote）
-for (let i = STAGES.length - 1; i >= 0; i--) if (!['pre', 'bonus', 'stroke'].includes(STAGES[i].id)) STAGES.splice(i, 1);
+for (let i = STAGES.length - 1; i >= 0; i--) if (!['pre', 'bonus', 'stroke', 'dayi'].includes(STAGES[i].id)) STAGES.splice(i, 1);
 
 // 生字小百科（第八課）：字的由來只放有可靠說法的字；o 為 null 的字不顯示「字的由來」
 // o:[說明, 造字方法]  r:部首的意思  m:易錯提醒(另加 CHARS 的寫字提醒)  w:更多造詞  e:例句
@@ -1171,7 +1203,7 @@ function stageStatus(s) {
   if (s.review && r?.done && !r.extra?.check?.ok) return ['wait', r.extra?.check ? '要訂正' : '等老師檢核'];
   if (r?.done) return ['done', '完成'];
   if (r && Object.keys(r.ans).length) return ['doing', '進行中'];
-  if (s.diff && (!myGroup(s.diff) || (!st.preview && !st.cfg?.ov?.[s.diff] && !gRec(s.diff, x => st.recs[x])?.reviewed))) return ['wait', '先做檢測和檢討'];
+  if (s.diff && (!myGroup(s.diff) || (!st.preview && !st.cfg?.ov?.[s.diff] && !gRec(s.diff, x => st.recs[x])?.reviewed))) return ['wait', gTests(s.diff).length ? '先做檢測和檢討' : '等老師分組'];
   return ['go', '可以開始'];
 }
 function renderHome() {
@@ -1293,7 +1325,7 @@ function itemsBody(s) {
   let group = null;
   if (s.diff) {
     group = myGroup(s.diff);
-    if (!group || (!st.preview && !st.cfg?.ov?.[s.diff] && !gRec(s.diff, x => st.recs[x])?.reviewed)) return `<div class="notice">先完成${gNames(s.diff)}並看完檢討，網站會自動幫你分組，再回來這裡。</div>`;
+    if (!group || (!st.preview && !st.cfg?.ov?.[s.diff] && !gRec(s.diff, x => st.recs[x])?.reviewed)) return gTests(s.diff).length ? `<div class="notice">先完成${gNames(s.diff)}並看完檢討，網站會自動幫你分組，再回來這裡。</div>` : `<div class="notice">老師還沒幫你分組喔！等老師分好組，按右上角「重新整理」。</div>`;
   }
   const pvSwitch = st.preview && s.diff ? `<div class="pv-switch"><span class="label">預覽組別</span>${Object.entries(GROUPS).map(([k, g]) => `<button type="button" class="chip ${group === k ? 'on' : ''}" data-pvg="${k}">${g.name}（${g.level}）</button>`).join('')}</div>` : '';
   const items = itemsFor(s, group);
@@ -1302,7 +1334,8 @@ function itemsBody(s) {
   const top = [
     s.showText ? textBlock(s.wordMark) : '',
     s.showWords && !rec.done ? wordCards() : '',
-    pvSwitch, group ? `<div class="group-banner g-${GROUPS[group].tone}"><span>你的組別</span><strong>${GROUPS[group].name}</strong></div>` : ''
+    pvSwitch, group ? `<div class="group-banner g-${GROUPS[group].tone}"><span>你的組別</span><strong>${GROUPS[group].name}</strong></div>` : '',
+    group && s.paras?.[group] ? `<details class="words my-paras" open><summary>你負責的課文：第${s.paras[group].map(k => ZH_NUM[k]).join('、')}段</summary><div class="kai my-para-text">${s.paras[group].map(k => `<p><span class="pno">${ZH_NUM[k]}</span>${esc(LESSON.paras[k])}</p>`).join('')}</div></details>` : ''
   ].join('');
   if (s.teach) return teachBody(s, rec);
   if (locked) {
@@ -1339,11 +1372,23 @@ function itemsBody(s) {
       : `已完成！你答對 ${rec.score} / ${rec.max} 題。`;
     return top + `<div class="notice done next-row">${msg}</div>`;
   }
+  if (s.holdReview && !isTest && rec.done) {
+    const show = revealed(s.id);
+    return top + `<div class="notice ${show ? 'done' : ''}">${show ? '老師公布答案了！看看你的答案和參考答案。' : '交給老師了！等老師公布答案，大家再一起對答案。'}</div>
+    <div class="qlist">${items.map((it, i) => { const v = rec.ans[it.id];
+      const ok = it.t === 'cut' ? cutOk(it, v) : it.t === 'mc' ? v === it.a : null;
+      const mine = it.t === 'cut' ? `你刪減後：<b class="kai">${esc(cutResult(it, v))}</b>` : it.t === 'mc' ? `你選：${esc(it.o[v] ?? '沒作答')}` : `你寫的：<b class="kai">${esc(v || '')}</b>`;
+      const ref = it.t === 'cut' ? `參考答案：<b class="kai">${esc(it.best ? it.best.map(k => cutStrip(it.chunks[k])).join('') + '。' : cutRef(it)[0])}</b>${it.keep.length > 1 ? '<small class="muted">（多留或少留一點修飾的字也算對）</small>' : ''}` : it.t === 'mc' ? `正確答案：<b>${esc(it.o[it.a])}</b>` : `參考大意：<b class="kai">${esc(it.ref || '')}</b>`;
+      return `<div class="q ${show && ok != null ? 'rv ' + (ok ? 'is-ok' : 'is-no') : ''}"><p class="sq"><span class="qno">${i + 1}</span>${esc(it.q)}</p>
+        <p class="rv-line">${show && ok != null ? `<span class="mark ${ok ? 'ok' : 'no'}">${ok ? '答對' : '再想想'}</span>` : ''}${mine}</p>
+        ${show ? `<p class="rv-line">${ref}</p>${it.ex ? `<p class="ex"><b>說明</b>${esc(it.ex)}</p>` : ''}` : ''}</div>`; }).join('')}</div>
+    ${show ? '' : '<p class="muted">老師公布答案後，畫面會自動更新；沒有更新就按右上角「重新整理」。</p>'}`;
+  }
   const doneNote = rec.done && !isTest ? `<div class="notice done">完成這一關了！第一次就答對 ${rec.score} / ${rec.max} 題。想再練習可以往下看，也可以回闖關地圖。</div>` : '';
   return top + doneNote + `<form class="qlist" id="qform">
     ${items.map((it, i) => qHtml(s, it, i, rec)).join('')}
     <div class="submit-row">
-      ${isTest ? `<button class="primary" type="submit">交出${s.cmp ? '' : s.test ? '後測' : '檢測'}${s.cmp ? '課文內容後測' : ''}</button>` : rec.done ? '' : `<button class="primary" type="submit">完成這一關</button>`}
+      ${isTest ? `<button class="primary" type="submit">交出${s.cmp ? '' : s.test ? '後測' : '檢測'}${s.cmp ? '課文內容後測' : ''}</button>` : rec.done ? '' : `<button class="primary" type="submit">${s.holdReview ? '交給老師' : '完成這一關'}</button>`}
       <span class="muted" id="left"></span>
     </div>
   </form>`;
@@ -1420,7 +1465,7 @@ const matchSel = {};
 function qHtml(s, it, i, rec) {
   const v = rec.ans[it.id];
   const isTest = !!(s.group || s.test);
-  const fb = !isTest && it.t === 'mc' && v != null ? (v === it.a ? `<p class="fb ok">答對了！${esc(it.ex || '')}</p>` : `<p class="fb no">再想一想，換一個答案試試看。</p>`) : '';
+  const fb = !isTest && !s.holdReview && it.t === 'mc' && v != null ? (v === it.a ? `<p class="fb ok">答對了！${esc(it.ex || '')}</p>` : `<p class="fb no">再想一想，換一個答案試試看。</p>`) : '';
   const hints = s.hints && it.hs ? `<div class="hints">${(it.hs).map((hh, k) => (rec.hints[it.id] || 0) > k ? `<p class="hint"><b>提示 ${k + 1}</b>${esc(hh)}</p>` : '').join('')}
     ${(rec.hints[it.id] || 0) < it.hs.length ? `<button type="button" class="ghost sm hbtn" data-id="${it.id}">看提示 ${(rec.hints[it.id] || 0) + 1}</button>` : ''}</div>` : '';
   const tag = it.tag ? `<span class="qtag">${esc(it.tag)}</span>` : '';
@@ -1442,7 +1487,7 @@ function qHtml(s, it, i, rec) {
       <p class="cut-res">縮短後：<b class="kai">${esc(cutResult(it, struck))}</b>${struck.length ? `<button type="button" class="ghost sm" data-cutreset="${it.id}">重來</button>` : ''}</p>`;
   } else if (it.t === 'mc') {
     input = `<div class="opts ${it.o.length <= 2 ? 'two' : ''}">${it.o.map((o, k) => `
-      <label class="opt ${v === k ? 'sel' : ''} ${!isTest && v === k ? (k === it.a ? 'right' : 'wrong') : ''}">
+      <label class="opt ${v === k ? 'sel' : ''} ${!isTest && !s.holdReview && v === k ? (k === it.a ? 'right' : 'wrong') : ''}">
         <input type="radio" name="${it.id}" value="${k}" ${v === k ? 'checked' : ''}><span class="${/^[ㄅ-ㄩ]/.test(o) ? 'zy' : ''}">${esc(o)}</span></label>`).join('')}</div>`;
   } else {
     const tps = it.topics ? `<p class="label">可以選一個主題（點一下，會幫你寫好開頭）</p><div class="topic-grid">${it.topics.map(([t, idm, start], k) => `<button type="button" class="topic" data-tid="${it.id}" data-tk="${k}"><b>${esc(t)}</b><span>適合用：${esc(idm)}</span></button>`).join('')}</div>` : '';
@@ -1481,7 +1526,7 @@ function bindItems(s) {
     if (rec.first[it.id] == null) rec.first[it.id] = k === it.a;
     if (s.group) rec.extra.group = s.group;
     queueSave(s.id);
-    if (!isTest) { const y = scrollY; renderStage(); scrollTo(0, y); } else {
+    if (!isTest && !s.holdReview) { const y = scrollY; renderStage(); scrollTo(0, y); } else {
       r.closest('.opts').querySelectorAll('.opt').forEach(l => l.classList.toggle('sel', l.contains(r)));
       updateLeft();
     }
@@ -1526,7 +1571,7 @@ function bindItems(s) {
     }
     const mcs = items.filter(it => it.t === 'mc' || it.t === 'cut' || it.t === 'match' || GAME_T.includes(it.t));
     rec.max = mcs.length;
-    rec.score = mcs.filter(it => (isTest ? rec.ok[it.id] : rec.first[it.id])).length;
+    rec.score = mcs.filter(it => (isTest || s.holdReview ? rec.ok[it.id] : rec.first[it.id])).length;
     if (group) rec.extra.group = group;
     rec.done = true; queueSave(s.id, true);
     renderStage(); scrollTo(0, 0);
@@ -1726,7 +1771,7 @@ function go(view) {
   if (view !== 'stage') scrollTo(0, 0);
 }
 // ===== 新版本偵測：答案都先存在平板，重新載入不會不見 =====
-const BUILD = '20261115105911';
+const BUILD = '20261115153634';
 async function checkVer() {
   if (!/^https?:/.test(location.protocol) || BUILD.startsWith('/*')) return;
   try {
@@ -1940,6 +1985,9 @@ function tBoard() {
     }).join('');
   }
   let extra = '';
+  if (s?.summary) {
+    extra = `<div class="pre-sum"><p><b>全課大意（照段落順序，四組合起來）</b></p><ol>${s.summary.map(([g, txt]) => `<li><span class="gchip g-${GROUPS[g].tone}">${GROUPS[g].name}</span>　第${s.paras[g].map(k => ZH_NUM[k]).join('、')}段：<span class="kai">${esc(txt)}</span></li>`).join('')}</ol></div>`;
+  }
   if (sid === 'pre') {
     const cnt = {}; let readers = 0;
     seats.forEach(n => { const r = recOf(n, 'pre'); (r?.extra?.marked || []).forEach(w => cnt[w] = (cnt[w] || 0) + 1); if (r?.extra?.reads) readers++; });
@@ -2051,7 +2099,15 @@ function showDetail(seat, sid) {
 function tGroups() {
   const seats = seatsList();
   const panel = (diff) => {
-    const cut = gCut(diff); const counts = { A: 0, B: 0, C: 0 };
+    const cut = gCut(diff); const counts = Object.fromEntries(Object.keys(GROUPS).map(k => [k, 0]));
+    if (!cut) { seats.forEach(n => { const g = tGroupOf(n, diff)?.g; if (g) counts[g]++; });
+      return `<section class="panel"><h2>分組：${esc(STAGES.find(x => x.diff === diff)?.name || '')}</h2>
+      <p class="muted">由老師指定組別（右欄可參考預習單閱讀理解第一次的答對題數）。每組 4 人最剛好。</p>
+      <div class="gsum">${Object.entries(GROUPS).map(([k, g]) => `<span class="gchip g-${g.tone}">${g.name} ${counts[k]} 人</span>`).join('')}</div>
+      <div class="scroll"><table class="tbl"><thead><tr><th>座號</th><th>預習單閱讀理解</th><th>組別</th></tr></thead><tbody>
+      ${seats.map(n => { const ov = st.t.cfg.ov[diff][n] || ''; const pf = preFirst(recOf(n, 'pre'));
+        return `<tr><td class="num">${n}</td><td class="num">${pf ?? '·'}</td><td><select data-ov="${diff}" data-seat="${n}"><option value="">未分組</option>${Object.entries(GROUPS).map(([k, g]) => `<option value="${k}" ${ov === k ? 'selected' : ''}>${g.name}</option>`).join('')}</select></td></tr>`; }).join('')}
+      </tbody></table></div></section>`; }
     seats.forEach(n => { const g = tGroupOf(n, diff)?.g; if (g) counts[g]++; });
     return `<section class="panel"><h2>${diff === 'v' ? '分組 ①：生字語詞' : '分組 ②：修辭句型'}</h2>
       <p class="muted">依${gNames(diff)}${gTests(diff).length > 1 ? '合計' : ''}自動分組：${cut[0]} 題以下${GROUPS.A.name}、${cut[0] + 1}～${cut[1]} 題${GROUPS.B.name}、${cut[1] + 1} 題以上${GROUPS.C.name}。可以手動調整。</p>
