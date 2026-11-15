@@ -1633,7 +1633,7 @@ function charDetail(i) {
         <div class="row"><span class="sk-count muted">第 <b>1</b> / ${STROKE_DATA[c[0]].length} 筆</span><button class="ghost sm" id="traceAgain">重描</button></div></div>
       <details class="cc-book"><summary>看課本筆順圖</summary><img src="${STROKE_IMG[i]}" alt="「${c[0]}」的筆順圖" class="stroke-img"></details>
       <div class="row cc-act"><button class="ghost" id="say">🔊 念念看</button>
-        <button class="${got ? 'ghost' : 'primary'}" id="wrote">${got ? '已寫好 ✓' : '我寫好了'}</button></div>
+        <button class="${got ? 'ghost' : 'primary'}" id="wrote" ${got || rec.extra.traced?.[c[0]] != null ? '' : 'disabled'}>${got ? '已寫好 ✓' : rec.extra.traced?.[c[0]] != null ? '我寫好了' : '描完才能按「我寫好了」'}</button></div>
     </div>
     <div class="cc-right">${charWiki(c)}</div>
     <nav class="cc-nav">
@@ -1653,6 +1653,7 @@ function bindStroke() {
       K.onDone = () => {
         const rec = myRec('stroke'); rec.extra.traced = Object.assign({}, rec.extra.traced, { [CHARS[i][0]]: K.miss }); queueSave('stroke');
         $('#skMsg').textContent = `描完了！錯了 ${K.miss} 次。${K.miss ? '再描一次會更熟。' : '筆順全對，好厲害！'}`;
+        const wb = $('#wrote'); if (wb && wb.disabled) { wb.disabled = false; wb.textContent = '我寫好了'; }
         setupPad(K);
       };
       setupPad(K);
@@ -1724,7 +1725,7 @@ function go(view) {
   if (view !== 'stage') scrollTo(0, 0);
 }
 // ===== 新版本偵測：答案都先存在平板，重新載入不會不見 =====
-const BUILD = '20261115010046';
+const BUILD = '20261115103335';
 async function checkVer() {
   if (!/^https?:/.test(location.protocol) || BUILD.startsWith('/*')) return;
   try {
@@ -2531,20 +2532,28 @@ function resample(pts, n) {
 }
 const plen = p => { let s = 0; for (let i = 1; i < p.length; i++) s += Math.hypot(p[i][0] - p[i - 1][0], p[i][1] - p[i - 1][1]); return s; };
 const dst = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]);
-function strokeMatch(u, t) {
+// 平滑後再量長度、數急轉彎：手抖不算，來回塗才算
+const turns = p => { const q = resample(p, Math.max(3, Math.round(plen(p) / 0.6) + 1)); let n = 0; for (let i = 1; i < q.length - 1; i++) { const ax = q[i][0] - q[i - 1][0], ay = q[i][1] - q[i - 1][1], bx = q[i + 1][0] - q[i][0], by = q[i + 1][1] - q[i][1]; const d = Math.hypot(ax, ay) * Math.hypot(bx, by); if (d && (ax * bx + ay * by) / d < -0.3) n++; } return n; };
+const smooth = (p, w = 4) => p.map((_, i) => { let x = 0, y = 0, n = 0; for (let j = Math.max(0, i - w); j <= Math.min(p.length - 1, i + w); j++) { x += p[j][0]; y += p[j][1]; n++; } return [x / n, y / n]; });
+function strokeMatch(u, t, loose) { // loose：挑戰模式（沒有灰字）放寬位置
   if (u.length < 2) return { ok: false, why: 'short' };
-  const tl = plen(t), ul = plen(u);
+  // 防亂畫：超出格子太多就不算
+  if (u.some(p => p[0] < -0.4 || p[0] > 10.4 || p[1] < -0.4 || p[1] > 10.4)) return { ok: false, why: 'out', score: 99 };
+  const tl = plen(t), ul = plen(u), sl = plen(smooth(resample(u, 40), 2));
   const u0 = u[0], uN = u[u.length - 1], t0 = t[0], tN = t[t.length - 1];
   const sD = dst(u0, t0), eD = dst(uN, tN);
   const rev = dst(u0, tN) + dst(uN, t0) < sD + eD - 1.2;
   if (tl < 1.7) { // 點、短筆
+    if (sl > tl * 2.5 + 1.5) return { ok: false, why: 'scribble', rev, score: 99 };
     const dot = (uN[0] - u0[0]) * (tN[0] - t0[0]) + (uN[1] - u0[1]) * (tN[1] - t0[1]);
-    return { ok: sD < 1.9 && eD < 1.9 && dot > 0, rev, score: (sD + eD) / 2 };
+    const L = loose ? 1.9 : 1.6; return { ok: sD < L && eD < L && dot > 0, rev, score: (sD + eD) / 2 };
   }
-  if (ul < tl * 0.35) return { ok: false, why: 'short', score: 99 };
+  if (ul < tl * 0.4) return { ok: false, why: 'short', score: 99 };
+  if (sl > tl * 1.9 + 1.2 || turns(smooth(u, 2)) > turns(t) + 2) return { ok: false, why: 'scribble', rev, score: 99 }; // 來回塗
   const A = resample(u, 16), B = resample(t, 16);
-  const mean = A.reduce((s, p, i) => s + dst(p, B[i]), 0) / 16;
-  return { ok: mean < 1.8 && sD < 2.3 && eD < 2.5, rev, score: mean * 0.5 + (sD + eD) * 0.25 };
+  const ds = A.map((p, i) => dst(p, B[i]));
+  const mean = ds.reduce((s, d) => s + d, 0) / 16, worst = Math.max(...ds);
+  return { ok: loose ? mean < 1.8 && worst < 3.4 && sD < 2.3 && eD < 2.5 : mean < 1.4 && worst < 2.8 && sD < 2 && eD < 2.2, rev, score: mean * 0.5 + (sD + eD) * 0.25 };
 }
 const GLYPH_CACHE = {};
 function glyphImg(i) { if (!GLYPH_CACHE[i]) { const im = new Image(); im.src = GLYPH_IMG[i]; GLYPH_CACHE[i] = im; } return GLYPH_CACHE[i]; }
@@ -2620,14 +2629,14 @@ function setupPad(K) {
     if (!cur) return; const u = cur; cur = null;
     if (plen(u) < 0.15 && u.length < 3) { draw(); return; }
     const adj = u.map(p => [p[0] - K.off[0], p[1] - K.off[1]]);
-    const t = K.data[K.k]; const m = strokeMatch(adj, t);
+    const t = K.data[K.k]; const m = strokeMatch(adj, t, !K.trace);
     let later = -1;
-    for (let j = K.k + 1; j < Math.min(K.data.length, K.k + 8); j++) { const mj = strokeMatch(adj, K.data[j]); if (mj.ok && !mj.rev && (!m.ok || mj.score < m.score - 0.4)) { later = j; break; } }
+    for (let j = K.k + 1; j < Math.min(K.data.length, K.k + 8); j++) { const mj = strokeMatch(adj, K.data[j], !K.trace); if (mj.ok && !mj.rev && (!m.ok || mj.score < m.score - 0.4)) { later = j; break; } }
     if (m.ok && !m.rev && later < 0) {
       K.ink.push(u); K.k++; K.missHere = 0;
       // 依學生寫字的位置微調參考框（最多偏移 2 格）
-      const n = K.ink.length; const dx = u[0][0] - t[0][0], dy = u[0][1] - t[0][1];
-      K.off = [Math.max(-2, Math.min(2, (K.off[0] * (n - 1) + dx) / n)), Math.max(-2, Math.min(2, (K.off[1] * (n - 1) + dy) / n))];
+      const n = K.ink.length; const dx = u[0][0] - t[0][0], dy = u[0][1] - t[0][1]; const C = K.trace ? 0.6 : 1.5;
+      K.off = [Math.max(-C, Math.min(C, (K.off[0] * (n - 1) + dx) / n)), Math.max(-C, Math.min(C, (K.off[1] * (n - 1) + dy) / n))];
       if (K.k >= K.data.length) {
         K.done = true; K.msg = '';
         K.onDone && K.onDone(); return;
@@ -2635,7 +2644,7 @@ function setupPad(K) {
       K.msg = K.missHere ? '' : '很好，繼續寫下一筆。'; sfx('tick');
     } else {
       K.miss++; K.missHere++; K.bad = u; sfx('no');
-      K.msg = m.rev ? '這一筆的方向反了，想想看從哪裡起筆。'
+      K.msg = m.why === 'out' ? '要寫在格子裡面喔！' : m.why === 'scribble' ? '一筆就好，不要來回塗喔！' : m.rev ? '這一筆的方向反了，想想看從哪裡起筆。'
         : later >= 0 ? `這是後面的筆畫喔！想想看第 ${K.k + 1} 筆要寫哪裡。`
         : '這一筆的位置或寫法不太對，再試一次。';
       if (K.missHere === 2) K.msg += ' 紅點是起筆的位置。';
