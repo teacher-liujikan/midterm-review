@@ -1138,6 +1138,7 @@ function renderLogin() {
       <button class="link-btn" id="toPreview">老師預覽全部關卡</button>
       <form class="pv-form" id="pvForm" hidden><input id="pvPin" type="password" inputmode="numeric" placeholder="輸入密碼" autocomplete="off"><button class="primary sm" type="submit">進入預覽</button><span class="err" id="pvErr"></span></form>
       <button class="link-btn" id="toTeacher">老師登入</button>
+      ${LESSON.key === 'l8' ? '<a class="link-btn" href="barber.html" target="_blank" rel="noopener">🎮 語詞大改造（電視遊戲）</a>' : ''}
       ${DEMO ? '<p class="demo-note">示範模式：資料只存在這台裝置。教師密碼 1234。</p>' : ''}
     </div>
   </section>`;
@@ -1725,7 +1726,7 @@ function go(view) {
   if (view !== 'stage') scrollTo(0, 0);
 }
 // ===== 新版本偵測：答案都先存在平板，重新載入不會不見 =====
-const BUILD = '20261115103335';
+const BUILD = '20261115105911';
 async function checkVer() {
   if (!/^https?:/.test(location.protocol) || BUILD.startsWith('/*')) return;
   try {
@@ -1813,6 +1814,7 @@ function renderTeacher(soft) {
   <header class="topbar t"><div class="topbar-in">
     <span class="brand"><span class="kai">第${LESSON.no}課</span> 教師端・${esc(st.cls)}</span>
     <span class="live">每 6 秒更新</span>
+    ${LESSON.key === 'l8' ? '<a class="ghost sm" href="barber.html" target="_blank" rel="noopener">🎮 語詞大改造</a>' : ''}
     <button class="qr-mini" id="qrTop" aria-label="顯示網址 QR code">${QR_SVG}</button>
     <button class="ghost" id="tout">登出</button>
   </div>
