@@ -645,7 +645,7 @@ const DIFF_Q = [
 ];
 
 // 成語練功房（老師的成語練功房網站，篩選三上第八課）
-const IDIOM_PAGE = { src: 'idiom8.html', type: 'idiom8', note: '本課延伸成語：一視同仁、牛刀小試、當機立斷、破鏡重圓、參差不齊，還有更多藏著本課生字的成語。' };
+const IDIOM_PAGE = { src: 'idiom8.html', type: 'idiom8', note: '本課成語：走火入魔、巾幗英雄、一視同仁、誤入歧途、濫竽充數、牛刀小試、似曾相識、當機立斷、破鏡重圓、參差不齊。' };
 
 // 題目型別：mc 選擇、text 簡答／造句（進作品牆）
 const STAGES = [
@@ -822,6 +822,24 @@ const STAGES = [
 
 // 多音字・形近字教學（和學習單一樣的格子），放在生字筆順旁邊
 STAGES.splice(STAGES.findIndex(x => x.id === 'stroke') + 1, 0, { id: 'zi', sec: '生字筆順', name: '多音字・形近字', when: '第1節', frame: 'zi.html' });
+// 成語檢核：本課十個成語（以老師提供的成語表為主），配對＋填空
+const IDIOM10 = [["走火入魔", "魔", "比喻過分沉溺於某事，且方法錯誤，而導致身心受到傷害。"], ["巾幗英雄", "巾", "指女性英雄。"], ["一視同仁", "視", "平等待人，不分親疏厚薄，沒有歧視。"], ["誤入歧途", "誤", "因一時迷惑而走入錯誤的路途。"], ["濫竽充數", "數", "比喻沒有真才實學的人，混在行家之間充數。"], ["牛刀小試", "刀", "比喻才智和能力很強，先在小事上施展一下。"], ["似曾相識", "曾", "對所見的人事物感覺熟悉，卻又不真切。"], ["當機立斷", "機", "掌握時機，立刻決斷。"], ["破鏡重圓", "鏡", "比喻夫妻失散或決裂後重新團圓和好。"], ["參差不齊", "齊", "雜亂不整齊。"]];
+STAGES.splice(STAGES.findIndex(x => x.id === 'zi') + 1, 0, { id: 'idiomchk', sec: '生字筆順', name: '成語檢核', when: '第1節', idiomCards: true,
+  intro: '先複習本課的十個成語，再做配對和填空。答錯可以再試一次，第一次就答對才算分喔！',
+  items: [
+    { id: 'im1', t: 'match', label: '配對', q: '把成語和它的意思配成一對（第一組）。', kaiL: true, wide: true, pairs: [["走火入魔", "比喻過分沉溺於某事，且方法錯誤，而導致身心受到傷害。"], ["巾幗英雄", "指女性英雄。"], ["一視同仁", "平等待人，不分親疏厚薄，沒有歧視。"], ["誤入歧途", "因一時迷惑而走入錯誤的路途。"], ["濫竽充數", "比喻沒有真才實學的人，混在行家之間充數。"]] },
+    { id: 'im2', t: 'match', label: '配對', q: '把成語和它的意思配成一對（第二組）。', kaiL: true, wide: true, pairs: [["牛刀小試", "比喻才智和能力很強，先在小事上施展一下。"], ["似曾相識", "對所見的人事物感覺熟悉，卻又不真切。"], ["當機立斷", "掌握時機，立刻決斷。"], ["破鏡重圓", "比喻夫妻失散或決裂後重新團圓和好。"], ["參差不齊", "雜亂不整齊。"]] },
+    { id: 'if1', t: 'mc', label: '填空', q: "哥哥打電動打到＿＿＿＿，連飯都忘了吃。", o: ["當機立斷", "走火入魔", "誤入歧途", "牛刀小試"], a: 1, ex: "走火入魔：比喻過分沉溺於某事，且方法錯誤，而導致身心受到傷害。" },
+    { id: 'if2', t: 'mc', label: '填空', q: "那位勇敢救人的女消防員，是大家心中的＿＿＿＿。", o: ["破鏡重圓", "誤入歧途", "巾幗英雄", "一視同仁"], a: 2, ex: "巾幗英雄：指女性英雄。" },
+    { id: 'if3', t: 'mc', label: '填空', q: "老師對每位同學都＿＿＿＿，從來不偏心。", o: ["巾幗英雄", "破鏡重圓", "當機立斷", "一視同仁"], a: 3, ex: "一視同仁：平等待人，不分親疏厚薄，沒有歧視。" },
+    { id: 'if4', t: 'mc', label: '填空', q: "他因為交到壞朋友而＿＿＿＿，後來很後悔。", o: ["破鏡重圓", "一視同仁", "誤入歧途", "似曾相識"], a: 2, ex: "誤入歧途：因一時迷惑而走入錯誤的路途。" },
+    { id: 'if5', t: 'mc', label: '填空', q: "他根本不會吹笛子，只是站在樂隊裡＿＿＿＿。", o: ["似曾相識", "濫竽充數", "參差不齊", "一視同仁"], a: 1, ex: "濫竽充數：比喻沒有真才實學的人，混在行家之間充數。" },
+    { id: 'if6', t: 'mc', label: '填空', q: "數學小天才解這題只是＿＿＿＿，一下子就算出來了。", o: ["走火入魔", "巾幗英雄", "牛刀小試", "當機立斷"], a: 2, ex: "牛刀小試：比喻才智和能力很強，先在小事上施展一下。" },
+    { id: 'if7', t: 'mc', label: '填空', q: "走進這間教室，我覺得＿＿＿＿，好像在夢裡來過。", o: ["似曾相識", "當機立斷", "濫竽充數", "走火入魔"], a: 0, ex: "似曾相識：對所見的人事物感覺熟悉，卻又不真切。" },
+    { id: 'if8', t: 'mc', label: '填空', q: "看到廚房冒煙，姊姊＿＿＿＿，馬上關掉瓦斯。", o: ["誤入歧途", "走火入魔", "一視同仁", "當機立斷"], a: 3, ex: "當機立斷：掌握時機，立刻決斷。" },
+    { id: 'if9', t: 'mc', label: '填空', q: "分開好幾年的叔叔和嬸嬸終於＿＿＿＿，又住在一起了。", o: ["破鏡重圓", "巾幗英雄", "當機立斷", "似曾相識"], a: 0, ex: "破鏡重圓：比喻夫妻失散或決裂後重新團圓和好。" },
+    { id: 'if10', t: 'mc', label: '填空', q: "剛長出來的小草長長短短，看起來＿＿＿＿。", o: ["誤入歧途", "似曾相識", "當機立斷", "參差不齊"], a: 3, ex: "參差不齊：雜亂不整齊。" }
+  ] });
 // 第二節：分組刪減大意（四組各負責一個意義段，老師在「分組」分頁指定組別）
 // keepSets：必留的語塊＋可留可刪的語塊，列出所有可接受的組合
 const keepSets = (req, opt = []) => { const out = []; for (let m = 0; m < 1 << opt.length; m++) out.push([...req, ...opt.filter((_, i) => m >> i & 1)].sort((a, b) => a - b)); return out; };
@@ -854,7 +872,7 @@ STAGES.push({ id: 'dayi', sec: '課文內容', name: '分組刪減大意', when:
   }
 });
 // 只保留網頁上的三關（其餘改用 LoiLoNote）
-for (let i = STAGES.length - 1; i >= 0; i--) if (!['pre', 'bonus', 'stroke', 'zi', 'dayi'].includes(STAGES[i].id)) STAGES.splice(i, 1);
+for (let i = STAGES.length - 1; i >= 0; i--) if (!['pre', 'bonus', 'stroke', 'zi', 'idiomchk', 'dayi'].includes(STAGES[i].id)) STAGES.splice(i, 1);
 
 // 生字小百科（第八課）：字的由來只放有可靠說法的字；o 為 null 的字不顯示「字的由來」
 // o:[說明, 造字方法]  r:部首的意思  m:易錯提醒(另加 CHARS 的寫字提醒)  w:更多造詞  e:例句
@@ -1338,6 +1356,7 @@ function itemsBody(s) {
   const top = [
     s.showText ? textBlock(s.wordMark) : '',
     s.showWords && !rec.done ? wordCards() : '',
+    s.idiomCards ? `<details class="words"><summary>本課成語（${IDIOM10.length} 個，忘記時再打開看）</summary><div class="word-grid">${IDIOM10.map(([w, c, m]) => `<div class="word"><b class="kai">${esc(w).replace(c, `<u>${c}</u>`)}</b><span>${esc(m)}</span></div>`).join('')}</div></details>` : '',
     pvSwitch, group ? `<div class="group-banner g-${GROUPS[group].tone}"><span>你的組別</span><strong>${GROUPS[group].name}</strong></div>` : '',
     group && s.paras?.[group] ? `<details class="words my-paras" open><summary>你負責的課文：第${s.paras[group].map(k => ZH_NUM[k]).join('、')}段</summary><div class="kai my-para-text">${s.paras[group].map(k => `<p><span class="pno">${ZH_NUM[k]}</span>${esc(LESSON.paras[k])}</p>`).join('')}</div></details>` : ''
   ].join('');
@@ -1775,7 +1794,7 @@ function go(view) {
   if (view !== 'stage') scrollTo(0, 0);
 }
 // ===== 新版本偵測：答案都先存在平板，重新載入不會不見 =====
-const BUILD = '20261116093147';
+const BUILD = '20261116094116';
 async function checkVer() {
   if (!/^https?:/.test(location.protocol) || BUILD.startsWith('/*')) return;
   try {
