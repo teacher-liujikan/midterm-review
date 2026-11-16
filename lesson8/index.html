@@ -81,7 +81,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .st-done .tile-st{background:var(--ok-soft);color:var(--ok)}
 .st-lock{opacity:.55;cursor:not-allowed}.st-wait .tile-st{background:var(--warn-soft)}
 .gchip{display:inline-block;border-radius:999px;padding:.1em .7em;font-size:.85rem;font-weight:700;justify-self:start}
-.g-gold{background:var(--gold-soft);color:var(--gold)}.g-teal{background:var(--teal-soft);color:var(--teal)}.g-blue{background:#e2e7fb;color:#4258b8}.my-para-text p{margin:.4em 0;line-height:1.9;font-size:1.15rem}.my-para-text .pno{display:inline-block;min-width:2em;color:var(--muted);font-family:var(--sans,sans-serif);font-size:.85rem}.g-rose{background:var(--rose-soft);color:var(--rose)}
+.g-gold{background:var(--gold-soft);color:var(--gold)}.g-teal{background:var(--teal-soft);color:var(--teal)}.fix-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin-top:8px;padding:8px 10px;border:1.5px dashed var(--rose,#c44);border-radius:10px}.fix-row span{font-weight:700;font-size:.95rem}.fix-in{flex:1;min-width:10em;font:inherit;font-size:1.1rem;padding:6px 8px;border:1px solid var(--line);border-radius:8px}.fix-n{color:var(--muted)}.g-blue{background:#e2e7fb;color:#4258b8}.my-para-text p{margin:.4em 0;line-height:1.9;font-size:1.15rem}.my-para-text .pno{display:inline-block;min-width:2em;color:var(--muted);font-family:var(--sans,sans-serif);font-size:.85rem}.g-rose{background:var(--rose-soft);color:var(--rose)}
 /* 關卡 */
 .crumbs{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;color:var(--muted);font-size:.9rem}
 .stage-title{font-family:var(--f-disp);font-size:1.9rem;margin:.4em 0 .1em}
@@ -1771,7 +1771,7 @@ function go(view) {
   if (view !== 'stage') scrollTo(0, 0);
 }
 // ===== 新版本偵測：答案都先存在平板，重新載入不會不見 =====
-const BUILD = '20261115153634';
+const BUILD = '20261116090213';
 async function checkVer() {
   if (!/^https?:/.test(location.protocol) || BUILD.startsWith('/*')) return;
   try {
@@ -2090,6 +2090,7 @@ function showDetail(seat, sid) {
         ${it.ref ? `<p class="muted">參考：${esc(it.ref)}</p>` : ''}</div>`; }).join('')}
     ${sid === 'pre' && r?.extra?.check ? `<p><b>老師檢核：</b>${CHECK_ITEMS.map(([k, n]) => `${n}：${r.extra.check.items[k]}`).join('；')}</p>` : ''}
     ${sid === 'pre' && r ? `<p><b>生字描寫：</b>鉛筆${r.extra?.trace1 ? '✓' : '✗'}　紅筆部首${r.extra?.trace2 ? '✓' : '✗'}　圈詞${r.extra?.circle ? '✓' : '✗'}</p>` : ''}
+    ${sid === 'pre' && r?.extra?.fix && Object.values(r.extra.fix).some(x => x) ? `<p><b>訂正：</b>${items.filter(it => r.extra.fix[it.id]).map(it => `${esc(it.q.slice(0, 14))}…→ <span class="kai">${esc(r.extra.fix[it.id])}</span>`).join('<br>')}</p>` : ''}
     ${sid === 'pre' && r?.extra?.reads ? `<p><b>讀課文：</b>${r.extra.reads} 遍</p>` : ''}
     ${sid === 'pre' && r?.extra?.marked?.length ? `<p><b>不懂的語詞：</b>${r.extra.marked.join('、')}</p>` : ''}
   </div></div>`;
@@ -2317,7 +2318,8 @@ function preReviewBody(s) {
       <p class="sq"><span class="qno">${no}</span>${esc(it.q)}</p>
       <div class="opts">${it.o.map((o, k) => `<label class="opt ${sn ? (k === it.a ? 'right' : v === k ? 'wrong' : '') : ''}"><input type="radio" name="${it.id}" value="${k}" ${v === k ? 'checked' : ''} ${sn ? 'disabled' : ''}><span>${CIRC[k]} ${esc(o)}</span></label>`).join('')}</div>
       ${sn ? (v === it.a ? `<p class="fb ok">答對了！${esc(it.ex)}</p>`
-        : `<p class="fb no">答錯了。正確答案是 <b>${CIRC[it.a]} ${esc(it.o[it.a])}</b>。</p><p class="ex"><b>為什麼</b>${esc(it.ex)}</p>`) : ''}
+        : `<p class="fb no">答錯了。正確答案是 <b>${CIRC[it.a]} ${esc(it.o[it.a])}</b>。</p><p class="ex"><b>為什麼</b>${esc(it.ex)}</p>
+          <label class="fix-row"><span>訂正：用 10 個字以內寫出正確的答案或理由</span><input type="text" class="fix-in" data-fix="${it.id}" maxlength="10" value="${esc((rec.extra.fix || {})[it.id] || '')}" placeholder="例：因為頭髮還會長出來" ${rec.done && (rec.extra.fix || {})[it.id] ? 'readonly' : ''}><small class="fix-n">${[...((rec.extra.fix || {})[it.id] || '')].length} / 10</small></label>`) : ''}
     </div>`; };
   const step = (n, title, inner, done) => `<section class="step ${done ? 'is-done' : ''}"><header class="step-head"><span class="step-no">${n}</span><h2>${title}</h2>${done ? '<span class="pill ok">完成</span>' : ''}</header>${inner}</section>`;
   return `
@@ -2343,7 +2345,7 @@ function preReviewBody(s) {
   ${step(4, '自然段', `<p>在課本上標出自然段，再回答這一題。按「顯示自然段編號」可以對照答案。</p>
     <button type="button" class="${rec.extra.showNo ? 'ghost' : 'primary'}" id="showNo">${rec.extra.showNo ? '隱藏自然段編號' : '顯示自然段編號'}</button>
     <div class="qlist">${mcCard(para, '★')}</div>`, !!seen[para.id])}
-  ${step(5, '閱讀理解（和預習單三部曲一樣）', `<p>題目和紙本預習單一樣。在課文裡找答案，點一下就會對答案。答錯的看看為什麼，再回課文找一找，並在紙本上訂正。</p>
+  ${step(5, '閱讀理解（和預習單三部曲一樣）', `<p>題目和紙本預習單一樣。在課文裡找答案，點一下就會對答案。答錯的看看為什麼，再回課文找一找，用 10 個字以內寫下訂正，紙本也要訂正。</p>
     <div class="qlist">${rest.map((it, i) => mcCard(it, i + 1)).join('')}</div>`, rest.every(it => seen[it.id]))}
   </div>
   <div class="submit-row">${rec.done ? teacherCheckPanel(rec)
@@ -2374,6 +2376,12 @@ function bindPreReview(s) {
     const w = b.dataset.w; const open = !b.classList.contains('open'); b.classList.toggle('open', open); b.setAttribute('aria-pressed', open);
     if (open) { const m = rec.extra.marked || []; if (!m.includes(w)) { rec.extra.marked = [...m, w]; queueSave(s.id); } const it = WORDS.find(x => x[0] === w); speak(w + '。' + it[1]); }
   });
+  document.querySelectorAll('[data-fix]').forEach(t => t.oninput = () => {
+    const v = t.value.slice(0, 10); if (v !== t.value) t.value = v;
+    rec.extra.fix = Object.assign({}, rec.extra.fix, { [t.dataset.fix]: v.trim() });
+    const n = t.parentElement.querySelector('.fix-n'); if (n) n.textContent = `${[...v].length} / 10`;
+    queueSave(s.id);
+  });
   $('#tr1').onchange = () => { rec.extra.trace1 = $('#tr1').checked; queueSave(s.id); };
   $('#tr2').onchange = () => { rec.extra.trace2 = $('#tr2').checked; queueSave(s.id); };
   $('#tr3').onchange = () => { rec.extra.circle = $('#tr3').checked; queueSave(s.id); };
@@ -2386,6 +2394,8 @@ function bindPreReview(s) {
     if (rec.ans.genre == null) need.push('文體');
     if (!seen[qs[0].id]) need.push('自然段');
     if (qs.slice(1).some(i => !seen[i.id])) need.push('課文問答');
+    const nofix = qs.filter(i => seen[i.id] && rec.ans[i.id] !== i.a && !((rec.extra.fix || {})[i.id] || '').trim());
+    if (nofix.length) { need.push(`訂正 ${nofix.length} 題`); const el = document.querySelector(`[data-fix="${nofix[0].id}"]`); if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.focus(); } }
     if (need.length) { $('#left').textContent = `還沒完成：${need.join('、')}`; return; }
     rec.max = qs.length; rec.score = qs.filter(i => rec.ans[i.id] === i.a).length;
     rec.done = true; queueSave(s.id, true); rerender();
