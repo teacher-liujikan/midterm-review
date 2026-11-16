@@ -156,13 +156,13 @@ section[data-q="3"]{--cell:clamp(40px,min(10vh,6vw),80px)}
 
   <!-- 2 -->
   <section data-q="2" hidden>
-    <div class="qhead"><span class="qn">2</span><p class="qtext">下面圖形的面積各是幾平方公分？<br><span class="hint">每格是 1 cm²。點一點圖形，整格會標 1，半格會標 ½，2 個半格合起來是 1 格。</span></p></div>
+    <div class="qhead"><span class="qn">2</span><p class="qtext">下面圖形的面積各是幾平方公分？<br><span class="hint">每格是 1 cm²。用手指把<b>半格</b>拖到另一個半格上，就能拼成 1 整格；點一下可以做記號。</span></p></div>
     <div class="figs" id="q2"></div>
   </section>
 
   <!-- 3 -->
   <section data-q="3" hidden>
-    <div class="qhead"><span class="qn">3</span><p class="qtext">方格點上有 3 個圖形，每一小格是 1 cm²。<span class="hint">（可以點圖形做記號）</span></p></div>
+    <div class="qhead"><span class="qn">3</span><p class="qtext">方格點上有 3 個圖形，每一小格是 1 cm²。<span class="hint">（半格可以拖去拼成整格，點一下可以做記號）</span></p></div>
     <div class="figs" id="q3figs"></div>
     <div class="col">
       <div class="say">① 甲 <input class="num" id="q3a" inputmode="numeric"> cm²，乙 <input class="num" id="q3b" inputmode="numeric"> cm²，丙 <input class="num" id="q3c" inputmode="numeric"> cm²</div>
@@ -226,25 +226,41 @@ function outline(polys){const cnt=new Map();
   polys.forEach(a=>a.forEach((p,i)=>{const q=a[(i+1)%a.length];const k=[p,q].map(v=>v.join(',')).sort().join('|');cnt.set(k,(cnt.get(k)||0)+1)}));
   return [...cnt].filter(([,n])=>n===1).map(([k])=>k.split('|').map(s=>s.split(',').map(Number)))}
 
-/* tappable figure on a lined grid or a dot grid */
+/* figure on a lined grid or a dot grid: tap to mark, drag a half onto another half to make 1 whole */
 function figure(rows,color,mode,counter){
   const R=rows.length,C=rows[0].length;
   const svg=el('svg',{viewBox:`-6 -6 ${C*U+12} ${R*U+12}`,class:'fig'});svg.style.width=`calc(var(--cell)*${C} + var(--cell)*.12)`;
-  const polys=[];
-  rows.forEach((row,r)=>[...row].forEach((k,c)=>{if(!SHAPE[k])return;const a=pts(k,c,r);polys.push({k,a})}));
-  polys.forEach(o=>{const p=el('polygon',{points:ptStr(o.a),fill:color,class:'pc'});o.el=p;svg.appendChild(p)});
-  if(mode==='grid'){for(let i=0;i<=C;i++)svg.appendChild(el('line',{x1:i*U,y1:0,x2:i*U,y2:R*U,stroke:'#7fb0dc','stroke-width':2,'pointer-events':'none'}));
-    for(let j=0;j<=R;j++)svg.appendChild(el('line',{x1:0,y1:j*U,x2:C*U,y2:j*U,stroke:'#7fb0dc','stroke-width':2,'pointer-events':'none'}))}
-  else{for(let i=0;i<=C;i++)for(let j=0;j<=R;j++)svg.appendChild(el('circle',{cx:i*U,cy:j*U,r:6,fill:'#5b6b7d','pointer-events':'none'}))}
-  outline(polys.map(o=>o.a)).forEach(([p,q])=>svg.appendChild(el('line',{x1:p[0],y1:p[1],x2:q[0],y2:q[1],stroke:mode==='grid'?'#c0622f':'#1f7fc4','stroke-width':5,'stroke-linecap':'round','pointer-events':'none'})));
-  const marks=el('g',{});svg.appendChild(marks);
-  let whole=0,half=0;
+  const toSvg=e=>{const p=svg.createSVGPoint();p.x=e.clientX;p.y=e.clientY;return p.matrixTransform(svg.getScreenCTM().inverse())};
+  let polys=[],whole=0,half=0,marks,top;
   function upd(){if(counter)counter.textContent=(whole||half)?`整格 ${whole} 個，半格 ${half} 個`:''}
-  polys.forEach(o=>o.el.addEventListener('click',()=>{
-    if(o.t){o.t.remove();o.t=null;o.el.setAttribute('fill',color);o.k==='#'?whole--:half--;upd();return}
+  function unmark(o){if(o.t){o.t.remove();o.t=null;o.k==='#'?whole--:half--}o.el.setAttribute('fill',color)}
+  function toggle(o){if(o.t){unmark(o);upd();return}
     const [x,y]=centroid(o.a);o.t=el('text',{x,y:y+11,'text-anchor':'middle'});o.t.textContent=o.k==='#'?'1':'½';marks.appendChild(o.t);
-    o.el.setAttribute('fill','#ffb38a');o.k==='#'?whole++:half++;upd()}));
-  svg.reset=()=>{polys.forEach(o=>{if(o.t){o.t.remove();o.t=null}o.el.setAttribute('fill',color)});whole=half=0;upd()};
+    o.el.setAttribute('fill','#ffb38a');o.k==='#'?whole++:half++;upd()}
+  function build(){svg.innerHTML='';polys=[];whole=half=0;
+    rows.forEach((row,r)=>[...row].forEach((k,c)=>{if(SHAPE[k])polys.push({k,c,r,a:pts(k,c,r)})}));
+    const base=el('g',{});svg.appendChild(base);
+    if(mode==='grid'){for(let i=0;i<=C;i++)svg.appendChild(el('line',{x1:i*U,y1:0,x2:i*U,y2:R*U,stroke:'#7fb0dc','stroke-width':2,'pointer-events':'none'}));
+      for(let j=0;j<=R;j++)svg.appendChild(el('line',{x1:0,y1:j*U,x2:C*U,y2:j*U,stroke:'#7fb0dc','stroke-width':2,'pointer-events':'none'}))}
+    else{for(let i=0;i<=C;i++)for(let j=0;j<=R;j++)svg.appendChild(el('circle',{cx:i*U,cy:j*U,r:6,fill:'#5b6b7d','pointer-events':'none'}))}
+    outline(polys.map(o=>o.a)).forEach(([p,q])=>svg.appendChild(el('line',{x1:p[0],y1:p[1],x2:q[0],y2:q[1],stroke:mode==='grid'?'#c0622f':'#1f7fc4','stroke-width':5,'stroke-linecap':'round','pointer-events':'none'})));
+    marks=el('g',{});svg.appendChild(marks);top=el('g',{});svg.appendChild(top);
+    polys.forEach(o=>{o.el=el('polygon',{points:ptStr(o.a),fill:color,class:'pc'});base.appendChild(o.el);hook(o)});upd()}
+  function hook(o){let start=null,moved=false,dx=0,dy=0;
+    o.el.addEventListener('pointerdown',e=>{e.preventDefault();o.el.setPointerCapture(e.pointerId);const p=toSvg(e);start=[p.x,p.y];moved=false;dx=dy=0});
+    o.el.addEventListener('pointermove',e=>{if(!start||o.k==='#')return;const p=toSvg(e);dx=p.x-start[0];dy=p.y-start[1];
+      if(!moved&&Math.hypot(dx,dy)>U*.12){moved=true;unmark(o);upd();top.appendChild(o.el);o.el.setAttribute('stroke','#1f2d3d');o.el.setAttribute('stroke-width',4)}
+      if(moved)o.el.setAttribute('transform',`translate(${dx},${dy})`)});
+    const end=()=>{if(!start)return;start=null;
+      if(!moved){toggle(o);return}
+      const [cx,cy]=centroid(o.a);const nx=cx+dx,ny=cy+dy;
+      const tgt=polys.find(t=>t!==o&&t.k!=='#'&&!t.gone&&Math.abs(nx-(t.c+.5)*U)<U*.55&&Math.abs(ny-(t.r+.5)*U)<U*.55);
+      o.el.removeAttribute('stroke');o.el.removeAttribute('stroke-width');
+      if(tgt){unmark(tgt);o.gone=true;o.el.remove();tgt.k='#';tgt.a=pts('#',tgt.c,tgt.r);tgt.el.setAttribute('points',ptStr(tgt.a));
+        tgt.el.setAttribute('fill','#fff3b0');setTimeout(()=>{if(!tgt.t)tgt.el.setAttribute('fill',color)},450);upd()}
+      else{o.el.setAttribute('transform','')}};
+    o.el.addEventListener('pointerup',end);o.el.addEventListener('pointercancel',end)}
+  build();svg.reset=build;
   return svg}
 
 /* 1. drag a piece to complete one square */
@@ -287,7 +303,7 @@ Q2.forEach((t,i)=>{const col=document.createElement('div');col.className='figcol
   col.innerHTML=`<div class="sub">${t.lab}</div>`;const cnt=document.createElement('p');cnt.className='counter';
   const svg=figure(t.rows,t.color,'grid',cnt);col.appendChild(svg);col.appendChild(cnt);
   const box=document.createElement('div');box.className='col';
-  box.innerHTML=`<div class="say">${t.lab}：( <input class="num" inputmode="numeric"> ) cm²</div><div class="btns"><button class="btn">對答案</button><button class="btn soft">擦掉記號</button></div><p class="fb"></p>`;
+  box.innerHTML=`<div class="say">${t.lab}：( <input class="num" inputmode="numeric"> ) cm²</div><div class="btns"><button class="btn">對答案</button><button class="btn soft">放回原樣</button></div><p class="fb"></p>`;
   col.appendChild(box);$('#q2').appendChild(col);
   const inp=box.querySelector('input'),[btn,clr]=box.querySelectorAll('button'),f=box.querySelector('.fb');
   clr.onclick=()=>svg.reset();
