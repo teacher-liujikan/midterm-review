@@ -30,7 +30,11 @@ button:focus-visible{outline:4px solid var(--pole-b);outline-offset:3px}
 .qbox{background:var(--paper);border:3px solid var(--ink);border-radius:22px;padding:1.6vh 2.4vw;display:flex;flex-direction:column;gap:1.4vh;flex:0 0 auto}
 .qtag{font-size:clamp(14px,1.4vw,20px);color:var(--muted);font-weight:700;letter-spacing:.1em}
 .qtag.bonus{color:var(--gold)}
-.qtag.turn{color:var(--c);font-size:clamp(18px,min(2vw,3.6vh),30px);letter-spacing:.04em}.qtag .bn{color:var(--gold)}
+.qtag.turn{align-self:flex-start;display:inline-flex;align-items:center;gap:.4em;background:var(--c);color:#fff;font-size:clamp(24px,min(2.8vw,5vh),44px);letter-spacing:.04em;padding:.25em .9em;border-radius:999px;box-shadow:0 4px 0 rgba(0,0,0,.15);animation:turnIn .5s ease-out}
+.qtag.turn b{font-size:1.2em;background:#fff;color:var(--c);border-radius:.4em;padding:0 .3em;margin:0 .1em}
+.qtag.turn .gi{width:1.3em;height:1.3em}
+.qtag .bn{color:#fff;opacity:.9;font-size:.8em}
+@keyframes turnIn{0%{transform:scale(.8);opacity:0}60%{transform:scale(1.06)}100%{transform:none;opacity:1}}
 .sent{font-family:var(--kai);font-size:clamp(28px,3.8vw,58px);line-height:1.4}
 .blank{display:inline-block;min-width:3.4em;border-bottom:5px solid var(--ink);text-align:center;margin:0 .15em}
 .blank.fill{color:var(--ok)}
