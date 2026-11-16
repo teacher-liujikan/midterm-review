@@ -4,14 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>魔法理髮店：語詞大改造</title>
+<link rel="stylesheet" href="../fonts/bpmf/bpmf.css">
 <style>
 @font-face{font-family:"EduKai";src:url("https://teacher-liujikan.github.io/idiompractice/fonts/edukai-4.0.ttf") format("truetype");font-display:swap}
 :root{
   --bg:#fbf4ea; --paper:#fffdf8; --ink:#2d2420; --muted:#86766a; --line:#eadccb;
   --pole-r:#d8443a; --pole-b:#2f6fb5;
   --ok:#2e9a5c; --no:#d8443a; --gold:#e6a817;
-  --kai:"EduKai","BiauKai","DFKai-SB","Kaiti TC",serif;
-  --sans:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+  --kai:"Bpmf Zihi Kai Std","EduKai","BiauKai","DFKai-SB","Kaiti TC",serif;
+  --sans:"Bpmf Zihi Kai Std","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
 }
 *{box-sizing:border-box}
 html,body{height:100%;margin:0}
@@ -80,24 +81,24 @@ button:focus-visible{outline:4px solid var(--pole-b);outline-offset:3px}
 // ===== 題目 =====
 const WORDS = [
   ['理髮店', '我的頭髮太長了，下課後要去巷口的＿＿剪頭髮。'],
-  ['圍巾', '冬天出門好冷，記得圍上溫暖的＿＿。'],
-  ['籃框', '他用力一投，球「咚」的一聲打到＿＿，又彈了出來。'],
-  ['近視眼', '哥哥開玩笑說：「一定是那顆球有＿＿，才沒有進。」'],
-  ['失誤', '比賽時一個小＿＿，讓我們輸了一分。'],
-  ['愉快', '祝你週末＿＿，玩得開開心心！'],
+  ['圍巾', '冬天出門好冷，記得󠇡圍上溫暖的＿＿。'],
+  ['籃框', '他用力一󠇢投，球「咚」的一󠇢聲打到＿＿，又彈了出來。'],
+  ['近視眼', '哥哥󠇡開玩笑說：「一󠇡定是那顆球有＿＿，才沒有進。」'],
+  ['失誤', '比賽時一󠇡個󠇡小＿＿，讓我們輸了一󠇢分。'],
+  ['愉快', '祝你週末＿＿，玩得󠇡開開心心！'],
   ['全數', '掃地時間，我們把地上的紙屑＿＿撿起來。'],
   ['垃圾桶', '吃完的餅乾袋，要丟進＿＿裡。'],
-  ['剪刀', '美勞課要剪紙，記得帶一把＿＿。'],
+  ['剪刀', '美勞課要剪紙，記得󠇡帶一󠇢把＿＿。'],
   ['曾經', '我＿＿在海邊看過美麗的日出。'],
-  ['機會', '這次輸了沒關係，下次還有＿＿！'],
-  ['鏡子', '出門前，姊姊站在＿＿前整理頭髮。'],
-  ['整齊', '大家把鞋子排得好＿＿，老師誇我們很棒。']
+  ['機會', '這次輸了沒關係󠇡，下次還有＿＿！'],
+  ['鏡子󠇡', '出門前，姊姊󠇡站在＿＿前整理頭髮。'],
+  ['整齊', '大家把鞋子󠇡排得󠇡好＿＿，老師誇我們很棒。']
 ];
 const IDIOMS = [
-  ['一視同仁', '老師對每個同學都＿＿，從來不偏心。'],
-  ['牛刀小試', '剛學會游泳的他，先在淺水區＿＿，游了一小段。'],
+  ['一󠇡視同仁', '老師對每個󠇡同學都＿＿，從來不偏心。'],
+  ['牛刀小試', '剛學會游泳的他，先在淺水區＿＿，游了一󠇢小段。'],
   ['當機立斷', '看到冒煙，他＿＿，馬上打電話叫消防車。'],
-  ['參差不齊', '剛長出來的頭髮長長短短，＿＿的。']
+  ['參󠇢差󠇢不齊', '剛長󠇡出來的頭髮長長短短，＿＿的。']
 ];
 const COLORS = ['#d8443a', '#2f6fb5', '#2e9a5c', '#9b59b6', '#e67e22', '#16a3a3'];
 const HAIR = ['#3b2a20', '#7a4a22', '#1f1f2e', '#a0522d', '#4a3426', '#2b2b2b'];
@@ -132,7 +133,7 @@ function tone(freqs, dur = 0.12) {
 }
 
 // ===== 客人 =====
-// 亂髮：從頭頂往外亂翹的一撮一撮
+// 亂髮：從頭頂往外亂翹的一󠇡撮一撮
 const STRAND_D = [
   'M70 70 C55 40 40 30 22 18 C38 40 48 55 58 78Z',
   'M86 58 C82 25 75 10 66 -4 C78 18 86 35 96 60Z',
@@ -157,7 +158,7 @@ function guestSVG(g, score) {
     <!-- 整齊的底髮 -->
     <path d="M52 112 C50 70 72 52 100 52 C128 52 150 70 148 112 C140 92 124 82 100 82 C76 82 60 92 52 112Z" fill="${hair}"/>
     ${neat ? `<path d="M64 84 C80 70 104 66 132 78" stroke="#fff" stroke-width="5" stroke-linecap="round" fill="none" opacity=".35"/>` : ''}
-    <!-- 眼睛、嘴巴 -->
+    <!-- 眼睛、嘴巴󠇡 -->
     <ellipse cx="82" cy="122" rx="5" ry="${score >= 1 ? 5 : 2}" fill="#2d2420"/><ellipse cx="118" cy="122" rx="5" ry="${score >= 1 ? 5 : 2}" fill="#2d2420"/>
     <ellipse cx="72" cy="140" rx="7" ry="4" fill="#f19a8e" opacity="${score >= 2 ? .7 : 0}"/><ellipse cx="128" cy="140" rx="7" ry="4" fill="#f19a8e" opacity="${score >= 2 ? .7 : 0}"/>
     <path d="${smile}" stroke="#2d2420" stroke-width="4" fill="none" stroke-linecap="round"/>
@@ -178,11 +179,11 @@ function render() {
     app.innerHTML = `${sign('')}
     <section class="cover">
       <h2>今天店裡來了 ${G.n} 位頭髮亂糟糟的客人！</h2>
-      <p>每一題選出正確的語詞。答對的組，就可以幫自己的客人剪掉一撮亂髮。<br>題目做完，看看哪一組的客人造型最帥！</p>
+      <p>每一󠇢題選出正確的語詞。答對的組，就可以幫自己的客人剪掉一󠇡撮亂髮。<br>題目做完，看看哪一󠇢組的客人造型最帥！</p>
       <div class="set">組數：${[2, 3, 4, 5, 6].map(n => `<button class="seg" data-n="${n}" aria-pressed="${G.n === n}">${n} 組</button>`).join('')}</div>
-      <div class="set">成語加分題：<button class="seg" data-b="1" aria-pressed="${G.bonus}">要</button><button class="seg" data-b="0" aria-pressed="${!G.bonus}">不要</button></div>
+      <div class="set">成語加分題：<button class="seg" data-b="1" aria-pressed="${G.bonus}">要</button><button class="seg" data-b="0" aria-pressed="${!G.bonus}">不󠇡要</button></div>
       <div class="shop" style="--n:${G.n};width:100%;max-width:1200px">${Array.from({ length: G.n }, (_, g) => chair(g, 0)).join('')}</div>
-      <button class="btn" id="go">開店囉！</button>
+      <button class="btn" id="go">開店囉󠇢！</button>
     </section>${foot()}`;
     return;
   }
@@ -191,9 +192,9 @@ function render() {
     app.innerHTML = `${sign('')}
     <section class="cover">
       <h2>改造完成！</h2>
-      <p>${G.score.filter(s => s === max).length > 1 ? '好幾組並列第一，造型都超帥！' : `第 ${G.score.indexOf(max) + 1} 組的客人最帥！`}　大家都會用這 ${WORDS.length} 個語詞了嗎？</p>
+      <p>${G.score.filter(s => s === max).length > 1 ? '好幾組並列第一，造型都超帥！' : `第 ${G.score.indexOf(max) + 1} 組的客人最帥！`}　大家都會用這 ${WORDS.length} 個󠇡語詞了嗎？</p>
       <div class="shop" style="--n:${G.n};width:100%">${G.score.map((s, g) => chair(g, s, s === max)).join('')}</div>
-      <button class="btn ghost" id="again">再玩一次</button>
+      <button class="btn ghost" id="again">再玩一󠇡次</button>
     </section>${foot()}`;
     return;
   }
@@ -209,12 +210,12 @@ function render() {
   <div class="shop" style="--n:${G.n}">${G.score.map((s, g) => chair(g, s, false, lead > 0 && s === lead)).join('')}</div>${foot()}`;
 }
 function barHTML(q) {
-  if (G.solved && G.pick === null) return `<span class="msg ok">答對了！是哪一組答對的？</span>
+  if (G.solved && G.pick === null) return `<span class="msg ok">答對了！是哪一󠇢組答對的？</span>
     <div class="who">${G.score.map((_, g) => `<button class="btn" style="--c:${COLORS[g % COLORS.length]}" data-g="${g}">第 ${g + 1} 組</button>`).join('')}
     <button class="btn ghost" data-g="-1">都沒有</button></div>`;
-  if (G.solved) return `<span class="msg ok">${G.pick >= 0 ? `第 ${G.pick + 1} 組的客人剪掉一撮頭髮！` : '答案是「' + esc(q.w) + '」'}</span>
-    <button class="btn" id="next">${G.i + 1 < G.qs.length ? '下一題 →' : '看改造結果！'}</button>`;
-  return `${G.tried.length ? '<span class="msg no">不對喔！其他組可以搶答。</span>' : '<span class="msg">先舉手的組回答，老師點選他們說的語詞。</span>'}
+  if (G.solved) return `<span class="msg ok">${G.pick >= 0 ? `第 ${G.pick + 1} 組的客人剪掉一󠇡撮頭髮！` : '答案是「' + esc(q.w) + '」'}</span>
+    <button class="btn" id="next">${G.i + 1 < G.qs.length ? '下一󠇢題 →' : '看改造結果！'}</button>`;
+  return `${G.tried.length ? '<span class="msg no">不󠇡對喔！其他組可以搶答。</span>' : '<span class="msg">先舉手的組回答，老師點選他們說的語詞。</span>'}
     <button class="btn ghost" id="reveal">公布答案</button>`;
 }
 function chair(g, s, win = false, lead = false) {
@@ -223,7 +224,7 @@ function chair(g, s, win = false, lead = false) {
     <h2>第 ${g + 1} 組</h2>${guestSVG(g, s)}${SCIS}<span class="sc">剪了 ${s} 刀</span></div>`;
 }
 const sign = prog => `<header class="sign"><span class="pole" aria-hidden="true"></span><h1>魔法理髮店：語詞大改造</h1><span class="prog">${prog}</span></header>`;
-const foot = () => `<div class="foot">第八課〈魔「髮」哥哥〉語詞遊戲・© 范范老師（老師媽咪）設計</div>`;
+const foot = () => `<div class="foot">第八課〈魔「髮」哥哥󠇡〉語詞遊戲・© 范范老師（老師媽咪）設計</div>`;
 
 // ===== 操作 =====
 document.addEventListener('click', e => {
@@ -244,7 +245,7 @@ document.addEventListener('click', e => {
       const before = G.score[g]; G.score[g]++;
       render();
       const ch = document.querySelector(`[data-chair="${g}"]`);
-      // 先畫出還沒剪的樣子，再剪掉
+      // 先畫出還沒剪的樣子󠇡，再剪掉
       if (before < STRANDS) { const st = ch.querySelector(`.strand[data-k="${before}"]`); st && st.classList.remove('cut'); requestAnimationFrame(() => requestAnimationFrame(() => st && st.classList.add('cut'))); }
       const sc = ch.querySelector('.scis'); sc.classList.add('go'); snipSound();
     } else render();
