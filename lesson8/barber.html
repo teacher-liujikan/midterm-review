@@ -34,6 +34,7 @@ button:focus-visible{outline:4px solid var(--pole-b);outline-offset:3px}
 .qtag.turn b{font-size:1.2em;background:#fff;color:var(--c);border-radius:.4em;padding:0 .3em;margin:0 .1em}
 .qtag.turn .gi{width:1.3em;height:1.3em}
 .qtag .bn{color:#fff;opacity:.9;font-size:.8em}
+.who-line{display:flex;flex-wrap:wrap;gap:.5em 1em;font-size:clamp(20px,min(2.2vw,4vh),36px)}.who-line span{color:var(--c);font-weight:700}.who-line b{font-size:1.25em}
 @keyframes turnIn{0%{transform:scale(.8);opacity:0}60%{transform:scale(1.06)}100%{transform:none;opacity:1}}
 .sent{font-family:var(--kai);font-size:clamp(28px,3.8vw,58px);line-height:1.4}
 .blank{display:inline-block;min-width:3.4em;border-bottom:5px solid var(--ink);text-align:center;margin:0 .15em}
@@ -111,6 +112,15 @@ const COLORS = ['#d8443a', '#2f6fb5', '#2e9a5c', '#9b59b6'];
 const LCOLORS = ['#d2553f', '#c4870f', '#3c9a6a', '#5468c9'];
 const LNAMES = ['剪刀', '梳子󠇡', '吹風機', '魔鏡'];
 // 異質分組：每組都有剪刀、梳子󠇡、吹風機、魔鏡各一󠇡位同學
+// 教師端「分組」排好的第 1～4 組名單（同一󠇢台電腦開過教師端才會有）
+function homeNow() { try { const h = JSON.parse(localStorage.getItem('l8-home-now') || 'null'); return h && h.groups ? h.groups : null; } catch (e) { return null; } }
+function whoLine(g) {
+  const hs = homeNow(); if (!hs || g < 0) return '';
+  const role = 'ABCD'[g];
+  return `<div class="who-line">${hs.map((m, i) => { let p = m.find(x => x.role === role); let help = false;
+    if (!p && m.length) { help = true; p = m.slice().sort((x, y) => Math.abs('ABCD'.indexOf(x.lv) - g) - Math.abs('ABCD'.indexOf(y.lv) - g))[0]; }
+    return `<span style="--c:${COLORS[i % COLORS.length]}">第 ${i + 1} 組 <b>${p ? p.seat + ' 號' : '—'}</b>${help ? '<small>（幫忙答）</small>' : ''}</span>`; }).join('')}</div>`;
+}
 const GNAMES = ['第 1 組', '第 2 組', '第 3 組', '第 4 組'];
 // 組別圖示用畫的（有些電腦沒有梳子󠇡、鏡子󠇡的表情符號）
 const SVGI = p => `<svg class="gi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
@@ -231,7 +241,7 @@ function render() {
   const lead = Math.max(...G.score);
   app.innerHTML = `${sign(`第 ${G.i + 1} / ${G.qs.length} 題`)}
   <section class="qbox">
-    <div class="qtag turn" style="--c:${q.g >= 0 ? LCOLORS[q.g] : 'var(--ink)'}">${q.g >= 0 ? `${GICON[q.g]} 輪到各組的 <b>${LNAMES[q.g]}</b> 同學搶答` : '全班搶答！'}${q.bonus ? '　<span class="bn">★ 成語題</span>' : ''}</div>
+    <div class="qtag turn" style="--c:${q.g >= 0 ? LCOLORS[q.g] : 'var(--ink)'}">${q.g >= 0 ? `${GICON[q.g]} 輪到各組的 <b>${LNAMES[q.g]}</b> 同學搶答` : '全班搶答！'}${q.bonus ? '　<span class="bn">★ 成語題</span>' : ''}</div>${whoLine(q.g)}
     <div class="sent">${esc(q.s).replace('＿＿', `<span class="blank ${G.solved ? 'fill' : ''}">${G.solved ? esc(q.w) : '　'}</span>`)}</div>
     <div class="opts">${q.o.map(w => `<button class="opt ${G.tried.includes(w) ? 'no' : ''} ${G.solved && w === q.w ? 'ok' : ''}" data-w="${esc(w)}" ${G.solved || G.tried.includes(w) ? 'disabled' : ''}>${esc(w)}</button>`).join('')}</div>
     <div class="bar">${barHTML(q)}</div>
