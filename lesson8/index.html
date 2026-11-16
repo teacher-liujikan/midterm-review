@@ -81,7 +81,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .st-done .tile-st{background:var(--ok-soft);color:var(--ok)}
 .st-lock{opacity:.55;cursor:not-allowed}.st-wait .tile-st{background:var(--warn-soft)}
 .gchip{display:inline-block;border-radius:999px;padding:.1em .7em;font-size:.85rem;font-weight:700;justify-self:start}
-.g-gold{background:var(--gold-soft);color:var(--gold)}.g-teal{background:var(--teal-soft);color:var(--teal)}.fix-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin-top:8px;padding:8px 10px;border:1.5px dashed var(--rose,#c44);border-radius:10px}.fix-row span{font-weight:700;font-size:.95rem}.fix-txt{font-size:1.35rem;letter-spacing:.06em}.stage-frame{width:100%;height:min(80vh,760px);border:1px solid var(--line);border-radius:14px;background:#fbf4ea;margin-top:8px}.g-blue{background:#e2e7fb;color:#4258b8}.my-para-text p{margin:.4em 0;line-height:1.9;font-size:1.15rem}.my-para-text .pno{display:inline-block;min-width:2em;color:var(--muted);font-family:var(--sans,sans-serif);font-size:.85rem}.g-rose{background:var(--rose-soft);color:var(--rose)}
+.g-gold{background:var(--gold-soft);color:var(--gold)}.g-teal{background:var(--teal-soft);color:var(--teal)}.fix-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin-top:8px;padding:8px 10px;border:1.5px dashed var(--rose,#c44);border-radius:10px}.fix-row span{font-weight:700;font-size:.95rem}.fix-txt{font-size:1.35rem;letter-spacing:.06em}.stage-frame{width:100%;height:min(80vh,760px);border:1px solid var(--line);border-radius:14px;background:#fbf4ea;margin-top:8px}.park{font-style:normal;display:inline-block;font-size:.78rem;font-weight:700;color:#fff;background:#e0742a;border-radius:999px;padding:1px 8px;vertical-align:middle;margin-left:4px;font-family:var(--sans,sans-serif)}.wk-idm{font-size:1.5rem;margin:.2em 0}.g-blue{background:#e2e7fb;color:#4258b8}.my-para-text p{margin:.4em 0;line-height:1.9;font-size:1.15rem}.my-para-text .pno{display:inline-block;min-width:2em;color:var(--muted);font-family:var(--sans,sans-serif);font-size:.85rem}.g-rose{background:var(--rose-soft);color:var(--rose)}
 /* 關卡 */
 .crumbs{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;color:var(--muted);font-size:.9rem}
 .stage-title{font-family:var(--f-disp);font-size:1.9rem;margin:.4em 0 .1em}
@@ -824,6 +824,10 @@ const STAGES = [
 STAGES.splice(STAGES.findIndex(x => x.id === 'stroke') + 1, 0, { id: 'zi', sec: '生字筆順', name: '多音字・形近字', when: '第1節', frame: 'zi.html' });
 // 成語檢核：本課十個成語（以老師提供的成語表為主），配對＋填空
 const IDIOM10 = [["走火入魔", "魔", "比喻過分沉溺於某事，且方法錯誤，而導致身心受到傷害。"], ["巾幗英雄", "巾", "指女性英雄。"], ["一視同仁", "視", "平等待人，不分親疏厚薄，沒有歧視。"], ["誤入歧途", "誤", "因一時迷惑而走入錯誤的路途。"], ["濫竽充數", "數", "比喻沒有真才實學的人，混在行家之間充數。"], ["牛刀小試", "刀", "比喻才智和能力很強，先在小事上施展一下。"], ["似曾相識", "曾", "對所見的人事物感覺熟悉，卻又不真切。"], ["當機立斷", "機", "掌握時機，立刻決斷。"], ["破鏡重圓", "鏡", "比喻夫妻失散或決裂後重新團圓和好。"], ["參差不齊", "齊", "雜亂不整齊。"]];
+// 課本「成語遊樂園」裡的成語（要特別標記）
+const IDIOM_PARK = ['一視同仁', '牛刀小試', '當機立斷', '破鏡重圓', '參差不齊'];
+// 生字筆順的「生字小百科」也改用這十個成語
+IDIOM10.forEach(([w, ch]) => { const c = CHARS.find(x => x[0] === ch); if (c) c[6] = w; });
 STAGES.splice(STAGES.findIndex(x => x.id === 'zi') + 1, 0, { id: 'idiomchk', sec: '生字筆順', name: '成語檢核', when: '第1節', idiomCards: true,
   intro: '先複習本課的十個成語，再做配對和填空。答錯可以再試一次，第一次就答對才算分喔！',
   items: [
@@ -1356,7 +1360,7 @@ function itemsBody(s) {
   const top = [
     s.showText ? textBlock(s.wordMark) : '',
     s.showWords && !rec.done ? wordCards() : '',
-    s.idiomCards ? `<details class="words"><summary>本課成語（${IDIOM10.length} 個，忘記時再打開看）</summary><div class="word-grid">${IDIOM10.map(([w, c, m]) => `<div class="word"><b class="kai">${esc(w).replace(c, `<u>${c}</u>`)}</b><span>${esc(m)}</span></div>`).join('')}</div></details>` : '',
+    s.idiomCards ? `<details class="words"><summary>本課成語（${IDIOM10.length} 個，忘記時再打開看）</summary><div class="word-grid">${IDIOM10.map(([w, c, m]) => `<div class="word"><b class="kai">${esc(w).replace(c, `<u>${c}</u>`)}${IDIOM_PARK.includes(w) ? ' <em class="park">成語遊樂園</em>' : ''}</b><span>${esc(m)}</span></div>`).join('')}</div></details>` : '',
     pvSwitch, group ? `<div class="group-banner g-${GROUPS[group].tone}"><span>你的組別</span><strong>${GROUPS[group].name}</strong></div>` : '',
     group && s.paras?.[group] ? `<details class="words my-paras" open><summary>你負責的課文：第${s.paras[group].map(k => ZH_NUM[k]).join('、')}段</summary><div class="kai my-para-text">${s.paras[group].map(k => `<p><span class="pno">${ZH_NUM[k]}</span>${esc(LESSON.paras[k])}</p>`).join('')}</div></details>` : ''
   ].join('');
@@ -1685,8 +1689,9 @@ function charWiki(c) {
     ${I.o ? sec('o', '📜', '字的由來', `<p class="wk-tag">${esc(I.o[1])}</p><p>${esc(I.o[0])}</p>${I.o[1] === '形聲字' ? '<p class="muted wk-small">形聲字：一半表示意思，一半表示讀音。</p>' : ''}`) : ''}
     ${sec('r', '🧩', '部首的意思', `<p class="wk-rad"><span class="kai">${c[2]}</span>部</p><p>${esc(I.r || '')}</p>`)}
     ${sec('m', '⚠️', '易錯提醒', `<ul class="wk-list"><li>${esc(c[7])}</li>${(I.m || []).map(x => `<li>${esc(x)}</li>`).join('')}</ul>`)}
-    ${sec('w', '📝', '造詞和例句', `<div class="wk-words">${words.map(x => `<span class="kai">${esc(x)}</span>`).join('')}${c[6] ? `<span class="kai wk-idiom">成語：${c[6]}</span>` : ''}</div>
+    ${sec('w', '📝', '造詞和例句', `<div class="wk-words">${words.map(x => `<span class="kai">${esc(x)}</span>`).join('')}</div>
       <ul class="wk-eg">${(I.e || []).map(x => `<li><span class="kai">${esc(x)}</span>${say(x)}</li>`).join('')}</ul>`)}
+    ${c[6] ? (() => { const d = IDIOM10.find(x => x[0] === c[6]); return sec('i', '🎡', `成語：<span class="kai">${c[6]}</span>${IDIOM_PARK.includes(c[6]) ? ' <span class="park">成語遊樂園</span>' : ''}`, `<p class="wk-idm kai">${esc(c[6]).replace(c[0], `<u>${c[0]}</u>`)}${say(c[6])}</p><p>${esc(d ? d[2] : '')}</p>${IDIOM_PARK.includes(c[6]) ? '<p class="muted wk-small">這個成語在課本的「成語遊樂園」裡。</p>' : ''}`); })() : ''}
     ${sec('l', '🔍', '相似字・近義詞・反義詞', `${I.l && I.l.length ? `<div class="wk-like">${I.l.map(([x, z, w]) => `<div class="wk-lc"><span class="kai">${x}</span><span class="zy">${z}</span><span class="kai">${esc(w)}</span></div>`).join('')}</div>` : ''}
       ${pairs('近義詞', I.syn, '≈')}${pairs('反義詞', I.ant, '↔')}`)}`;
 }
@@ -1794,7 +1799,7 @@ function go(view) {
   if (view !== 'stage') scrollTo(0, 0);
 }
 // ===== 新版本偵測：答案都先存在平板，重新載入不會不見 =====
-const BUILD = '20261116094116';
+const BUILD = '20261116094422';
 async function checkVer() {
   if (!/^https?:/.test(location.protocol) || BUILD.startsWith('/*')) return;
   try {
