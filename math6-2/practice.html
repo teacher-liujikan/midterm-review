@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>切割拼湊類題</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Huninn&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<style>
+/* Layout: textbook-order lesson — question chips on top, one question per page, big tappable cells for the classroom TV */
+:root{
+  --paper:#f7f9fc; --sheet:#ffffff; --ink:#1f2d3d; --muted:#5b6b7d;
+  --grid:#9cc3e8; --grid-strong:#3d8bd4; --mark:#ff8a65; --ok:#2e9d5b; --bad:#d64545;
+  --chip:#e8f1fb; --note:#fde8ee; --note-ink:#c2185b; --qnum:#f26b3a; --plate:rgba(120,180,235,.16);
+  --display:"Huninn","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+  --body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+  --cell:clamp(40px,min(9.5vh,7vw),90px);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#121a24; --sheet:#1a2533; --ink:#e8eef5; --muted:#9fb0c3;
+  --grid:#2f4d6b; --grid-strong:#6db3f2; --mark:#ff9e80; --ok:#5cc98a; --bad:#ff7b7b;
+  --chip:#21344a; --note:#3a2230; --note-ink:#ff9ec4; --qnum:#ff8a5c; --plate:rgba(120,180,235,.12); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#121a24; --sheet:#1a2533; --ink:#e8eef5; --muted:#9fb0c3;
+  --grid:#2f4d6b; --grid-strong:#6db3f2; --mark:#ff9e80; --ok:#5cc98a; --bad:#ff7b7b;
+  --chip:#21344a; --note:#3a2230; --note-ink:#ff9ec4; --qnum:#ff8a5c; --plate:rgba(120,180,235,.12); color-scheme:dark}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:18px;line-height:1.55;overflow:hidden;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:10px}
+.wrap{max-width:1280px;height:100%;margin:0 auto;display:flex;flex-direction:column;gap:10px}
+header{display:flex;align-items:center;gap:12px;flex:none;min-width:0}
+.unitTag{font:700 24px var(--display);color:#fff;background:var(--qnum);border-radius:10px;padding:0 12px;flex:none}
+h1{font-family:var(--display);font-size:24px;margin:0;white-space:nowrap;flex:none}
+nav{display:flex;gap:6px;flex:1;min-width:0;overflow-x:auto;justify-content:center}
+nav button{font:700 22px var(--display);min-width:54px;height:54px;border:2px solid var(--grid);background:var(--sheet);color:var(--ink);border-radius:12px;cursor:pointer;padding:0 10px;flex:none}
+nav button[aria-selected="true"]{background:var(--qnum);border-color:var(--qnum);color:#fff}
+.pager{display:flex;gap:6px;flex:none}
+.pager .btn{padding:0 16px;font-size:24px}
+button:focus-visible,input:focus-visible{outline:3px solid var(--mark);outline-offset:2px}
+section{flex:1;min-height:0;overflow:auto;background:var(--sheet);border:2px solid var(--grid);border-radius:18px;padding:14px 22px;display:flex;flex-direction:column;gap:12px}
+.qhead{display:flex;gap:12px;align-items:flex-start}
+.qn{flex:none;font:700 22px var(--display);color:#fff;background:var(--qnum);border-radius:8px;min-width:38px;text-align:center;padding:0 8px;line-height:1.5}
+.qtext{font-size:23px;margin:0;font-weight:500}
+.sub{font-family:var(--display);font-size:20px;color:var(--qnum);margin:0}
+.hint{margin:0;color:var(--muted);font-size:18px}
+.row{display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start}
+.row>*{min-width:0}
+.two{display:grid;grid-template-columns:auto minmax(0,1fr);gap:28px;align-items:start}
+.col{display:flex;flex-direction:column;gap:10px;min-width:0}
+.btns{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.btn{font:700 20px var(--body);border:none;border-radius:14px;padding:0 20px;min-height:54px;min-width:54px;cursor:pointer;background:var(--grid-strong);color:#fff}
+.btn.soft{background:var(--chip);color:var(--ink)}
+.btn.pick{background:var(--qnum);color:#fff}
+.btn:disabled{opacity:.4;cursor:default}
+.btn:active{transform:translateY(1px)}
+input.num{font:700 28px var(--display);width:2.8em;height:54px;text-align:center;border:2px solid var(--grid);border-radius:10px;padding:0 4px;background:var(--paper);color:var(--ink);font-variant-numeric:tabular-nums}
+input.num.right{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,var(--paper))}
+input.num.wrong{border-color:var(--bad)}
+.say{font-size:22px;display:flex;flex-wrap:wrap;align-items:center;gap:6px;line-height:1.9}
+.fb{min-height:1.5em;font-weight:700;margin:0;font-size:20px}
+.fb.ok{color:var(--ok)} .fb.bad{color:var(--bad)}
+.note{background:var(--note);border-radius:14px;padding:10px 16px;font-size:19px}
+.note b{color:var(--note-ink)}
+.bubble{background:var(--chip);border-radius:14px;padding:8px 14px;font-size:18px}
+.mini{display:inline-block;width:1.2em;height:1.2em;background:#fff;box-shadow:inset 0 0 0 2px var(--grid-strong);vertical-align:-.2em;border-radius:2px}
+.rotate{display:none;background:var(--note);color:var(--note-ink);border-radius:10px;padding:4px 12px;font-weight:700;flex:none;text-align:center}
+@media (orientation:portrait){.rotate{display:block}}
+
+nav button.done{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 18%,var(--sheet))}
+nav button.done[aria-selected="true"]{background:var(--qnum);border-color:var(--ok)}
+.choice .btn.right{background:var(--ok);color:#fff}
+.choice .btn.wrong{background:var(--bad);color:#fff}
+.score{font:700 40px var(--display);color:var(--qnum)}
+.res{border-collapse:collapse;font-size:20px;width:100%;max-width:640px}
+.res td{padding:6px 12px;border-bottom:1px solid var(--grid)}
+.res td:last-child{font-weight:700}
+.tag{display:inline-block;font:700 16px var(--body);color:#fff;background:var(--grid-strong);border-radius:6px;padding:0 8px;margin-left:8px;vertical-align:middle}
+.tray{position:relative;cursor:grab;touch-action:none;padding:4px 8px 8px 4px}
+.tray .tile1{box-shadow:inset 0 0 0 2px var(--grid-strong),4px 4px 0 #fff,4px 4px 0 2px var(--grid-strong),8px 8px 0 #fff,8px 8px 0 2px var(--grid-strong)}
+.dropzone,.dropzone .cell{touch-action:none}
+.dropzone .cell.tile{cursor:grab}
+.ghost{position:fixed;z-index:50;pointer-events:none;background:#fff;box-shadow:inset 0 0 0 2px var(--grid-strong),0 8px 18px rgba(0,0,0,.28);opacity:.92}
+.qrwrap{background:#fff;padding:10px;border-radius:10px;width:max-content}
+.qrwrap img,.qrwrap canvas{display:block}
+section[data-q="1"]{--cell:clamp(60px,min(21vh,13vw),170px)}
+section[data-q="2"]{--cell:clamp(40px,min(9vh,5.4vw),80px)}
+section[data-q="3"]{--cell:clamp(40px,min(10vh,6vw),80px)}
+.fig{display:block;touch-action:none;overflow:visible}
+.fig .pc{cursor:pointer}
+.fig text{font:700 30px var(--display);fill:#1f2d3d;pointer-events:none}
+.figs{display:flex;gap:28px;flex-wrap:wrap;align-items:flex-end}
+.figcol{display:flex;flex-direction:column;gap:8px;min-width:0}
+.counter{font-size:17px;color:var(--muted);margin:0;min-height:1.5em}
+.mover{cursor:grab}
+/* grids */
+.scroll{overflow-x:auto;max-width:100%;padding:4px}
+.board{display:grid;grid-template-columns:repeat(var(--cols),var(--cell));grid-auto-rows:var(--cell);width:max-content;position:relative}
+.cell{display:flex;align-items:center;justify-content:center;font:700 calc(var(--cell)*.42) var(--display);color:var(--ink);user-select:none;transition:background .15s}
+.cell.in{background:var(--shape,#ffd95a);color:#1f2d3d}
+.cell.tap{cursor:pointer}
+.cell.tile{background:#fff;color:#1f2d3d;box-shadow:inset 0 0 0 1.5px var(--grid-strong);animation:drop .25s ease-out}
+@keyframes drop{from{transform:translateY(-12px) scale(1.12);opacity:0}to{transform:none;opacity:1}}
+.plate .board{background:var(--plate);outline:2px solid var(--grid-strong)}
+.plate .cell{box-shadow:inset 0 0 0 .75px var(--grid-strong)}
+.plate .cell.in{background:color-mix(in srgb,var(--shape,#ffd95a) 85%,#9cc3e8)}
+.cell.cnt{background:var(--mark)!important;color:#fff!important}
+.cell.lit{background:color-mix(in srgb,var(--mark) 60%,transparent)!important}
+@media (prefers-reduced-motion:reduce){.cell,.piece{transition:none!important;animation:none!important}}
+
+/* picture cards */
+.pcard{position:relative;width:max-content;line-height:0;box-shadow:0 4px 14px rgba(0,0,0,.18)}
+.pcard svg{position:absolute;inset:0;width:100%;height:100%}
+.pcard .cell{line-height:1}
+.pcard.plate .cell{box-shadow:inset 0 0 0 1px rgba(30,90,160,.8)}
+.pcard.plate .board{background:rgba(120,180,235,.18);outline:2px solid #3d8bd4}
+
+/* tile + ruler */
+.tile1{width:var(--cell);height:var(--cell);background:#fff;box-shadow:inset 0 0 0 2px var(--grid-strong);display:flex;align-items:center;justify-content:center;font:700 13px var(--display);color:#1f2d3d}
+.rulerBox{display:flex;flex-direction:column;gap:0;width:max-content}
+.ruler{position:relative;width:calc(var(--cell)*2.6);height:46px;background:#bfe0f5;border:2px solid #6aa8d6;border-radius:4px;
+  background-image:repeating-linear-gradient(90deg,#1f2d3d 0 1px,transparent 1px calc(var(--cell)/10));background-size:100% 9px;background-repeat:no-repeat;background-position:calc(var(--cell)*.2) 0}
+.ruler .big{position:absolute;top:0;width:2px;height:18px;background:#1f2d3d}
+.ruler .lab{position:absolute;top:18px;font:700 16px var(--display);color:#1f2d3d;transform:translateX(-50%)}
+.cmTag{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.sqDemo{position:relative;width:80px;height:80px;margin:24px 0 0 48px;background:#fff;box-shadow:inset 0 0 0 3px var(--grid-strong);display:flex;align-items:center;justify-content:center;font:700 24px var(--display);color:#1f2d3d}
+.sqDemo .t{position:absolute;top:-28px;left:0;right:0;text-align:center;color:var(--muted);font-size:16px}
+.sqDemo .s{position:absolute;left:-50px;top:0;bottom:0;display:flex;align-items:center;color:var(--muted);font-size:16px}
+
+.pad{background:#fff;border:2px solid var(--grid);border-radius:12px;overflow:hidden}
+.pad canvas{display:block;width:100%;height:180px;touch-action:none;cursor:crosshair}
+/* cut & move */
+.stage{position:relative}
+.piece{position:absolute;transition:transform .9s cubic-bezier(.5,0,.2,1)}
+.cutline{position:absolute;border:0 dashed #d64545;pointer-events:none;transition:opacity .3s}
+.scissor{position:absolute;font-size:24px;line-height:1;color:var(--bad)}
+.combo{display:flex;gap:4px;align-items:center}
+</style>
+
+<div class="wrap">
+  <header><span class="unitTag">6-2</span><h1>切割拼湊類題</h1><nav id="nav" role="tablist"></nav>
+    <div class="pager"><button class="btn soft" id="prev" aria-label="上一題">←</button><button class="btn soft" id="next" aria-label="下一題">→</button></div></header>
+  <div class="rotate">請把平板轉成橫的</div>
+
+  <!-- 1 -->
+  <section data-q="1">
+    <div class="qhead"><span class="qn">1</span><p class="qtext">把塗色的部分剪下來，拼成 1 格。用手指把<b style="color:var(--qnum)">深色的那一片</b>拖到虛線的地方。</p></div>
+    <div class="row" style="gap:48px">
+      <div class="figcol" id="drag0"><div class="sub">①</div></div>
+      <div class="figcol" id="drag1"><div class="sub">②</div></div>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section data-q="2" hidden>
+    <div class="qhead"><span class="qn">2</span><p class="qtext">下面圖形的面積各是幾平方公分？<br><span class="hint">每格是 1 cm²。點一點圖形，整格會標 1，半格會標 ½，2 個半格合起來是 1 格。</span></p></div>
+    <div class="figs" id="q2"></div>
+  </section>
+
+  <!-- 3 -->
+  <section data-q="3" hidden>
+    <div class="qhead"><span class="qn">3</span><p class="qtext">方格點上有 3 個圖形，每一小格是 1 cm²。<span class="hint">（可以點圖形做記號）</span></p></div>
+    <div class="figs" id="q3figs"></div>
+    <div class="col">
+      <div class="say">① 甲 <input class="num" id="q3a" inputmode="numeric"> cm²，乙 <input class="num" id="q3b" inputmode="numeric"> cm²，丙 <input class="num" id="q3c" inputmode="numeric"> cm²</div>
+      <div class="say">② 乙的面積比甲多 <input class="num" id="q3d" inputmode="numeric"> cm²，乙的面積比丙多 <input class="num" id="q3e" inputmode="numeric"> cm²</div>
+      <div class="btns"><button class="btn" data-check="3">對答案</button><p class="fb" id="q3fb" style="flex:1;min-width:0"></p></div>
+    </div>
+  </section>
+
+  <!-- result -->
+  <section data-q="r" hidden>
+    <div class="qhead"><span class="qn">成績</span><p class="qtext">做完了嗎？填上座號，讓老師掃 QR Code。</p></div>
+    <div class="two">
+      <div class="col">
+        <div class="score" id="score"></div>
+        <div class="say">我的座號 <input class="num" id="seat" inputmode="numeric" maxlength="2"> 號 <button class="btn" id="mkqr">給老師掃描</button></div>
+        <p class="fb" id="seatfb"></p>
+        <div id="qrbox" hidden><div id="qr" class="qrwrap"></div><p class="hint" style="margin-top:6px">掃不到的話，請老師輸入：<b id="code" style="font-size:22px;color:var(--ink);letter-spacing:.05em"></b></p></div>
+      </div>
+      <div class="col">
+        <table class="res" id="res"></table>
+        <p class="hint">⭕ 答對　❌ 答錯　— 還沒做</p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+const $=s=>document.querySelector(s);
+const ORDER=['1','2','3','r'];
+const LABEL={r:'成績'};
+const ITEMS=[['1-0','第 1 題 ①'],['1-1','第 1 題 ②'],['2-0','第 2 題 ㄅ'],['2-1','第 2 題 ㄆ'],['2-2','第 2 題 ㄇ'],
+  ['3-0','第 3 題 甲'],['3-1','第 3 題 乙'],['3-2','第 3 題 丙'],['3-3','第 3 題 乙比甲'],['3-4','第 3 題 乙比丙']];
+const first={},ANS={};
+function record(id,ok,ans){if(id in first)return;first[id]=ok;ANS[id]=String(ans??'').replace(/[;|]/g,' ');updNav()}
+function updNav(){document.querySelectorAll('#nav button').forEach(b=>{const q=b.dataset.q;if(q==='r')return;
+  const its=ITEMS.filter(([id])=>id.split('-')[0]===q);b.classList.toggle('done',its.every(([id])=>id in first))})}
+function setfb(el,t,ok){el.textContent=t;el.className='fb'+(ok===true?' ok':ok===false?' bad':'')}
+function mark(inp,ok){inp.classList.toggle('right',ok);inp.classList.toggle('wrong',!ok)}
+const num=inp=>parseInt(inp.value,10);
+
+/* nav */
+let cur='1';
+ORDER.forEach(q=>{const b=document.createElement('button');b.textContent=LABEL[q]||q;b.dataset.q=q;b.setAttribute('role','tab');b.onclick=()=>go(q);$('#nav').appendChild(b)});
+function go(q){cur=q;document.querySelectorAll('section').forEach(s=>s.hidden=s.dataset.q!==q);
+  document.querySelectorAll('#nav button').forEach(b=>b.setAttribute('aria-selected',b.dataset.q===q));
+  const i=ORDER.indexOf(q);$('#prev').disabled=i===0;$('#next').disabled=i===ORDER.length-1;
+  if(q==='r')showResult()}
+$('#prev').onclick=()=>go(ORDER[ORDER.indexOf(cur)-1]);
+$('#next').onclick=()=>go(ORDER[ORDER.indexOf(cur)+1]);
+
+/* figure pieces (unit cell 0..1) */
+const SHAPE={'#':[[0,0],[1,0],[1,1],[0,1]],p:[[1,0],[1,1],[0,1]],q:[[0,0],[0,1],[1,1]],b:[[0,0],[1,0],[0,1]],d:[[0,0],[1,0],[1,1]],
+  h:[[0,.5],[1,.5],[1,1],[0,1]],t:[[0,0],[1,0],[1,.5],[0,.5]]};
+const U=100,NS='http://www.w3.org/2000/svg';
+const el=(tag,attrs)=>{const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);return e};
+const pts=(k,c,r)=>SHAPE[k].map(([x,y])=>[(c+x)*U,(r+y)*U]);
+const ptStr=a=>a.map(p=>p.join(',')).join(' ');
+const centroid=a=>[a.reduce((s,p)=>s+p[0],0)/a.length,a.reduce((s,p)=>s+p[1],0)/a.length];
+function outline(polys){const cnt=new Map();
+  polys.forEach(a=>a.forEach((p,i)=>{const q=a[(i+1)%a.length];const k=[p,q].map(v=>v.join(',')).sort().join('|');cnt.set(k,(cnt.get(k)||0)+1)}));
+  return [...cnt].filter(([,n])=>n===1).map(([k])=>k.split('|').map(s=>s.split(',').map(Number)))}
+
+/* tappable figure on a lined grid or a dot grid */
+function figure(rows,color,mode,counter){
+  const R=rows.length,C=rows[0].length;
+  const svg=el('svg',{viewBox:`-6 -6 ${C*U+12} ${R*U+12}`,class:'fig'});svg.style.width=`calc(var(--cell)*${C} + var(--cell)*.12)`;
+  const polys=[];
+  rows.forEach((row,r)=>[...row].forEach((k,c)=>{if(!SHAPE[k])return;const a=pts(k,c,r);polys.push({k,a})}));
+  polys.forEach(o=>{const p=el('polygon',{points:ptStr(o.a),fill:color,class:'pc'});o.el=p;svg.appendChild(p)});
+  if(mode==='grid'){for(let i=0;i<=C;i++)svg.appendChild(el('line',{x1:i*U,y1:0,x2:i*U,y2:R*U,stroke:'#7fb0dc','stroke-width':2,'pointer-events':'none'}));
+    for(let j=0;j<=R;j++)svg.appendChild(el('line',{x1:0,y1:j*U,x2:C*U,y2:j*U,stroke:'#7fb0dc','stroke-width':2,'pointer-events':'none'}))}
+  else{for(let i=0;i<=C;i++)for(let j=0;j<=R;j++)svg.appendChild(el('circle',{cx:i*U,cy:j*U,r:6,fill:'#5b6b7d','pointer-events':'none'}))}
+  outline(polys.map(o=>o.a)).forEach(([p,q])=>svg.appendChild(el('line',{x1:p[0],y1:p[1],x2:q[0],y2:q[1],stroke:mode==='grid'?'#c0622f':'#1f7fc4','stroke-width':5,'stroke-linecap':'round','pointer-events':'none'})));
+  const marks=el('g',{});svg.appendChild(marks);
+  let whole=0,half=0;
+  function upd(){if(counter)counter.textContent=(whole||half)?`整格 ${whole} 個，半格 ${half} 個`:''}
+  polys.forEach(o=>o.el.addEventListener('click',()=>{
+    if(o.t){o.t.remove();o.t=null;o.el.setAttribute('fill',color);o.k==='#'?whole--:half--;upd();return}
+    const [x,y]=centroid(o.a);o.t=el('text',{x,y:y+11,'text-anchor':'middle'});o.t.textContent=o.k==='#'?'1':'½';marks.appendChild(o.t);
+    o.el.setAttribute('fill','#ffb38a');o.k==='#'?whole++:half++;upd()}));
+  svg.reset=()=>{polys.forEach(o=>{if(o.t){o.t.remove();o.t=null}o.el.setAttribute('fill',color)});whole=half=0;upd()};
+  return svg}
+
+/* 1. drag a piece to complete one square */
+const DRAGS=[
+ {fixed:[['h',0,1]],move:['h',1,1],target:['t',0,1],color:'#f6b7b7'},
+ {fixed:[['p',0,1]],move:['q',1,1],target:['b',0,1],color:'#bfe3a0'}];
+DRAGS.forEach((d,i)=>{
+  const host=$('#drag'+i),C=3,R=2;
+  const svg=el('svg',{viewBox:`-6 -6 ${C*U+12} ${R*U+12}`,class:'fig'});svg.style.width=`calc(var(--cell)*${C})`;
+  for(let x=0;x<=2;x++)svg.appendChild(el('line',{x1:x*U,y1:U,x2:x*U,y2:2*U,stroke:'#7fb0dc','stroke-width':2}));
+  [1,2].forEach(y=>svg.appendChild(el('line',{x1:0,y1:y*U,x2:2*U,y2:y*U,stroke:'#7fb0dc','stroke-width':2})));
+  d.fixed.forEach(([k,c,r])=>svg.appendChild(el('polygon',{points:ptStr(pts(k,c,r)),fill:d.color})));
+  const tA=pts(...d.target);const tgt=el('polygon',{points:ptStr(tA),fill:'none',stroke:'#c0622f','stroke-width':4,'stroke-dasharray':'10 8'});svg.appendChild(tgt);
+  const mA=pts(...d.move);const dark=`color-mix(in srgb,${d.color} 70%,#1f2d3d)`;
+  const mv=el('polygon',{points:ptStr(mA),fill:d.color,stroke:'#1f2d3d','stroke-width':4,class:'mover'});mv.style.fill=dark;svg.appendChild(mv);
+  const [mx,my]=centroid(mA),[tx,ty]=centroid(tA);let dx=0,dy=0,start=null,placed=false;
+  const toSvg=e=>{const p=svg.createSVGPoint();p.x=e.clientX;p.y=e.clientY;return p.matrixTransform(svg.getScreenCTM().inverse())};
+  mv.addEventListener('pointerdown',e=>{if(placed)return;e.preventDefault();mv.setPointerCapture(e.pointerId);const p=toSvg(e);start=[p.x-dx,p.y-dy]});
+  mv.addEventListener('pointermove',e=>{if(!start)return;const p=toSvg(e);dx=p.x-start[0];dy=p.y-start[1];mv.setAttribute('transform',`translate(${dx},${dy})`)});
+  const end=()=>{if(!start)return;start=null;
+    if(Math.hypot(mx+dx-tx,my+dy-ty)<U*.5){placed=true;mv.remove();tgt.setAttribute('fill',d.color);tgt.setAttribute('stroke','none');setfb(info,'拼好了！剛好是 1 格。',true)}
+    else{dx=dy=0;mv.setAttribute('transform','');setfb(info,'再靠近虛線一點試試看。',false)}};
+  mv.addEventListener('pointerup',end);mv.addEventListener('pointercancel',end);
+  host.appendChild(svg);
+  const info=document.createElement('p');info.className='fb';host.appendChild(info);
+  const box=document.createElement('div');box.className='col';
+  box.innerHTML=`<div class="say">拼成 <input class="num" inputmode="numeric"> 格，面積是 <input class="num" inputmode="numeric"> cm²</div><div class="btns"><button class="btn">對答案</button></div><p class="fb"></p>`;
+  host.appendChild(box);
+  const [i1,i2]=box.querySelectorAll('input'),btn=box.querySelector('button'),f=box.querySelectorAll('.fb')[0];
+  btn.onclick=()=>{if(isNaN(num(i1))||isNaN(num(i2)))return setfb(f,'兩個空格都要填喔！',false);
+    const a=num(i1)===1,b=num(i2)===1;mark(i1,a);mark(i2,b);record('1-'+i,a&&b,i1.value+','+i2.value);i1.disabled=i2.disabled=btn.disabled=true;
+    setfb(f,a&&b?'⭕ 答對了！拼起來剛好 1 格，面積是 1 cm²。':'❌ 答錯了。拼起來剛好 1 格，面積是 1 cm²。',a&&b)}});
+
+/* 2. count whole and half squares */
+const Q2=[
+ {lab:'ㄅ',rows:['.p##b','p##b.'],color:'#f6c6d6',A:6},
+ {lab:'ㄆ',rows:['.pq.','p##q','####','####'],color:'#ffe58a',A:12},
+ {lab:'ㄇ',rows:['.pq.','p##q','d##b','.db.'],color:'#c8e6a0',A:8}];
+Q2.forEach((t,i)=>{const col=document.createElement('div');col.className='figcol';
+  col.innerHTML=`<div class="sub">${t.lab}</div>`;const cnt=document.createElement('p');cnt.className='counter';
+  const svg=figure(t.rows,t.color,'grid',cnt);col.appendChild(svg);col.appendChild(cnt);
+  const box=document.createElement('div');box.className='col';
+  box.innerHTML=`<div class="say">${t.lab}：( <input class="num" inputmode="numeric"> ) cm²</div><div class="btns"><button class="btn">對答案</button><button class="btn soft">擦掉記號</button></div><p class="fb"></p>`;
+  col.appendChild(box);$('#q2').appendChild(col);
+  const inp=box.querySelector('input'),[btn,clr]=box.querySelectorAll('button'),f=box.querySelector('.fb');
+  clr.onclick=()=>svg.reset();
+  btn.onclick=()=>{if(isNaN(num(inp)))return setfb(f,'先填上答案喔！',false);
+    const ok=num(inp)===t.A;mark(inp,ok);record('2-'+i,ok,inp.value);inp.disabled=btn.disabled=true;
+    setfb(f,ok?`⭕ 答對了！${t.A} cm²`:`❌ 答錯了。正確是 ${t.A} cm²`,ok)}});
+
+/* 3. dot grid */
+const Q3=[{lab:'甲',rows:['###','###'],color:'#ffd9b0'},{lab:'乙',rows:['##..','####','##..'],color:'#cfe9b0'},{lab:'丙',rows:['p##q','####'],color:'#bfe0f5'}];
+Q3.forEach(t=>{const col=document.createElement('div');col.className='figcol';col.innerHTML=`<div class="sub">${t.lab}</div>`;
+  const cnt=document.createElement('p');cnt.className='counter';col.appendChild(figure(t.rows,t.color,'dot',cnt));col.appendChild(cnt);$('#q3figs').appendChild(col)});
+document.querySelector('[data-check="3"]').onclick=()=>{
+  const ids=['#q3a','#q3b','#q3c','#q3d','#q3e'],key=[6,8,7,2,1],f=$('#q3fb');
+  if(ids.some(i=>isNaN(num($(i)))))return setfb(f,'每個空格都要填喔！',false);
+  let all=true;ids.forEach((i,k)=>{const ok=num($(i))===key[k];mark($(i),ok);record('3-'+k,ok,$(i).value);if(!ok)all=false;$(i).disabled=true});
+  document.querySelector('[data-check="3"]').disabled=true;
+  setfb(f,all?'⭕ 全部答對了！甲 6、乙 8、丙 7；乙比甲多 2，乙比丙多 1。':'❌ 紅框的答錯了。正確是：甲 6、乙 8、丙 7；乙比甲多 2 cm²，乙比丙多 1 cm²。',all)};
+
+/* result + QR */
+function flags(){return ITEMS.map(([id])=>id in first?(first[id]?'1':'0'):'-').join('')}
+function showResult(){let ok=0;
+  $('#res').innerHTML=ITEMS.map(([id,name])=>{let r='— 還沒做';if(id in first){if(first[id]){ok++;r='⭕ 答對'}else r='❌ 答錯'}return `<tr><td>${name}</td><td>${r}</td></tr>`}).join('');
+  const left=ITEMS.filter(([id])=>!(id in first)).length;
+  $('#score').innerHTML=`答對 ${ok} / ${ITEMS.length} 題`+(left?`<br><span style="font-size:24px;color:var(--muted)">還有 ${left} 題沒做</span>`:'')}
+$('#mkqr').onclick=()=>{const n=parseInt($('#seat').value,10);
+  if(!(n>=1&&n<=40))return setfb($('#seatfb'),'請填上你的座號喔！',false);
+  const seat=String(n).padStart(2,'0');setfb($('#seatfb'),'');
+  const text='M62;'+seat+';'+flags()+';'+ITEMS.map(([id])=>ANS[id]||'').join('|');
+  $('#qr').innerHTML='';try{new QRCode($('#qr'),{text,width:240,height:240,correctLevel:QRCode.CorrectLevel.M})}catch(e){$('#qr').textContent='QR Code 產生失敗，請老師輸入下面的代碼。'}
+  $('#code').textContent=seat+'-'+flags();$('#qrbox').hidden=false};
+$('#seat').oninput=()=>{$('#qrbox').hidden=true};
+go('1');
+</script>
+
+</html>
