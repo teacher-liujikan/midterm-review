@@ -117,9 +117,8 @@ function homeNow() { try { const h = JSON.parse(localStorage.getItem('l8-home-no
 function whoLine(g) {
   const hs = homeNow(); if (!hs || g < 0) return '';
   const role = 'ABCD'[g];
-  return `<div class="who-line">${hs.map((m, i) => { let p = m.find(x => x.role === role); let help = false;
-    if (!p && m.length) { help = true; p = m.slice().sort((x, y) => Math.abs('ABCD'.indexOf(x.lv) - g) - Math.abs('ABCD'.indexOf(y.lv) - g))[0]; }
-    return `<span style="--c:${COLORS[i % COLORS.length]}">第 ${i + 1} 組 <b>${p ? p.seat + ' 號' : '—'}</b>${help ? '<small>（幫忙答）</small>' : ''}</span>`; }).join('')}</div>`;
+  return `<div class="who-line">${hs.map((m, i) => { const ps = m.filter(x => x.lv === role).map(x => x.seat);
+    return `<span style="--c:${COLORS[i % COLORS.length]}">第 ${i + 1} 組 <b>${ps.length ? ps.join('、') + ' 號' : '任一󠇢人'}</b></span>`; }).join('')}</div>`;
 }
 const GNAMES = ['第 1 組', '第 2 組', '第 3 組', '第 4 組'];
 // 組別圖示用畫的（有些電腦沒有梳子󠇡、鏡子󠇡的表情符號）
