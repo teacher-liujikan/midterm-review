@@ -81,7 +81,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .st-done .tile-st{background:var(--ok-soft);color:var(--ok)}
 .st-lock{opacity:.55;cursor:not-allowed}.st-wait .tile-st{background:var(--warn-soft)}
 .gchip{display:inline-block;border-radius:999px;padding:.1em .7em;font-size:.85rem;font-weight:700;justify-self:start}
-.g-gold{background:var(--gold-soft);color:var(--gold)}.g-teal{background:var(--teal-soft);color:var(--teal)}.fix-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin-top:8px;padding:8px 10px;border:1.5px dashed var(--rose,#c44);border-radius:10px}.fix-row span{font-weight:700;font-size:.95rem}.fix-in{flex:1;min-width:10em;font:inherit;font-size:1.1rem;padding:6px 8px;border:1px solid var(--line);border-radius:8px}.fix-n{color:var(--muted)}.g-blue{background:#e2e7fb;color:#4258b8}.my-para-text p{margin:.4em 0;line-height:1.9;font-size:1.15rem}.my-para-text .pno{display:inline-block;min-width:2em;color:var(--muted);font-family:var(--sans,sans-serif);font-size:.85rem}.g-rose{background:var(--rose-soft);color:var(--rose)}
+.g-gold{background:var(--gold-soft);color:var(--gold)}.g-teal{background:var(--teal-soft);color:var(--teal)}.fix-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin-top:8px;padding:8px 10px;border:1.5px dashed var(--rose,#c44);border-radius:10px}.fix-row span{font-weight:700;font-size:.95rem}.fix-txt{font-size:1.35rem;letter-spacing:.06em}.g-blue{background:#e2e7fb;color:#4258b8}.my-para-text p{margin:.4em 0;line-height:1.9;font-size:1.15rem}.my-para-text .pno{display:inline-block;min-width:2em;color:var(--muted);font-family:var(--sans,sans-serif);font-size:.85rem}.g-rose{background:var(--rose-soft);color:var(--rose)}
 /* 關卡 */
 .crumbs{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;color:var(--muted);font-size:.9rem}
 .stage-title{font-family:var(--f-disp);font-size:1.9rem;margin:.4em 0 .1em}
@@ -653,17 +653,17 @@ const STAGES = [
     intro: '先完成生字描寫和圈詞，再讀課文、回答問題。每一題點一下就會對答案。',
     items: [
       { id: 'genre', t: 'mc', q: '這一課的文體是什麼？', o: ['童詩', '記敘文', '應用文'], a: 1, ex: '這一課記下小飛到理髮店剪頭髮的事，是記敘文本。' },
-      { id: 'para', t: 'mc', q: '這一課共有幾個自然段？', o: ['十段', '十一段', '十二段'], a: 1, ex: '每一段開頭空兩格的地方，就是新的自然段。按上面的「顯示自然段編號」，對照你在課本標的段落。' },
-      { id: 'q1', t: 'mc', kind: '提取', q: '小飛家旁邊有一家什麼店？', o: ['麵包店', '理髮店', '文具店', '書店'], a: 1, ex: '第一段：我家旁邊有一家理髮店。' },
-      { id: 'q2', t: 'mc', kind: '提取', q: '理髮師哥哥的笑聲怎麼樣？', o: ['好小聲', '好奇怪', '好可怕', '好響亮'], a: 3, ex: '第一段：理髮師的笑聲好響亮，是一位十分開朗的哥哥。' },
-      { id: 'q3', t: 'mc', kind: '推論', q: '大家為什麼叫這位理髮師「魔『髮』哥哥」？', o: ['因為他會變魔術', '因為他的頭髮是綠色的', '因為讓他剪完頭髮，心情一定會很好', '因為他剪頭髮剪得最快'], a: 2, ex: '第一段：每一次讓他剪完頭髮，心情一定會很好，所以大家都叫他「魔『髮』哥哥」。剪完頭髮心情變好，就像被施了魔法。' },
-      { id: 'q4', t: 'mc', kind: '提取', q: '小飛為什麼心情不好？', o: ['今天打籃球輸了', '頭髮被剪壞了', '考試考不好', '和同學吵架'], a: 0, ex: '第三段：「今天打籃球輸了。」' },
-      { id: 'q5', t: 'mc', kind: '推論', q: '哥哥說「一定是那顆球有近視眼」，他是想做什麼？', o: ['責怪籃球不好', '用好笑的話讓小飛開心一點', '叫小飛去看眼科', '告訴小飛球壞掉了'], a: 1, ex: '球不會有近視眼，哥哥故意說好笑的話，想逗小飛開心。' },
-      { id: 'q6', t: 'mc', kind: '提取', q: '小飛覺得打輸球的原因是什麼？', o: ['球有近視眼', '籃框太高了', '是自己的失誤', '隊友不認真'], a: 2, ex: '第五段：「不是啦！是我的失誤。」' },
-      { id: 'q7', t: 'mc', kind: '提取', q: '哥哥說，要把小飛的「不愉快」怎麼處理？', o: ['寫在日記裡', '藏在心裡面', '告訴爸爸媽媽', '全數剪掉，倒進垃圾桶'], a: 3, ex: '第六段：我們把不愉快全數剪掉，倒進垃圾桶。' },
-      { id: 'q8', t: 'mc', kind: '提取', q: '哥哥的頭髮曾經被剪壞，為什麼他沒有難過很久？', o: ['因為頭髮還會長出來', '因為他戴了帽子', '因為他不喜歡頭髮', '因為他去別家剪了'], a: 0, ex: '第九段：我沒有難過很久，因為頭髮還會長出來呀！' },
-      { id: 'q9', t: 'mc', kind: '詮釋', q: '哥哥說出自己頭髮被剪壞的祕密，是想告訴小飛什麼？', o: ['頭髮剪壞了就不要再剪', '以後不要再打籃球', '輸了不用難過太久，還有機會，下次再努力就好', '要換一家理髮店'], a: 2, ex: '頭髮剪壞還會長出來，就像輸了球還有機會再打。第九段：你還有機會打球，下次再努力就行了！' },
-      { id: 'q10', t: 'mc', kind: '詮釋', q: '最後小飛說魔「髮」哥哥「果然有魔法」，這個「魔法」指的是什麼？', o: ['哥哥真的會變魔術', '哥哥讓小飛的心情從難過變成開心', '哥哥把小飛的頭髮變長了', '鏡子會說話'], a: 1, ex: '剪完頭髮，小飛看到整齊的頭髮，還露出微笑。哥哥讓人心情變好，就是他的「魔法」。' }
+      { id: 'para', fix: '共有十一個自然段', t: 'mc', q: '這一課共有幾個自然段？', o: ['十段', '十一段', '十二段'], a: 1, ex: '每一段開頭空兩格的地方，就是新的自然段。按上面的「顯示自然段編號」，對照你在課本標的段落。' },
+      { id: 'q1', fix: '小飛家旁是理髮店', t: 'mc', kind: '提取', q: '小飛家旁邊有一家什麼店？', o: ['麵包店', '理髮店', '文具店', '書店'], a: 1, ex: '第一段：我家旁邊有一家理髮店。' },
+      { id: 'q2', fix: '哥哥的笑聲好響亮', t: 'mc', kind: '提取', q: '理髮師哥哥的笑聲怎麼樣？', o: ['好小聲', '好奇怪', '好可怕', '好響亮'], a: 3, ex: '第一段：理髮師的笑聲好響亮，是一位十分開朗的哥哥。' },
+      { id: 'q3', fix: '剪完頭髮心情會變好', t: 'mc', kind: '推論', q: '大家為什麼叫這位理髮師「魔『髮』哥哥」？', o: ['因為他會變魔術', '因為他的頭髮是綠色的', '因為讓他剪完頭髮，心情一定會很好', '因為他剪頭髮剪得最快'], a: 2, ex: '第一段：每一次讓他剪完頭髮，心情一定會很好，所以大家都叫他「魔『髮』哥哥」。剪完頭髮心情變好，就像被施了魔法。' },
+      { id: 'q4', fix: '今天打籃球輸了', t: 'mc', kind: '提取', q: '小飛為什麼心情不好？', o: ['今天打籃球輸了', '頭髮被剪壞了', '考試考不好', '和同學吵架'], a: 0, ex: '第三段：「今天打籃球輸了。」' },
+      { id: 'q5', fix: '說好笑的話逗他開心', t: 'mc', kind: '推論', q: '哥哥說「一定是那顆球有近視眼」，他是想做什麼？', o: ['責怪籃球不好', '用好笑的話讓小飛開心一點', '叫小飛去看眼科', '告訴小飛球壞掉了'], a: 1, ex: '球不會有近視眼，哥哥故意說好笑的話，想逗小飛開心。' },
+      { id: 'q6', fix: '是自己的失誤', t: 'mc', kind: '提取', q: '小飛覺得打輸球的原因是什麼？', o: ['球有近視眼', '籃框太高了', '是自己的失誤', '隊友不認真'], a: 2, ex: '第五段：「不是啦！是我的失誤。」' },
+      { id: 'q7', fix: '把不愉快全數剪掉', t: 'mc', kind: '提取', q: '哥哥說，要把小飛的「不愉快」怎麼處理？', o: ['寫在日記裡', '藏在心裡面', '告訴爸爸媽媽', '全數剪掉，倒進垃圾桶'], a: 3, ex: '第六段：我們把不愉快全數剪掉，倒進垃圾桶。' },
+      { id: 'q8', fix: '頭髮還會長出來', t: 'mc', kind: '提取', q: '哥哥的頭髮曾經被剪壞，為什麼他沒有難過很久？', o: ['因為頭髮還會長出來', '因為他戴了帽子', '因為他不喜歡頭髮', '因為他去別家剪了'], a: 0, ex: '第九段：我沒有難過很久，因為頭髮還會長出來呀！' },
+      { id: 'q9', fix: '還有機會下次再努力', t: 'mc', kind: '詮釋', q: '哥哥說出自己頭髮被剪壞的祕密，是想告訴小飛什麼？', o: ['頭髮剪壞了就不要再剪', '以後不要再打籃球', '輸了不用難過太久，還有機會，下次再努力就好', '要換一家理髮店'], a: 2, ex: '頭髮剪壞還會長出來，就像輸了球還有機會再打。第九段：你還有機會打球，下次再努力就行了！' },
+      { id: 'q10', fix: '讓小飛心情變開心', t: 'mc', kind: '詮釋', q: '最後小飛說魔「髮」哥哥「果然有魔法」，這個「魔法」指的是什麼？', o: ['哥哥真的會變魔術', '哥哥讓小飛的心情從難過變成開心', '哥哥把小飛的頭髮變長了', '鏡子會說話'], a: 1, ex: '剪完頭髮，小飛看到整齊的頭髮，還露出微笑。哥哥讓人心情變好，就是他的「魔法」。' }
     ] },
   { id: 'bonus', sec: '預習', name: '加分挑戰', when: '第1節', bonus: true,
     intro: '預習單做完並通過老師檢核的人，可以挑戰四個遊戲：部首配對、找不同、筆順挑戰、成語練功房。' },
@@ -1771,7 +1771,7 @@ function go(view) {
   if (view !== 'stage') scrollTo(0, 0);
 }
 // ===== 新版本偵測：答案都先存在平板，重新載入不會不見 =====
-const BUILD = '20261116090213';
+const BUILD = '20261116090808';
 async function checkVer() {
   if (!/^https?:/.test(location.protocol) || BUILD.startsWith('/*')) return;
   try {
@@ -2090,7 +2090,6 @@ function showDetail(seat, sid) {
         ${it.ref ? `<p class="muted">參考：${esc(it.ref)}</p>` : ''}</div>`; }).join('')}
     ${sid === 'pre' && r?.extra?.check ? `<p><b>老師檢核：</b>${CHECK_ITEMS.map(([k, n]) => `${n}：${r.extra.check.items[k]}`).join('；')}</p>` : ''}
     ${sid === 'pre' && r ? `<p><b>生字描寫：</b>鉛筆${r.extra?.trace1 ? '✓' : '✗'}　紅筆部首${r.extra?.trace2 ? '✓' : '✗'}　圈詞${r.extra?.circle ? '✓' : '✗'}</p>` : ''}
-    ${sid === 'pre' && r?.extra?.fix && Object.values(r.extra.fix).some(x => x) ? `<p><b>訂正：</b>${items.filter(it => r.extra.fix[it.id]).map(it => `${esc(it.q.slice(0, 14))}…→ <span class="kai">${esc(r.extra.fix[it.id])}</span>`).join('<br>')}</p>` : ''}
     ${sid === 'pre' && r?.extra?.reads ? `<p><b>讀課文：</b>${r.extra.reads} 遍</p>` : ''}
     ${sid === 'pre' && r?.extra?.marked?.length ? `<p><b>不懂的語詞：</b>${r.extra.marked.join('、')}</p>` : ''}
   </div></div>`;
@@ -2319,7 +2318,7 @@ function preReviewBody(s) {
       <div class="opts">${it.o.map((o, k) => `<label class="opt ${sn ? (k === it.a ? 'right' : v === k ? 'wrong' : '') : ''}"><input type="radio" name="${it.id}" value="${k}" ${v === k ? 'checked' : ''} ${sn ? 'disabled' : ''}><span>${CIRC[k]} ${esc(o)}</span></label>`).join('')}</div>
       ${sn ? (v === it.a ? `<p class="fb ok">答對了！${esc(it.ex)}</p>`
         : `<p class="fb no">答錯了。正確答案是 <b>${CIRC[it.a]} ${esc(it.o[it.a])}</b>。</p><p class="ex"><b>為什麼</b>${esc(it.ex)}</p>
-          <label class="fix-row"><span>訂正：用 10 個字以內寫出正確的答案或理由</span><input type="text" class="fix-in" data-fix="${it.id}" maxlength="10" value="${esc((rec.extra.fix || {})[it.id] || '')}" placeholder="例：因為頭髮還會長出來" ${rec.done && (rec.extra.fix || {})[it.id] ? 'readonly' : ''}><small class="fix-n">${[...((rec.extra.fix || {})[it.id] || '')].length} / 10</small></label>`) : ''}
+          ${it.fix ? `<p class="fix-row"><span>訂正（抄在紙本預習單上）</span><b class="kai fix-txt">${esc(it.fix)}</b></p>` : ''}`) : ''}
     </div>`; };
   const step = (n, title, inner, done) => `<section class="step ${done ? 'is-done' : ''}"><header class="step-head"><span class="step-no">${n}</span><h2>${title}</h2>${done ? '<span class="pill ok">完成</span>' : ''}</header>${inner}</section>`;
   return `
@@ -2345,7 +2344,7 @@ function preReviewBody(s) {
   ${step(4, '自然段', `<p>在課本上標出自然段，再回答這一題。按「顯示自然段編號」可以對照答案。</p>
     <button type="button" class="${rec.extra.showNo ? 'ghost' : 'primary'}" id="showNo">${rec.extra.showNo ? '隱藏自然段編號' : '顯示自然段編號'}</button>
     <div class="qlist">${mcCard(para, '★')}</div>`, !!seen[para.id])}
-  ${step(5, '閱讀理解（和預習單三部曲一樣）', `<p>題目和紙本預習單一樣。在課文裡找答案，點一下就會對答案。答錯的看看為什麼，再回課文找一找，用 10 個字以內寫下訂正，紙本也要訂正。</p>
+  ${step(5, '閱讀理解（和預習單三部曲一樣）', `<p>題目和紙本預習單一樣。在課文裡找答案，點一下就會對答案。答錯的看看為什麼，再回課文找一找，把框框裡的訂正抄在紙本預習單上。</p>
     <div class="qlist">${rest.map((it, i) => mcCard(it, i + 1)).join('')}</div>`, rest.every(it => seen[it.id]))}
   </div>
   <div class="submit-row">${rec.done ? teacherCheckPanel(rec)
@@ -2376,12 +2375,6 @@ function bindPreReview(s) {
     const w = b.dataset.w; const open = !b.classList.contains('open'); b.classList.toggle('open', open); b.setAttribute('aria-pressed', open);
     if (open) { const m = rec.extra.marked || []; if (!m.includes(w)) { rec.extra.marked = [...m, w]; queueSave(s.id); } const it = WORDS.find(x => x[0] === w); speak(w + '。' + it[1]); }
   });
-  document.querySelectorAll('[data-fix]').forEach(t => t.oninput = () => {
-    const v = t.value.slice(0, 10); if (v !== t.value) t.value = v;
-    rec.extra.fix = Object.assign({}, rec.extra.fix, { [t.dataset.fix]: v.trim() });
-    const n = t.parentElement.querySelector('.fix-n'); if (n) n.textContent = `${[...v].length} / 10`;
-    queueSave(s.id);
-  });
   $('#tr1').onchange = () => { rec.extra.trace1 = $('#tr1').checked; queueSave(s.id); };
   $('#tr2').onchange = () => { rec.extra.trace2 = $('#tr2').checked; queueSave(s.id); };
   $('#tr3').onchange = () => { rec.extra.circle = $('#tr3').checked; queueSave(s.id); };
@@ -2394,8 +2387,6 @@ function bindPreReview(s) {
     if (rec.ans.genre == null) need.push('文體');
     if (!seen[qs[0].id]) need.push('自然段');
     if (qs.slice(1).some(i => !seen[i.id])) need.push('課文問答');
-    const nofix = qs.filter(i => seen[i.id] && rec.ans[i.id] !== i.a && !((rec.extra.fix || {})[i.id] || '').trim());
-    if (nofix.length) { need.push(`訂正 ${nofix.length} 題`); const el = document.querySelector(`[data-fix="${nofix[0].id}"]`); if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.focus(); } }
     if (need.length) { $('#left').textContent = `還沒完成：${need.join('、')}`; return; }
     rec.max = qs.length; rec.score = qs.filter(i => rec.ans[i.id] === i.a).length;
     rec.done = true; queueSave(s.id, true); rerender();
