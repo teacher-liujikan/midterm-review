@@ -226,6 +226,12 @@ function outline(polys){const cnt=new Map();
   polys.forEach(a=>a.forEach((p,i)=>{const q=a[(i+1)%a.length];const k=[p,q].map(v=>v.join(',')).sort().join('|');cnt.set(k,(cnt.get(k)||0)+1)}));
   return [...cnt].filter(([,n])=>n===1).map(([k])=>k.split('|').map(s=>s.split(',').map(Number)))}
 
+/* one finger drag at a time, tracked on the whole page so it never drops */
+let DRAG=null;
+document.addEventListener('pointermove',e=>{if(DRAG&&e.pointerId===DRAG.id){e.preventDefault();DRAG.move(e)}},{passive:false});
+document.addEventListener('pointerup',e=>{if(DRAG&&e.pointerId===DRAG.id){const d=DRAG;d.end(false);DRAG=null}});
+document.addEventListener('pointercancel',e=>{if(DRAG&&e.pointerId===DRAG.id){const d=DRAG;d.end(true);DRAG=null}});
+
 /* figure on a lined grid or a dot grid: tap to mark, drag a half onto another half to make 1 whole */
 function figure(rows,color,mode,counter){
   const R=rows.length,C=rows[0].length;
@@ -246,20 +252,22 @@ function figure(rows,color,mode,counter){
     outline(polys.map(o=>o.a)).forEach(([p,q])=>svg.appendChild(el('line',{x1:p[0],y1:p[1],x2:q[0],y2:q[1],stroke:mode==='grid'?'#c0622f':'#1f7fc4','stroke-width':5,'stroke-linecap':'round','pointer-events':'none'})));
     marks=el('g',{});svg.appendChild(marks);top=el('g',{});svg.appendChild(top);
     polys.forEach(o=>{o.el=el('polygon',{points:ptStr(o.a),fill:color,class:'pc'});base.appendChild(o.el);hook(o)});upd()}
-  function hook(o){let start=null,moved=false,dx=0,dy=0;
-    o.el.addEventListener('pointerdown',e=>{e.preventDefault();o.el.setPointerCapture(e.pointerId);const p=toSvg(e);start=[p.x,p.y];moved=false;dx=dy=0});
-    o.el.addEventListener('pointermove',e=>{if(!start||o.k==='#')return;const p=toSvg(e);dx=p.x-start[0];dy=p.y-start[1];
-      if(!moved&&Math.hypot(dx,dy)>U*.12){moved=true;unmark(o);upd();top.appendChild(o.el);o.el.setAttribute('stroke','#1f2d3d');o.el.setAttribute('stroke-width',4)}
-      if(moved)o.el.setAttribute('transform',`translate(${dx},${dy})`)});
-    const end=()=>{if(!start)return;start=null;
-      if(!moved){toggle(o);return}
-      const [cx,cy]=centroid(o.a);const nx=cx+dx,ny=cy+dy;
-      const tgt=polys.find(t=>t!==o&&t.k!=='#'&&!t.gone&&Math.abs(nx-(t.c+.5)*U)<U*.55&&Math.abs(ny-(t.r+.5)*U)<U*.55);
+  function hook(o){
+    o.el.addEventListener('pointerdown',e=>{if(DRAG)return;e.preventDefault();const p=toSvg(e);
+      DRAG={o,id:e.pointerId,start:[p.x,p.y],dx:0,dy:0,moved:false,toSvg,move,end}});
+    function move(e){const d=DRAG;const p=d.toSvg(e);d.dx=p.x-d.start[0];d.dy=p.y-d.start[1];
+      if(o.k==='#')return;
+      if(!d.moved&&Math.hypot(d.dx,d.dy)>U*.12){d.moved=true;unmark(o);upd();top.appendChild(o.el);o.el.setAttribute('stroke','#1f2d3d');o.el.setAttribute('stroke-width',4)}
+      if(d.moved)o.el.setAttribute('transform',`translate(${d.dx},${d.dy})`)}
+    function end(cancel){const d=DRAG;
+      if(!d.moved){if(!cancel)toggle(o);return}
       o.el.removeAttribute('stroke');o.el.removeAttribute('stroke-width');
+      const [cx,cy]=centroid(o.a);const nx=cx+d.dx,ny=cy+d.dy;
+      const tgt=cancel?null:polys.filter(t=>t!==o&&t.k!=='#'&&!t.gone)
+        .map(t=>[t,Math.hypot(nx-(t.c+.5)*U,ny-(t.r+.5)*U)]).filter(([,dist])=>dist<U*.8).sort((x,y)=>x[1]-y[1]).map(([t])=>t)[0];
       if(tgt){unmark(tgt);o.gone=true;o.el.remove();tgt.k='#';tgt.a=pts('#',tgt.c,tgt.r);tgt.el.setAttribute('points',ptStr(tgt.a));
         tgt.el.setAttribute('fill','#fff3b0');setTimeout(()=>{if(!tgt.t)tgt.el.setAttribute('fill',color)},450);upd()}
-      else{o.el.setAttribute('transform','')}};
-    o.el.addEventListener('pointerup',end);o.el.addEventListener('pointercancel',end)}
+      else{o.el.setAttribute('transform','')}}}
   build();svg.reset=build;
   return svg}
 
