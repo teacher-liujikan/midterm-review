@@ -81,7 +81,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .st-done .tile-st{background:var(--ok-soft);color:var(--ok)}
 .st-lock{opacity:.55;cursor:not-allowed}.st-wait .tile-st{background:var(--warn-soft)}
 .gchip{display:inline-block;border-radius:999px;padding:.1em .7em;font-size:.85rem;font-weight:700;justify-self:start}
-.g-gold{background:var(--gold-soft);color:var(--gold)}.g-teal{background:var(--teal-soft);color:var(--teal)}.fix-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin-top:8px;padding:8px 10px;border:1.5px dashed var(--rose,#c44);border-radius:10px}.fix-row span{font-weight:700;font-size:.95rem}.fix-txt{font-size:1.35rem;letter-spacing:.06em}.g-blue{background:#e2e7fb;color:#4258b8}.my-para-text p{margin:.4em 0;line-height:1.9;font-size:1.15rem}.my-para-text .pno{display:inline-block;min-width:2em;color:var(--muted);font-family:var(--sans,sans-serif);font-size:.85rem}.g-rose{background:var(--rose-soft);color:var(--rose)}
+.g-gold{background:var(--gold-soft);color:var(--gold)}.g-teal{background:var(--teal-soft);color:var(--teal)}.fix-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin-top:8px;padding:8px 10px;border:1.5px dashed var(--rose,#c44);border-radius:10px}.fix-row span{font-weight:700;font-size:.95rem}.fix-txt{font-size:1.35rem;letter-spacing:.06em}.stage-frame{width:100%;height:min(80vh,760px);border:1px solid var(--line);border-radius:14px;background:#fbf4ea;margin-top:8px}.g-blue{background:#e2e7fb;color:#4258b8}.my-para-text p{margin:.4em 0;line-height:1.9;font-size:1.15rem}.my-para-text .pno{display:inline-block;min-width:2em;color:var(--muted);font-family:var(--sans,sans-serif);font-size:.85rem}.g-rose{background:var(--rose-soft);color:var(--rose)}
 /* 關卡 */
 .crumbs{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;color:var(--muted);font-size:.9rem}
 .stage-title{font-family:var(--f-disp);font-size:1.9rem;margin:.4em 0 .1em}
@@ -820,6 +820,8 @@ const STAGES = [
     intro: '看看每一題的詳解，給自己打個勾。答錯的題目可以再挑戰一次。' }
 ];
 
+// 多音字・形近字教學（和學習單一樣的格子），放在生字筆順旁邊
+STAGES.splice(STAGES.findIndex(x => x.id === 'stroke') + 1, 0, { id: 'zi', sec: '生字筆順', name: '多音字・形近字', when: '第1節', frame: 'zi.html' });
 // 第二節：分組刪減大意（四組各負責一個意義段，老師在「分組」分頁指定組別）
 // keepSets：必留的語塊＋可留可刪的語塊，列出所有可接受的組合
 const keepSets = (req, opt = []) => { const out = []; for (let m = 0; m < 1 << opt.length; m++) out.push([...req, ...opt.filter((_, i) => m >> i & 1)].sort((a, b) => a - b)); return out; };
@@ -852,7 +854,7 @@ STAGES.push({ id: 'dayi', sec: '課文內容', name: '分組刪減大意', when:
   }
 });
 // 只保留網頁上的三關（其餘改用 LoiLoNote）
-for (let i = STAGES.length - 1; i >= 0; i--) if (!['pre', 'bonus', 'stroke', 'dayi'].includes(STAGES[i].id)) STAGES.splice(i, 1);
+for (let i = STAGES.length - 1; i >= 0; i--) if (!['pre', 'bonus', 'stroke', 'zi', 'dayi'].includes(STAGES[i].id)) STAGES.splice(i, 1);
 
 // 生字小百科（第八課）：字的由來只放有可靠說法的字；o 為 null 的字不顯示「字的由來」
 // o:[說明, 造字方法]  r:部首的意思  m:易錯提醒(另加 CHARS 的寫字提醒)  w:更多造詞  e:例句
@@ -1199,6 +1201,7 @@ function stageStatus(s) {
   if (!isOpen(s.id)) return ['lock', '未開放'];
   if (s.id === 'review') return st.preview ? ['go', '預覽'] : st.recs.post?.done ? (r?.done ? ['done', '完成'] : ['go', '可以開始']) : ['lock', '先完成後測'];
   if (s.bonus) { if (!st.preview && !st.recs.pre?.done) return ['lock', '先完成預習單']; if (!st.preview && !st.recs.pre?.extra?.check?.ok) return ['lock', '等老師檢核']; const b = r?.extra || {}; const n = (b.radical?.done ? 1 : 0) + (b.diff?.done ? 1 : 0) + (Object.keys(b.strokes || {}).length ? 1 : 0) + (Object.keys(b.idiom || {}).length ? 1 : 0); return n ? ['doing', `玩了 ${n} / 4 個`] : ['go', '可以開始']; }
+  if (s.frame) return ['go', '可以開始'];
   if (s.id === 'stroke') { const n = (r?.extra?.written || []).length; return n >= CHARS.length ? ['done', '完成'] : n ? ['doing', `${n}/15`] : ['go', '可以開始']; }
   if (s.review && r?.done && !r.extra?.check?.ok) return ['wait', r.extra?.check ? '要訂正' : '等老師檢核'];
   if (r?.done) return ['done', '完成'];
@@ -1298,7 +1301,8 @@ function renderStage() {
   if (!isOpen(s.id) && st.entered !== s.id) return go('home');
   st.entered = s.id;
   let body = '';
-  if (s.id === 'stroke') body = strokeBody();
+  if (s.frame) body = `<p class="muted">點格子裡的「？」看答案，右邊有分辨的小撇步和考考你。<a class="ghost sm" href="${s.frame}" target="_blank" rel="noopener">開成全螢幕</a></p><iframe class="stage-frame" src="${s.frame}" title="${esc(s.name)}"></iframe>`;
+  else if (s.id === 'stroke') body = strokeBody();
   else if (s.id === 'review') body = reviewBody();
   else if (s.review) body = preReviewBody(s);
   else if (s.bonus) body = bonusBody();
@@ -1771,7 +1775,7 @@ function go(view) {
   if (view !== 'stage') scrollTo(0, 0);
 }
 // ===== 新版本偵測：答案都先存在平板，重新載入不會不見 =====
-const BUILD = '20261116091740';
+const BUILD = '20261116093147';
 async function checkVer() {
   if (!/^https?:/.test(location.protocol) || BUILD.startsWith('/*')) return;
   try {
