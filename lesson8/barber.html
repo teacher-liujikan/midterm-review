@@ -30,6 +30,7 @@ button:focus-visible{outline:4px solid var(--pole-b);outline-offset:3px}
 .qbox{background:var(--paper);border:3px solid var(--ink);border-radius:22px;padding:1.6vh 2.4vw;display:flex;flex-direction:column;gap:1.4vh;flex:0 0 auto}
 .qtag{font-size:clamp(14px,1.4vw,20px);color:var(--muted);font-weight:700;letter-spacing:.1em}
 .qtag.bonus{color:var(--gold)}
+.qtag.turn{color:var(--c);font-size:clamp(18px,min(2vw,3.6vh),30px);letter-spacing:.04em}.qtag .bn{color:var(--gold)}
 .sent{font-family:var(--kai);font-size:clamp(28px,3.8vw,58px);line-height:1.4}
 .blank{display:inline-block;min-width:3.4em;border-bottom:5px solid var(--ink);text-align:center;margin:0 .15em}
 .blank.fill{color:var(--ok)}
@@ -100,7 +101,16 @@ const IDIOMS = [
   ['當機立斷', '看到冒煙，他＿＿，馬上打電話叫消防車。'],
   ['參󠇢差󠇢不齊', '剛長󠇡出來的頭髮長長短短，＿＿的。']
 ];
-const COLORS = ['#d8443a', '#2f6fb5', '#2e9a5c', '#9b59b6', '#e67e22', '#16a3a3'];
+const COLORS = ['#d2553f', '#d99a1e', '#3c9a6a', '#5468c9'];
+// 同質分組：四組和󠇡學習站一󠇡樣
+const GNAMES = ['剪刀組', '梳子󠇡組', '吹風機組', '魔鏡組'];
+const GICON = ['✂️', '🪮', '💨', '🪞'];
+// 每題由哪一󠇢組回答（-1 = 全班搶答）。剪刀組最簡單、魔鏡組最難；每組 4 題，最後 1 題全班搶答
+const ASSIGN = { '剪刀': 0, '垃圾桶': 0, '鏡子󠇡': 0, '圍巾': 0,
+  '理髮店': 1, '籃框': 1, '愉快': 1, '整齊': 1,
+  '近視眼': 2, '失誤': 2, '機會': 2, '曾經': 2,
+  '全數': 3, '一󠇡視同仁': 3, '牛刀小試': 3, '當機立斷': 3,
+  '參󠇢差󠇢不齊': -1 };
 const HAIR = ['#3b2a20', '#7a4a22', '#1f1f2e', '#a0522d', '#4a3426', '#2b2b2b'];
 const SKIN = ['#f6d3b3', '#efc39d', '#f8dcc4', '#e8b88f', '#f3cfae', '#eebf98'];
 const STRANDS = 5; // 亂髮撮數
@@ -109,8 +119,13 @@ let G = { n: 4, bonus: true, phase: 'start', qs: [], i: 0, score: [], tried: [],
 
 function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
 function buildQs() {
-  const mk = (pool, bonus) => shuffle(pool).map(([w, s]) => ({ w, s, bonus, o: shuffle([w, ...shuffle(pool.filter(x => x[0] !== w)).slice(0, 3).map(x => x[0])]) }));
-  return [...mk(WORDS, false), ...(G.bonus ? mk(IDIOMS, true) : [])];
+  const pool = [...WORDS.map(([w, s]) => ({ w, s, bonus: false })), ...IDIOMS.map(([w, s]) => ({ w, s, bonus: true }))];
+  const all = { w: WORDS, i: IDIOMS };
+  pool.forEach(q => { const src = q.bonus ? IDIOMS : WORDS; q.o = shuffle([q.w, ...shuffle(src.filter(x => x[0] !== q.w)).slice(0, 3).map(x => x[0])]); q.g = ASSIGN[q.w] ?? -1; });
+  // 輪流：剪刀 → 梳子󠇡 → 吹風機 → 魔鏡，每組同一󠇢輪內順序打亂；最後全班搶答
+  const by = [0, 1, 2, 3].map(g => shuffle(pool.filter(q => q.g === g)));
+  const out = []; for (let r = 0; r < 4; r++) for (let g = 0; g < 4; g++) if (by[g][r]) out.push(by[g][r]);
+  return [...out, ...pool.filter(q => q.g === -1)];
 }
 const esc = t => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
@@ -147,7 +162,7 @@ function guestSVG(g, score) {
   const hair = HAIR[g % HAIR.length], skin = SKIN[g % SKIN.length], c = COLORS[g % COLORS.length];
   const neat = cut >= STRANDS;
   const smile = score >= 3 ? 'M86 150 Q100 166 114 150' : score >= 1 ? 'M88 154 Q100 160 112 154' : 'M88 158 Q100 152 112 158';
-  return `<svg class="guest" viewBox="-10 -14 220 250" role="img" aria-label="第 ${g + 1} 組的客人，剪掉 ${cut} 撮頭髮">
+  return `<svg class="guest" viewBox="-10 -14 220 250" role="img" aria-label="${GNAMES[g]}的客人，剪掉 ${cut} 撮頭髮">
     <!-- 理髮披巾 -->
     <path d="M30 236 C34 196 62 180 100 180 C138 180 166 196 170 236Z" fill="${c}" opacity=".9"/>
     <path d="M84 182 L100 200 L116 182" fill="#fff" opacity=".8"/>
@@ -180,8 +195,7 @@ function render() {
     <section class="cover">
       <h2>今天店裡來了 ${G.n} 位頭髮亂糟糟的客人！</h2>
       <p>每一󠇢題選出正確的語詞。答對的組，就可以幫自己的客人剪掉一󠇡撮亂髮。<br>題目做完，看看哪一󠇢組的客人造型最帥！</p>
-      <div class="set">組數：${[2, 3, 4, 5, 6].map(n => `<button class="seg" data-n="${n}" aria-pressed="${G.n === n}">${n} 組</button>`).join('')}</div>
-      <div class="set">成語加分題：<button class="seg" data-b="1" aria-pressed="${G.bonus}">要</button><button class="seg" data-b="0" aria-pressed="${!G.bonus}">不󠇡要</button></div>
+      <p>每一󠇢題都有指定的組別回答，最後一󠇢題全班搶答！答錯的話，其他組可以搶答。</p>
       <div class="shop" style="--n:${G.n};width:100%;max-width:1200px">${Array.from({ length: G.n }, (_, g) => chair(g, 0)).join('')}</div>
       <button class="btn" id="go">開店囉󠇢！</button>
     </section>${foot()}`;
@@ -192,7 +206,7 @@ function render() {
     app.innerHTML = `${sign('')}
     <section class="cover">
       <h2>改造完成！</h2>
-      <p>${G.score.filter(s => s === max).length > 1 ? '好幾組並列第一，造型都超帥！' : `第 ${G.score.indexOf(max) + 1} 組的客人最帥！`}　大家都會用這 ${WORDS.length} 個󠇡語詞了嗎？</p>
+      <p>${G.score.filter(s => s === max).length > 1 ? '好幾組並列第一，造型都超帥！' : `${GNAMES[G.score.indexOf(max)]}的客人最帥！`}　大家都會用這 ${WORDS.length} 個󠇡語詞了嗎？</p>
       <div class="shop" style="--n:${G.n};width:100%">${G.score.map((s, g) => chair(g, s, s === max)).join('')}</div>
       <button class="btn ghost" id="again">再玩一󠇡次</button>
     </section>${foot()}`;
@@ -202,7 +216,7 @@ function render() {
   const lead = Math.max(...G.score);
   app.innerHTML = `${sign(`第 ${G.i + 1} / ${G.qs.length} 題`)}
   <section class="qbox">
-    <div class="qtag ${q.bonus ? 'bonus' : ''}">${q.bonus ? '★ 成語加分題' : '選出正確的語詞'}</div>
+    <div class="qtag turn" style="--c:${q.g >= 0 ? COLORS[q.g] : 'var(--ink)'}">${q.g >= 0 ? `${GICON[q.g]} 輪到 <b>${GNAMES[q.g]}</b> 回答` : '🔔 全班搶答！'}${q.bonus ? '　<span class="bn">★ 成語題</span>' : ''}</div>
     <div class="sent">${esc(q.s).replace('＿＿', `<span class="blank ${G.solved ? 'fill' : ''}">${G.solved ? esc(q.w) : '　'}</span>`)}</div>
     <div class="opts">${q.o.map(w => `<button class="opt ${G.tried.includes(w) ? 'no' : ''} ${G.solved && w === q.w ? 'ok' : ''}" data-w="${esc(w)}" ${G.solved || G.tried.includes(w) ? 'disabled' : ''}>${esc(w)}</button>`).join('')}</div>
     <div class="bar">${barHTML(q)}</div>
@@ -210,23 +224,34 @@ function render() {
   <div class="shop" style="--n:${G.n}">${G.score.map((s, g) => chair(g, s, false, lead > 0 && s === lead)).join('')}</div>${foot()}`;
 }
 function barHTML(q) {
-  if (G.solved && G.pick === null) return `<span class="msg ok">答對了！是哪一󠇢組答對的？</span>
-    <div class="who">${G.score.map((_, g) => `<button class="btn" style="--c:${COLORS[g % COLORS.length]}" data-g="${g}">第 ${g + 1} 組</button>`).join('')}
+  if (G.solved && G.pick === null) return `<span class="msg ok">答對了！是哪一󠇢組搶答成功的？</span>
+    <div class="who">${G.score.map((_, g) => `<button class="btn" style="--c:${COLORS[g % COLORS.length]}" data-g="${g}">${GNAMES[g]}</button>`).join('')}
     <button class="btn ghost" data-g="-1">都沒有</button></div>`;
-  if (G.solved) return `<span class="msg ok">${G.pick >= 0 ? `第 ${G.pick + 1} 組的客人剪掉一󠇡撮頭髮！` : '答案是「' + esc(q.w) + '」'}</span>
+  if (G.solved) return `<span class="msg ok">${G.pick >= 0 ? `${GNAMES[G.pick]}的客人剪掉一󠇡撮頭髮！` : '答案是「' + esc(q.w) + '」'}</span>
     <button class="btn" id="next">${G.i + 1 < G.qs.length ? '下一󠇢題 →' : '看改造結果！'}</button>`;
-  return `${G.tried.length ? '<span class="msg no">不󠇡對喔！其他組可以搶答。</span>' : '<span class="msg">先舉手的組回答，老師點選他們說的語詞。</span>'}
+  return `${G.tried.length ? '<span class="msg no">不󠇡對喔！其他組可以舉手搶答。</span>' : (q.g >= 0 ? `<span class="msg">請${GNAMES[q.g]}討論後說出答案，老師點選他們說的語詞。</span>` : '<span class="msg">先舉手的組回答，老師點選他們說的語詞。</span>')}
     <button class="btn ghost" id="reveal">公布答案</button>`;
 }
 function chair(g, s, win = false, lead = false) {
   return `<div class="chair ${win ? 'win' : ''} ${lead ? 'lead' : ''}" style="--c:${COLORS[g % COLORS.length]}" data-chair="${g}">
     <span class="crown" aria-hidden="true">👑</span>
-    <h2>第 ${g + 1} 組</h2>${guestSVG(g, s)}${SCIS}<span class="sc">剪了 ${s} 刀</span></div>`;
+    <h2>${GICON[g]} ${GNAMES[g]}</h2>${guestSVG(g, s)}${SCIS}<span class="sc">剪了 ${s} 刀</span></div>`;
 }
 const sign = prog => `<header class="sign"><span class="pole" aria-hidden="true"></span><h1>魔法理髮店：語詞大改造</h1><span class="prog">${prog}</span></header>`;
 const foot = () => `<div class="foot">第八課〈魔「髮」哥哥󠇡〉語詞遊戲・© 范范老師（老師媽咪）設計</div>`;
 
 // ===== 操作 =====
+function award(g) {
+  G.pick = g;
+  if (g >= 0) {
+      const before = G.score[g]; G.score[g]++;
+      render();
+      const ch = document.querySelector(`[data-chair="${g}"]`);
+      // 先畫出還沒剪的樣子󠇡，再剪掉
+      if (before < STRANDS) { const st = ch.querySelector(`.strand[data-k="${before}"]`); st && st.classList.remove('cut'); requestAnimationFrame(() => requestAnimationFrame(() => st && st.classList.add('cut'))); }
+      const sc = ch.querySelector('.scis'); sc.classList.add('go'); snipSound();
+    } else render();
+}
 document.addEventListener('click', e => {
   const t = e.target.closest('button'); if (!t) return;
   ac();
@@ -235,22 +260,11 @@ document.addEventListener('click', e => {
   if (t.id === 'go' || t.id === 'again') { G.qs = buildQs(); G.i = 0; G.score = Array(G.n).fill(0); G.tried = []; G.pick = null; G.solved = false; G.phase = 'play'; render(); return; }
   if (t.classList.contains('opt')) {
     const q = G.qs[G.i]; const w = t.dataset.w;
-    if (w === q.w) { G.solved = true; tone([523, 659, 784]); } else { G.tried.push(w); tone([220, 180], 0.15); }
+    if (w === q.w) { G.solved = true; tone([523, 659, 784]); if (q.g >= 0 && !G.tried.length) { award(q.g); return; } } else { G.tried.push(w); tone([220, 180], 0.15); }
     render(); return;
   }
   if (t.id === 'reveal') { G.solved = true; G.pick = -1; render(); return; }
-  if (t.dataset.g !== undefined) {
-    const g = +t.dataset.g; G.pick = g;
-    if (g >= 0) {
-      const before = G.score[g]; G.score[g]++;
-      render();
-      const ch = document.querySelector(`[data-chair="${g}"]`);
-      // 先畫出還沒剪的樣子󠇡，再剪掉
-      if (before < STRANDS) { const st = ch.querySelector(`.strand[data-k="${before}"]`); st && st.classList.remove('cut'); requestAnimationFrame(() => requestAnimationFrame(() => st && st.classList.add('cut'))); }
-      const sc = ch.querySelector('.scis'); sc.classList.add('go'); snipSound();
-    } else render();
-    return;
-  }
+  if (t.dataset.g !== undefined) { award(+t.dataset.g); return; }
   if (t.id === 'next') {
     if (G.i + 1 < G.qs.length) { G.i++; G.tried = []; G.pick = null; G.solved = false; } else { G.phase = 'end'; tone([523, 659, 784, 1046], 0.16); }
     render(); return;
