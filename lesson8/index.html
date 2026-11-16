@@ -1771,7 +1771,7 @@ function go(view) {
   if (view !== 'stage') scrollTo(0, 0);
 }
 // ===== 新版本偵測：答案都先存在平板，重新載入不會不見 =====
-const BUILD = '20261116091729';
+const BUILD = '20261116091740';
 async function checkVer() {
   if (!/^https?:/.test(location.protocol) || BUILD.startsWith('/*')) return;
   try {
@@ -1859,7 +1859,7 @@ function renderTeacher(soft) {
   <header class="topbar t"><div class="topbar-in">
     <span class="brand"><span class="kai">第${LESSON.no}課</span> 教師端・${esc(st.cls)}</span>
     <span class="live">每 6 秒更新</span>
-    ${LESSON.key === 'l8' ? '<a class="ghost sm" href="barber.html" target="_blank" rel="noopener">🎮 語詞大改造</a>' : ''}
+    ${LESSON.key === 'l8' ? '<a class="ghost sm" href="barber.html" target="_blank" rel="noopener">🎮 語詞大改造</a><a class="ghost sm" href="zi.html" target="_blank" rel="noopener">🔤 多音字・形近字</a>' : ''}
     <button class="qr-mini" id="qrTop" aria-label="顯示網址 QR code">${QR_SVG}</button>
     <button class="ghost" id="tout">登出</button>
   </div>
