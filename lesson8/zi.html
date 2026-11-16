@@ -40,8 +40,8 @@ header h1{font-family:var(--kai);font-size:clamp(22px,min(2.6vw,5vh),40px);margi
 .zy .light{font-size:.7em;line-height:.8}
 .zy .tone{position:relative;width:.45em;align-self:stretch;font-size:.75em}
 .zy .tone i{position:absolute;left:0;font-style:normal}
-.words{font-family:var(--kai);writing-mode:vertical-rl;font-size:clamp(22px,min(2.4vw,4.6vh),42px);color:var(--blue);display:flex;gap:.35em;line-height:1.25}
-.words span{white-space:nowrap}
+.words{font-family:var(--kai);display:flex;flex-direction:row-reverse;align-items:flex-start;justify-content:center;gap:.45em;color:var(--blue);font-size:clamp(30px,min(3.4vw,6.4vh),62px);line-height:1.1}
+.words span{writing-mode:vertical-rl;text-orientation:upright;white-space:nowrap;letter-spacing:.05em}
 .cell.on .reveal{animation:pop .35s ease-out}
 @keyframes pop{0%{transform:scale(.85);opacity:0}100%{transform:none;opacity:1}}
 /* 右邊說明 */
