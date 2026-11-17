@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>句型修辭導學</title>
+<link rel="stylesheet" href="../fonts/bpmf/bpmf.css">
+<style>
+:root{
+  --bg:#fbf4ea; --paper:#fffdf8; --ink:#2d2420; --muted:#86766a; --soft:#eadccb;
+  --red:#c8372d; --blue:#2f6fb5; --green:#2e8a56; --gold:#c4870f; --purple:#5468c9;
+  --rose:#c94b6d; --rose-s:#fbe4ea; --gold-s:#fbefd2; --teal:#2a9d96; --teal-s:#dcf2f0; --blue-s:#e2e7fb;
+  --zy:"Bpmf Zihi Kai Std";
+  --sans:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--zy),var(--sans)}
+button{font:inherit;cursor:pointer;color:inherit}
+button:focus-visible{outline:4px solid var(--blue);outline-offset:3px}
+.app{height:100vh;min-height:540px;display:flex;flex-direction:column;gap:1.4vh;padding:1.6vh 2vw}
+header{display:flex;align-items:center;gap:12px;flex-wrap:wrap;flex:0 0 auto}
+header h1{font-size:clamp(20px,min(2.4vw,4.6vh),36px);margin:0}
+.tabs{display:flex;gap:8px;margin-left:auto;flex-wrap:wrap}
+.tab{border:2px solid var(--ink);background:#fff;border-radius:12px;padding:5px 14px;font-size:clamp(16px,min(1.6vw,3vh),26px)}
+.tab[aria-current="true"]{background:var(--ink);color:#fff}
+.slide{flex:1;min-height:0;background:var(--paper);border:3px solid var(--ink);border-radius:22px;padding:2.4vh 2.6vw;display:flex;flex-direction:column;gap:1.6vh;overflow:auto;position:relative}
+.kicker{font-size:clamp(16px,min(1.6vw,3vh),26px);color:var(--muted);margin:0}
+.big{font-size:clamp(26px,min(3.2vw,6vh),56px);line-height:1.5;margin:0}
+.mid{font-size:clamp(20px,min(2.3vw,4.4vh),40px);line-height:1.5;margin:0}
+.q{font-size:clamp(24px,min(2.8vw,5.4vh),48px);margin:0;color:var(--blue)}
+.zy-plain{font-family:var(--sans)}
+.reveal{border:3px dashed var(--soft);border-radius:18px;padding:2vh 2vw;display:flex;flex-direction:column;gap:1.2vh}
+.reveal[hidden]{display:none}
+.tag{display:inline-block;border-radius:999px;padding:.05em .7em;color:#fff;font-size:.9em}
+.t-ni{background:var(--green)}.t-mo{background:var(--gold)}.t-xie{background:var(--purple)}
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:2vw}
+.vs > div{border-radius:16px;padding:1.2vh 1.2vw;font-size:clamp(18px,min(1.9vw,3.6vh),32px);line-height:1.5}
+.vs .plain{background:#eee8e0;color:#6b5f56}
+.vs .magic{background:#fff3c4}
+.vs b{display:block;font-size:.7em;color:var(--muted);font-weight:normal}
+.btn{border:3px solid var(--ink);background:var(--ink);color:#fff;border-radius:16px;padding:.35em 1.2em;font-size:clamp(20px,min(2.2vw,4vh),36px);align-self:flex-start}
+.btn.ghost{background:#fff;color:var(--ink)}
+.hl{border-radius:8px;padding:0 .12em}
+.who{background:#ffd9d2}.what{background:#d6e8ff}.how{background:#d5f2df}
+.skel{display:flex;gap:1vw;flex-wrap:wrap;font-size:clamp(26px,min(3.2vw,6vh),56px)}
+.skel span{border:3px solid var(--ink);border-radius:14px;padding:.1em .5em;background:#fff}
+.skel small{display:block;font-size:.45em;color:var(--muted);text-align:center;font-family:var(--sans)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:2vw}
+.flip{border:3px solid var(--ink);border-radius:18px;background:#fff;padding:2vh 1.4vw;text-align:left;display:flex;flex-direction:column;gap:1vh;min-height:24vh}
+.flip .front{font-size:clamp(24px,min(2.6vw,5vh),44px)}
+.flip .back{font-size:clamp(18px,min(1.9vw,3.6vh),32px);line-height:1.6;color:var(--ink)}
+.flip .back[hidden]{display:none}
+.flip .tap{color:var(--muted);font-size:clamp(14px,min(1.3vw,2.4vh),22px);margin-top:auto}
+.flip.open{background:#fffbea}
+.lv{display:grid;grid-template-columns:auto 1fr;gap:1.4vh 1.6vw;align-items:center}
+.lv .pill{border-radius:999px;padding:.15em .8em;font-size:clamp(18px,min(2vw,3.8vh),34px);white-space:nowrap}
+.lv .txt{font-size:clamp(18px,min(2vw,3.8vh),34px);line-height:1.5}
+.p-rose{background:var(--rose-s);color:var(--rose)}.p-gold{background:var(--gold-s);color:var(--gold)}.p-teal{background:var(--teal-s);color:var(--teal)}.p-blue{background:var(--blue-s);color:var(--purple)}
+.lvhead{display:flex;align-items:center;gap:1.4vw;flex-wrap:wrap}
+.lvhead .pill{font-size:clamp(28px,min(3.4vw,6.4vh),58px);border-radius:999px;padding:.05em .7em}
+.box{border-radius:16px;padding:1.6vh 1.4vw;background:#f6efe5;font-size:clamp(20px,min(2.2vw,4.2vh),38px);line-height:1.6}
+.box b{display:block;font-size:.65em;color:var(--muted);font-weight:normal;font-family:var(--sans)}
+.box.ex{background:#fff3c4}
+.rules{margin:0;padding-left:1.2em;font-size:clamp(22px,min(2.5vw,4.8vh),42px);line-height:1.9}
+nav.bar{display:flex;align-items:center;gap:12px;flex:0 0 auto}
+nav.bar .dots{display:flex;gap:6px;flex-wrap:wrap;margin:0 auto}
+nav.bar .dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--ink);background:#fff;padding:0}
+nav.bar .dot.on{background:var(--ink)}
+.nav{border:3px solid var(--ink);background:#fff;border-radius:14px;padding:.2em 1em;font-size:clamp(18px,min(1.8vw,3.4vh),30px)}
+.nav:disabled{opacity:.35;cursor:default}
+.foot{font-size:12px;color:var(--muted);text-align:right;font-family:var(--sans)}
+@media (max-width:700px){.vs{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>第八課　句型修辭導學</h1>
+    <div class="tabs" id="tabs"></div>
+    <button class="tab" id="fs" type="button">全螢幕</button>
+  </header>
+  <main class="slide" id="slide" aria-live="polite"></main>
+  <nav class="bar">
+    <button class="nav" id="prev" type="button">← 上一󠇡頁</button>
+    <div class="dots" id="dots"></div>
+    <button class="nav" id="next" type="button">下一󠇡頁 →</button>
+  </nav>
+  <p class="foot">© 范范老師（老師媽咪）設計｜方向鍵可以換頁</p>
+</div>
+<script>
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+// 每一󠇡頁：{ ch: 章節, html: 內容（可含 data-show 揭曉按鈕） }
+const CH = ['修辭偵探', '諧音小教室', '句型骨架', '四層任務', '任務規則'];
+const S = [];
+// ===== 一、修辭偵探：先讓孩子󠇡找，再揭曉 =====
+const det = (n, sent, ask, tag, cls, name, why, plain) => S.push({ ch: 0, html: `
+  <p class="kicker">修辭偵探 ${n} / 3　課文裡的句子󠇡</p>
+  <p class="big">${sent}</p>
+  <p class="q">🔍 ${ask}</p>
+  <button class="btn" type="button" data-show>揭曉答案</button>
+  <div class="reveal" hidden>
+    <p class="mid"><span class="tag ${cls}">${tag}</span>　${name}</p>
+    <div class="vs"><div class="plain"><b>沒有魔法的句子󠇡</b>${plain}</div><div class="magic"><b>課文的句子󠇡</b>${sent}</div></div>
+    <p class="mid">${why}</p>
+  </div>` });
+det(1, '「一󠇡定是那顆球有近視眼，所以總是對不準籃框。」', '球會近視嗎？誰才會近視？', '擬人', 't-ni', '把東西󠇡當󠇡成人來寫', '哥哥󠇡把投不󠇡進說成「球近視了」，小飛就笑出來了！', '「你投籃沒有投進。」');
+det(2, '他拿起剪刀，ㄎㄚ ㄘㄚ ㄎㄚ ㄘㄚ響。', '閉上眼睛念念看，你「聽到」什麼？', '摹寫', 't-mo', '把聽到的聲音寫出來', '寫出聲音，讀起來好像真的在理髮店裡聽到剪刀聲。', '他拿起剪刀剪頭髮。');
+det(3, '魔「髮」哥哥󠇡', '念念看，「髮」和󠇡哪一󠇡個󠇡字念起來一󠇡樣？', '諧音', 't-xie', '念起來一󠇡樣的字，有兩種意思', '「髮」和「法」念起來一󠇡樣：哥哥󠇡會理「髮」，又像有魔「法」，讓人心情變好。', '理髮師哥哥󠇡');
+// ===== 二、諧音小教室（第一次學，多看幾個󠇡例子󠇡）=====
+S.push({ ch: 1, html: `
+  <p class="kicker">諧音小教室</p>
+  <p class="big">諧音：用<span class="hl what">念起來一󠇡樣（或很像）</span>的字，</p>
+  <p class="big">讓一󠇡句話藏著<span class="hl how">兩種意思</span>。</p>
+  <div class="vs"><div class="magic"><b>課文</b>魔「髮」哥哥󠇡</div><div class="magic"><b>藏著的意思</b>理「髮」＋ 魔「法」</div></div>` });
+const flip = (front, back) => `<button class="flip" type="button" data-flip><span class="front">${front}</span><span class="back" hidden>${back}</span><span class="tap">點一󠇡下看答案</span></button>`;
+S.push({ ch: 1, html: `
+  <p class="kicker">諧音小教室　生活裡的諧音，猜猜藏著什麼意思？</p>
+  <div class="cards">
+    ${flip('🐟 過年吃魚：「年年有魚」', '「魚」和「餘」念起來一󠇡樣：<br>年年有「餘」，每年都有多的、過得󠇡很富足。')}
+    ${flip('🧧 春聯把「福」字倒過來貼', '「倒」和「到」念起來一󠇡樣：<br>福「倒」了 → 福「到」了，福氣來了！')}
+    ${flip('🍎 平安夜送蘋果', '「蘋」和「平」念起來一󠇡樣：<br>送「蘋」果，祝你「平」安。')}
+    ${flip('✂️ 魔「髮」哥哥󠇡', '「髮」和「法」念起來一󠇡樣：<br>會理「髮」，又像有魔「法」。')}
+  </div>` });
+S.push({ ch: 1, html: `
+  <p class="kicker">諧音小教室　猜猜看：這些字原本是哪一󠇡個󠇡字？</p>
+  <div class="cards">
+    ${flip('🐷 生日卡片：「豬你生日快樂！」', '「豬」和「祝」念起來很像：<br>「祝」你生日快樂，還多了一󠇢隻可愛的小豬。')}
+    ${flip('✂️ 理髮店的名字：「剪」單理髮', '「剪」和「簡」念起來一󠇡樣：<br>「簡」單理髮，又告訴你這裡是「剪」頭髮的店。')}
+    ${flip('💇 理髮店的名字：「髮」國沙龍', '「髮」和「法」念起來一󠇡樣：<br>好像從「法」國來的，又是做頭「髮」的店。')}
+  </div>
+  <p class="mid">想一想：哪兩個󠇡字念起來一󠇡樣？藏著哪兩種意思？</p>` });
+// ===== 三、句型骨架 =====
+S.push({ ch: 2, html: `
+  <p class="kicker">句型骨架 1　課文：「理髮師的笑聲好響亮。」</p>
+  <p class="big"><span class="hl who">理髮師</span>的<span class="hl what">笑聲</span>好<span class="hl how">響亮</span>。</p>
+  <div class="skel"><span class="who">＿＿<small>誰</small></span><span>的</span><span class="what">＿＿<small>什麼</small></span><span>好</span><span class="how">＿＿<small>怎麼樣</small></span></div>
+  <button class="btn" type="button" data-show>換換看</button>
+  <div class="reveal" hidden><p class="mid"><span class="hl who">哥哥󠇡</span>的<span class="hl what">剪刀</span>好<span class="hl how">快</span>。　<span class="hl who">小飛</span>的<span class="hl what">頭髮</span>好<span class="hl how">整齊</span>。</p></div>` });
+S.push({ ch: 2, html: `
+  <p class="kicker">句型骨架 2　課文：「我們把不愉快全數剪掉。」</p>
+  <p class="big">我們把<span class="hl what">不愉快</span>全數<span class="hl how">剪掉</span>。</p>
+  <div class="skel"><span>把</span><span class="what">＿＿<small>什麼東西󠇡</small></span><span>全數</span><span class="how">＿＿<small>怎麼了</small></span></div>
+  <button class="btn" type="button" data-show>換換看</button>
+  <div class="reveal" hidden><p class="mid">我把<span class="hl what">玩具</span>全數<span class="hl how">收好</span>了。　媽媽󠇡把<span class="hl what">衣服</span>全數<span class="hl how">洗乾淨</span>。</p></div>` });
+// ===== 四、四層任務（用課文當例子󠇡）=====
+const LV = [
+  ['p-rose', '剪刀組', '骨架', '用「＿的＿好＿」寫一󠇡句。', '理髮師的笑聲好響亮。', '籃球場的人好多。'],
+  ['p-gold', '梳子󠇡組', '加聲音', '在骨架裡放進一󠇡個󠇡聲音（摹寫），還是一󠇡句。', '他拿起剪刀，ㄎㄚ ㄘㄚ響。', '剪刀「ㄎㄚ ㄘㄚ」的聲音好響亮。'],
+  ['p-teal', '吹風機組', '變成人', '把東西󠇡當󠇡成人（擬人），後面用逗號接上「它的＿好＿」。', '一󠇡定是那顆球有近視眼。', '那顆球有近視眼，它的眼睛好模糊。'],
+  ['p-blue', '魔鏡組', '有用途', '學哥哥󠇡安慰小飛：用「把＿全數＿」加上擬人，寫一󠇡句安慰同學的魔法咒語。', '我們把不愉快全數剪掉，倒進垃圾桶。', '剪刀說：「我把你的不開心全數剪掉，換你笑一󠇡個󠇡！」']
+];
+S.push({ ch: 3, html: `
+  <p class="kicker">四層任務　每一󠇢層，都是在骨架上多加一󠇢種魔法</p>
+  <div class="lv">${LV.map(l => `<span class="pill ${l[0]}">${l[1]}・${l[2]}</span><span class="txt">${l[3]}</span>`).join('')}</div>
+  <p class="mid">同一󠇢組的人：<b>句型一󠇡樣</b>；主題：看你的<b>原組</b>（第 1 組下雨天、第 2 組打籃球、第 3 組畫畫、第 4 組運動會）。</p>` });
+LV.forEach((l, i) => S.push({ ch: 3, html: `
+  <div class="lvhead"><span class="pill ${l[0]}">第 ${i + 1} 層・${l[1]}「${l[2]}」</span></div>
+  <p class="mid">任務：${l[3]}</p>
+  <div class="box"><b>課文這樣寫</b>${l[4]}</div>
+  <button class="btn ghost" type="button" data-show>看例句</button>
+  <div class="reveal" hidden><div class="box ex"><b>例句（只要寫一󠇡句）</b>${l[5]}</div><p class="mid">換成你們原組的主題，寫出自己的句子󠇡！</p></div>` }));
+// ===== 五、規則 =====
+S.push({ ch: 4, html: `
+  <p class="kicker">任務規則</p>
+  <ol class="rules">
+    <li>看電視名單，坐到你的<b>專家組</b>。</li>
+    <li>打開平板「專家任務」，先做暖身題。</li>
+    <li><b>只要寫一󠇡句</b>。卡󠇡住了，點「看提示」。</li>
+    <li>寫好了，念給同組的人聽，互相給一󠇡個󠇡建議。</li>
+    <li>回到<b>原組</b>，照 剪刀 → 梳子󠇡 → 吹風機 → 魔鏡 的順序分享。</li>
+  </ol>` });
+
+let cur = 0;
+const $ = s => document.querySelector(s);
+function render() {
+  const s = S[cur];
+  $('#slide').innerHTML = s.html;
+  $('#tabs').innerHTML = CH.map((c, i) => `<button class="tab" type="button" data-ch="${i}" aria-current="${s.ch === i}">${c}</button>`).join('');
+  $('#dots').innerHTML = S.map((x, i) => `<button class="dot ${i === cur ? 'on' : ''}" type="button" data-i="${i}" aria-label="第 ${i + 1} 頁"></button>`).join('');
+  $('#prev').disabled = cur === 0; $('#next').disabled = cur === S.length - 1;
+  document.querySelectorAll('[data-show]').forEach(b => b.onclick = () => { const r = b.nextElementSibling; r.hidden = !r.hidden; b.textContent = r.hidden ? b.dataset.l || b.textContent : '收起來'; });
+  document.querySelectorAll('[data-show]').forEach(b => b.dataset.l = b.textContent);
+  document.querySelectorAll('[data-flip]').forEach(b => b.onclick = () => { const bk = b.querySelector('.back'); bk.hidden = !bk.hidden; b.classList.toggle('open', !bk.hidden); b.querySelector('.tap').textContent = bk.hidden ? '點一󠇡下看答案' : '再點一󠇡下收起來'; });
+  document.querySelectorAll('[data-ch]').forEach(b => b.onclick = () => { cur = S.findIndex(x => x.ch === +b.dataset.ch); render(); });
+  document.querySelectorAll('[data-i]').forEach(b => b.onclick = () => { cur = +b.dataset.i; render(); });
+  try { history.replaceState(null, '', '#' + (cur + 1)); } catch (e) {}
+}
+$('#prev').onclick = () => { if (cur > 0) { cur--; render(); } };
+$('#next').onclick = () => { if (cur < S.length - 1) { cur++; render(); } };
+$('#fs').onclick = () => { try { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen(); } catch (e) {} };
+document.addEventListener('keydown', e => { if (e.key === 'ArrowRight' || e.key === 'PageDown') $('#next').click(); if (e.key === 'ArrowLeft' || e.key === 'PageUp') $('#prev').click(); });
+const h = parseInt(location.hash.slice(1)); if (h >= 1 && h <= S.length) cur = h - 1;
+render();
+</script>
+</body>
+</html>
