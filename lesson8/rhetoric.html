@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>句型修辭導學</title>
+<title>修辭導學</title>
 <link rel="stylesheet" href="../fonts/bpmf/bpmf.css">
 <style>
 :root{
@@ -76,7 +76,7 @@ nav.bar .dot.on{background:var(--ink)}
 <body>
 <div class="app">
   <header>
-    <h1>第八課　句型修辭導學</h1>
+    <h1>第八課　修辭導學</h1>
     <div class="tabs" id="tabs"></div>
     <button class="tab" id="fs" type="button">全螢幕</button>
   </header>
@@ -91,7 +91,7 @@ nav.bar .dot.on{background:var(--ink)}
 <script>
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 // 每一󠇡頁：{ ch: 章節, html: 內容（可含 data-show 揭曉按鈕） }
-const CH = ['修辭偵探', '諧音小教室', '句型骨架', '四層任務', '任務規則'];
+const CH = ['修辭偵探', '諧音小教室'];
 const S = [];
 // ===== 一、修辭偵探：先讓孩子󠇡找，再揭曉 =====
 const det = (n, sent, ask, tag, cls, name, why, plain) => S.push({ ch: 0, html: `
@@ -139,47 +139,6 @@ S.push({ ch: 1, html: `
     ${flip('💪 健身房：「益身GYM」', '念起來像「益生菌」：<br>GYM 是英文的「健身房」，在這裡運動對身體有益。')}
   </div>
   <p class="kicker">店名資料：TVBS 食尚玩家、DailyView 網路溫度計整理的臺南諧音店名</p>` });
-// ===== 三、句型骨架 =====
-S.push({ ch: 2, html: `
-  <p class="kicker">句型骨架 1　課文：「理髮師的笑聲好響亮。」</p>
-  <p class="big"><span class="hl who">理髮師</span>的<span class="hl what">笑聲</span>好<span class="hl how">響亮</span>。</p>
-  <div class="skel"><span class="who">＿＿<small>誰</small></span><span>的</span><span class="what">＿＿<small>什麼</small></span><span>好</span><span class="how">＿＿<small>怎麼樣</small></span></div>
-  <button class="btn" type="button" data-show>換換看</button>
-  <div class="reveal" hidden><p class="mid"><span class="hl who">哥哥󠇡</span>的<span class="hl what">剪刀</span>好<span class="hl how">快</span>。　<span class="hl who">小飛</span>的<span class="hl what">頭髮</span>好<span class="hl how">整齊</span>。</p></div>` });
-S.push({ ch: 2, html: `
-  <p class="kicker">句型骨架 2　課文：「我們把不愉快全數剪掉。」</p>
-  <p class="big">我們把<span class="hl what">不愉快</span>全數<span class="hl how">剪掉</span>。</p>
-  <div class="skel"><span>把</span><span class="what">＿＿<small>什麼東西󠇡</small></span><span>全數</span><span class="how">＿＿<small>怎麼了</small></span></div>
-  <button class="btn" type="button" data-show>換換看</button>
-  <div class="reveal" hidden><p class="mid">我把<span class="hl what">玩具</span>全數<span class="hl how">收好</span>了。　媽媽󠇡把<span class="hl what">衣服</span>全數<span class="hl how">洗乾淨</span>。</p></div>` });
-// ===== 四、四層任務（用課文當例子󠇡）=====
-const LV = [
-  ['p-rose', '剪刀組', '骨架', '用「＿的＿好＿」寫一󠇡句。', '理髮師的笑聲好響亮。', '籃球場的人好多。'],
-  ['p-gold', '梳子󠇡組', '加聲音', '在骨架裡放進一󠇡個󠇡聲音（摹寫），還是一󠇡句。', '他拿起剪刀，ㄎㄚ ㄘㄚ響。', '剪刀「ㄎㄚ ㄘㄚ」的聲音好響亮。'],
-  ['p-teal', '吹風機組', '變成人', '把東西󠇡當󠇡成人（擬人），後面用逗號接上「它的＿好＿」。', '一󠇡定是那顆球有近視眼。', '那顆球有近視眼，它的眼睛好模糊。'],
-  ['p-blue', '魔鏡組', '有用途', '學哥哥󠇡安慰小飛：用「把＿全數＿」加上擬人，寫一󠇡句安慰同學的魔法咒語。', '我們把不愉快全數剪掉，倒進垃圾桶。', '剪刀說：「我把你的不開心全數剪掉，換你笑一󠇡個󠇡！」']
-];
-S.push({ ch: 3, html: `
-  <p class="kicker">四層任務　每一󠇢層，都是在骨架上多加一󠇢種魔法</p>
-  <div class="lv">${LV.map(l => `<span class="pill ${l[0]}">${l[1]}・${l[2]}</span><span class="txt">${l[3]}</span>`).join('')}</div>
-  <p class="mid">同一󠇢組的人：<b>句型一󠇡樣</b>；主題：看你的<b>原組</b>（第 1 組下雨天、第 2 組打籃球、第 3 組畫畫、第 4 組運動會）。</p>` });
-LV.forEach((l, i) => S.push({ ch: 3, html: `
-  <div class="lvhead"><span class="pill ${l[0]}">第 ${i + 1} 層・${l[1]}「${l[2]}」</span></div>
-  <p class="mid">任務：${l[3]}</p>
-  <div class="box"><b>課文這樣寫</b>${l[4]}</div>
-  <button class="btn ghost" type="button" data-show>看例句</button>
-  <div class="reveal" hidden><div class="box ex"><b>例句（只要寫一󠇡句）</b>${l[5]}</div><p class="mid">換成你們原組的主題，寫出自己的句子󠇡！</p></div>` }));
-// ===== 五、規則 =====
-S.push({ ch: 4, html: `
-  <p class="kicker">任務規則</p>
-  <ol class="rules">
-    <li>看電視名單，坐到你的<b>專家組</b>。</li>
-    <li>打開平板「專家任務」，先做暖身題。</li>
-    <li><b>只要寫一󠇡句</b>。卡󠇡住了，點「看提示」。</li>
-    <li>寫好了，念給同組的人聽，互相給一󠇡個󠇡建議。</li>
-    <li>回到<b>原組</b>，照 剪刀 → 梳子󠇡 → 吹風機 → 魔鏡 的順序分享。</li>
-  </ol>` });
-
 let cur = 0;
 const $ = s => document.querySelector(s);
 function render() {

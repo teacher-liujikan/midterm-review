@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>句型導學</title>
+<link rel="stylesheet" href="../fonts/bpmf/bpmf.css">
+<style>
+:root{
+  --bg:#fbf4ea; --paper:#fffdf8; --ink:#2d2420; --muted:#86766a; --soft:#eadccb;
+  --red:#c8372d; --blue:#2f6fb5; --green:#2e8a56; --gold:#c4870f; --purple:#5468c9;
+  --rose:#c94b6d; --rose-s:#fbe4ea; --gold-s:#fbefd2; --teal:#2a9d96; --teal-s:#dcf2f0; --blue-s:#e2e7fb;
+  --zy:"Bpmf Zihi Kai Std";
+  --sans:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--zy),var(--sans)}
+button{font:inherit;cursor:pointer;color:inherit}
+button:focus-visible{outline:4px solid var(--blue);outline-offset:3px}
+.app{height:100vh;min-height:540px;display:flex;flex-direction:column;gap:1.4vh;padding:1.6vh 2vw}
+header{display:flex;align-items:center;gap:12px;flex-wrap:wrap;flex:0 0 auto}
+header h1{font-size:clamp(20px,min(2.4vw,4.6vh),36px);margin:0}
+.tabs{display:flex;gap:8px;margin-left:auto;flex-wrap:wrap}
+.tab{border:2px solid var(--ink);background:#fff;border-radius:12px;padding:5px 14px;font-size:clamp(16px,min(1.6vw,3vh),26px)}
+.tab[aria-current="true"]{background:var(--ink);color:#fff}
+.slide{flex:1;min-height:0;background:var(--paper);border:3px solid var(--ink);border-radius:22px;padding:2.4vh 2.6vw;display:flex;flex-direction:column;gap:1.6vh;overflow:auto;position:relative}
+.kicker{font-size:clamp(16px,min(1.6vw,3vh),26px);color:var(--muted);margin:0}
+.big{font-size:clamp(26px,min(3.2vw,6vh),56px);line-height:1.5;margin:0}
+.mid{font-size:clamp(20px,min(2.3vw,4.4vh),40px);line-height:1.5;margin:0}
+.q{font-size:clamp(24px,min(2.8vw,5.4vh),48px);margin:0;color:var(--blue)}
+.zy-plain{font-family:var(--sans)}
+.reveal{border:3px dashed var(--soft);border-radius:18px;padding:2vh 2vw;display:flex;flex-direction:column;gap:1.2vh}
+.reveal[hidden]{display:none}
+.tag{display:inline-block;border-radius:999px;padding:.05em .7em;color:#fff;font-size:.9em}
+.t-ni{background:var(--green)}.t-mo{background:var(--gold)}.t-xie{background:var(--purple)}
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:2vw}
+.vs > div{border-radius:16px;padding:1.2vh 1.2vw;font-size:clamp(18px,min(1.9vw,3.6vh),32px);line-height:1.5}
+.vs .plain{background:#eee8e0;color:#6b5f56}
+.vs .magic{background:#fff3c4}
+.vs b{display:block;font-size:.7em;color:var(--muted);font-weight:normal}
+.btn{border:3px solid var(--ink);background:var(--ink);color:#fff;border-radius:16px;padding:.35em 1.2em;font-size:clamp(20px,min(2.2vw,4vh),36px);align-self:flex-start}
+.btn.ghost{background:#fff;color:var(--ink)}
+.hl{border-radius:8px;padding:0 .12em}
+.who{background:#ffd9d2}.what{background:#d6e8ff}.how{background:#d5f2df}
+.skel{display:flex;gap:1vw;flex-wrap:wrap;font-size:clamp(26px,min(3.2vw,6vh),56px)}
+.skel span{border:3px solid var(--ink);border-radius:14px;padding:.1em .5em;background:#fff}
+.skel small{display:block;font-size:.45em;color:var(--muted);text-align:center;font-family:var(--sans)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:2vw}
+.flip{border:3px solid var(--ink);border-radius:18px;background:#fff;padding:2vh 1.4vw;text-align:left;display:flex;flex-direction:column;gap:1vh;min-height:24vh}
+.flip .front{font-size:clamp(24px,min(2.6vw,5vh),44px)}
+.flip .back{font-size:clamp(18px,min(1.9vw,3.6vh),32px);line-height:1.6;color:var(--ink)}
+.flip .back[hidden]{display:none}
+.flip .tap{color:var(--muted);font-size:clamp(14px,min(1.3vw,2.4vh),22px);margin-top:auto}
+.flip.open{background:#fffbea}.flip-img{display:block;max-height:22vh;max-width:100%;border-radius:12px;margin:0 0 1vh}
+.lv{display:grid;grid-template-columns:auto 1fr;gap:1.4vh 1.6vw;align-items:center}
+.lv .pill{border-radius:999px;padding:.15em .8em;font-size:clamp(18px,min(2vw,3.8vh),34px);white-space:nowrap}
+.lv .txt{font-size:clamp(18px,min(2vw,3.8vh),34px);line-height:1.5}
+.p-rose{background:var(--rose-s);color:var(--rose)}.p-gold{background:var(--gold-s);color:var(--gold)}.p-teal{background:var(--teal-s);color:var(--teal)}.p-blue{background:var(--blue-s);color:var(--purple)}
+.lvhead{display:flex;align-items:center;gap:1.4vw;flex-wrap:wrap}
+.lvhead .pill{font-size:clamp(28px,min(3.4vw,6.4vh),58px);border-radius:999px;padding:.05em .7em}
+.box{border-radius:16px;padding:1.6vh 1.4vw;background:#f6efe5;font-size:clamp(20px,min(2.2vw,4.2vh),38px);line-height:1.6}
+.box b{display:block;font-size:.65em;color:var(--muted);font-weight:normal;font-family:var(--sans)}
+.box.ex{background:#fff3c4}
+.rules{margin:0;padding-left:1.2em;font-size:clamp(22px,min(2.5vw,4.8vh),42px);line-height:1.9}
+nav.bar{display:flex;align-items:center;gap:12px;flex:0 0 auto}
+nav.bar .dots{display:flex;gap:6px;flex-wrap:wrap;margin:0 auto}
+nav.bar .dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--ink);background:#fff;padding:0}
+nav.bar .dot.on{background:var(--ink)}
+.nav{border:3px solid var(--ink);background:#fff;border-radius:14px;padding:.2em 1em;font-size:clamp(18px,min(1.8vw,3.4vh),30px)}
+.nav:disabled{opacity:.35;cursor:default}
+.foot{font-size:12px;color:var(--muted);text-align:right;font-family:var(--sans)}
+@media (max-width:700px){.vs{grid-template-columns:1fr}}
+</style>
+
+<style>
+.legend{display:flex;gap:1vw;flex-wrap:wrap;align-items:center}
+.lg{border-radius:999px;padding:.1em .8em;font-size:clamp(16px,min(1.6vw,3vh),28px);border:3px solid transparent}
+.L1{background:#fbe4ea;color:#c94b6d}.L2{background:#fbefd2;color:#9a6a08}.L3{background:#dcf2f0;color:#1f7f79}.L4{background:#e2e7fb;color:#4258b8}.L0{background:#eee8e0;color:#6b5f56}
+.text{display:flex;flex-direction:column;gap:1vh;font-size:clamp(18px,min(1.9vw,3.6vh),32px);line-height:1.75}
+.text p{margin:0}
+.pno{display:inline-block;min-width:2.2em;color:var(--muted);font-size:.6em;font-family:var(--sans)}
+.sen{display:inline;border:0;background:none;padding:0 .05em;border-radius:8px;font:inherit;line-height:inherit;text-align:left;cursor:pointer;border-bottom:3px dotted #c9b8a6}
+.sen:hover{background:#f6efe5}
+.sen.on{border-bottom-color:transparent}
+.sen.on.k1{background:#fbe4ea}.sen.on.k2{background:#fbefd2}.sen.on.k3{background:#dcf2f0}.sen.on.k4{background:#e2e7fb}.sen.on.k0{color:#8d8178}
+.badge{display:inline-block;font-size:.55em;border-radius:999px;padding:.05em .6em;margin:0 .3em;vertical-align:middle;font-family:var(--sans);white-space:nowrap}
+.tools{display:flex;gap:1vw;flex-wrap:wrap}
+.essay{display:flex;flex-direction:column;gap:1.4vh}
+.essay .row{display:grid;grid-template-columns:auto 1fr;gap:1.4vw;align-items:center}
+.essay .row .lg{min-width:7.5em;text-align:center}
+.essay .row .s{font-size:clamp(22px,min(2.4vw,4.6vh),42px);line-height:1.5;background:#fff;border:2px dashed #d8c8b4;border-radius:14px;padding:.4em .7em}
+.essay .row .s.hide{color:transparent;background:repeating-linear-gradient(45deg,#f6efe5,#f6efe5 10px,#efe5d6 10px,#efe5d6 20px)}
+.ask{font-size:clamp(16px,min(1.6vw,3vh),28px);color:var(--blue);margin:.2em 0 0}
+.themes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1.6vw;flex:1}
+.th{border:5px solid;border-radius:24px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2vh;padding:2vh 1vw;background:#fff}
+.th .n{font-size:clamp(26px,5vh,54px);font-weight:700}
+.th .e{font-size:clamp(60px,14vh,160px);line-height:1}
+.th .t{font-size:clamp(34px,7vh,80px)}
+.th.hide .e,.th.hide .t{visibility:hidden}
+@media (max-width:800px){.themes{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>第八課　句型導學</h1>
+    <div class="tabs" id="tabs"></div>
+    <button class="tab" id="fs" type="button">全螢幕</button>
+  </header>
+  <main class="slide" id="slide" aria-live="polite"></main>
+  <nav class="bar">
+    <button class="nav" id="prev" type="button">← 上一󠇡頁</button>
+    <div class="dots" id="dots"></div>
+    <button class="nav" id="next" type="button">下一󠇡頁 →</button>
+  </nav>
+  <p class="foot">© 范范老師（老師媽咪）設計｜方向鍵可以換頁</p>
+</div>
+<script>
+// 四個󠇡層次：1 骨架（核心主題）→ 2 摹寫（加聲音）→ 3 擬人（變成人）→ 4 魔法（有什麼作用）
+const LV = [['L0', '故事經過'], ['L1', '① 骨架：核心主題'], ['L2', '② 摹寫：加聲音'], ['L3', '③ 擬人：變成人'], ['L4', '④ 魔法：有什麼作用']];
+const legend = `<div class="legend">${LV.slice(1).map(l => `<span class="lg ${l[0]}">${l[1]}</span>`).join('')}</div>`;
+// 課文：每一󠇡句標上層次（0＝故事經過）
+const TEXT = [
+  [[0, '我家旁邊有一󠇢家理髮店。'], [1, '理髮師的笑聲好響亮，是一󠇡位十分開朗的哥哥󠇡。'], [4, '每一󠇡次讓他剪完頭髮，心情一󠇡定會很好，所以大家都叫他「魔『髮』哥哥󠇡」。']],
+  [[0, '「小飛，你來了！今天心情好嗎？」哥哥󠇡把剪髮圍巾圍在我脖子󠇡上。']],
+  [[0, '我搖搖頭，說：「今天打籃球輸了。」']],
+  [[3, '哥哥󠇡說：「打輸了？一󠇡定是那顆球有近視眼，所以總是對不準籃框，對不󠇡對？」']],
+  [[0, '我笑著說：「不󠇡是啦！是我的失誤。」']],
+  [[4, '「哦！你來我這裡就對了，我們把不愉快全數剪掉，倒進垃圾桶。」']],
+  [[2, '他拿起剪刀，ㄎㄚ ㄘㄚ ㄎㄚ ㄘㄚ響，'], [0, '接著說：「告訴你一󠇡個󠇡祕密——我的頭髮曾經被剪壞，讓我很難過。」']],
+  [[0, '「那怎麼辦？」']],
+  [[0, '他回答說：「我沒有難過很久，因為󠇡頭髮還會長󠇡出來呀󠇡！等頭髮長󠇡了再剪，不󠇡就好了？'], [4, '小飛，你還有機會打球，下次再努力就行了！」']],
+  [[0, '他解開圍巾時，我看著鏡子󠇡中的自己，有整齊的頭髮，還有微笑。']],
+  [[4, '「魔『髮』哥哥󠇡」果然有魔法！']]
+];
+const ZH = ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十', '十一'];
+const textHtml = (from, to) => `<div class="text">${TEXT.slice(from, to).map((p, i) => `<p><span class="pno">${ZH[from + i]}</span>${p.map(([k, s]) => `<button type="button" class="sen k${k}" data-k="${k}">${s}</button>`).join('')}</p>`).join('')}</div>`;
+// 範例短文（主題：理髮店）——第二頁一󠇢起討論
+const EX = [
+  [1, '魔髮哥哥󠇡的理髮店好熱鬧。', '這篇要寫什麼？用一󠇡句話說出主題。'],
+  [2, '剪刀「喀嚓喀嚓」的聲音好好聽，吹風機「呼呼呼」的唱著歌。', '理髮店裡聽得󠇡到什麼聲音？'],
+  [3, '鏡子󠇡笑咪咪的看著大家，好像在說：「今天也要帥帥的喔！」', '店裡的什麼東西󠇡可以變成人？它會做什麼？'],
+  [4, '哥哥󠇡把大家的煩惱全數剪掉，每個人都笑著走出門。', '這個󠇡地方有什麼魔法？讓人變得󠇡怎麼樣？']
+];
+const THEMES = [['第 1 組', '🌧️', '下雨天', '#d8443a'], ['第 2 組', '🏀', '打籃球', '#2f6fb5'], ['第 3 組', '🎨', '畫畫', '#2e9a5c'], ['第 4 組', '🏃', '運動會', '#9b59b6']];
+const CH = ['課文找層次', '範例短文', '各組主題', '任務規則'];
+const S = [
+    { ch: 0, html: `<p class="kicker">課文找層次（一）　點一󠇡句，看看它是哪一󠇡個󠇡層次</p>${legend}${textHtml(0, 4)}<div class="tools"><button class="btn ghost" type="button" data-all>全部顯示</button></div>` },
+  { ch: 0, html: `<p class="kicker">課文找層次（二）　點一󠇡句，看看它是哪一󠇡個󠇡層次</p>${legend}${textHtml(4, 8)}<div class="tools"><button class="btn ghost" type="button" data-all>全部顯示</button></div>` },
+  { ch: 0, html: `<p class="kicker">課文找層次（三）　點一󠇡句，看看它是哪一󠇡個󠇡層次</p>${legend}${textHtml(8, 11)}<div class="tools"><button class="btn ghost" type="button" data-all>全部顯示</button></div>` },
+  { ch: 0, html: `<p class="kicker">課文的四個󠇡層次</p>
+    <div class="essay">${[[1, '理髮師的笑聲好響亮。', '主角是誰？他怎麼樣？'], [2, '他拿起剪刀，ㄎㄚ ㄘㄚ ㄎㄚ ㄘㄚ響。', '聽到什麼聲音？'], [3, '一󠇡定是那顆球有近視眼。', '把什麼當󠇡成人？'], [4, '我們把不愉快全數剪掉，倒進垃圾桶。', '有什麼魔法、作用？']].map(([k, s, a]) => `<div class="row"><span class="lg L${k}">${LV[k][1]}</span><div><div class="s">${s}</div><p class="ask">${a}</p></div></div>`).join('')}</div>` },
+  { ch: 1, html: `<p class="kicker">範例短文：用四個󠇡層次，寫一󠇢篇「理髮店」的小短文　一󠇡句一句揭曉</p>
+    <div class="essay">${EX.map(([k, s, a], i) => `<div class="row"><span class="lg L${k}">${LV[k][1]}</span><div><button type="button" class="s hide" data-ex="${i}">${s}</button><p class="ask">💭 ${a}</p></div></div>`).join('')}</div>` },
+  { ch: 1, html: `<p class="kicker">範例短文：四句連起來，就是一󠇢篇小短文</p>
+    <div class="essay"><div class="s" style="font-size:clamp(24px,min(2.6vw,5vh),46px);line-height:1.8;background:#fff;border:3px solid var(--ink);border-radius:18px;padding:2vh 2vw">${EX.map(([k, s]) => `<span class="hl" style="background:${['', '#fbe4ea', '#fbefd2', '#dcf2f0', '#e2e7fb'][k]}">${s}</span>`).join('')}</div>
+    <p class="mid">每升一󠇢層，句子󠇡就多一󠇢種魔法：骨架 → 聲音 → 變成人 → 有什麼作用。</p></div>` },
+  { ch: 2, html: `<p class="kicker">各組主題　每一󠇢組寫一󠇢篇自己主題的小短文，每個人負責一󠇡個󠇡層次</p>
+    <div class="themes">${THEMES.map(([n, e, t, c], i) => `<button type="button" class="th hide" data-th style="border-color:${c}"><span class="n" style="color:${c}">${n}</span><span class="e">${e}</span><span class="t">${t}</span></button>`).join('')}</div>
+    <div class="tools"><button class="btn" type="button" data-thall>全部揭曉</button></div>` },
+  { ch: 3, html: `<p class="kicker">任務規則</p>
+    <div class="legend"><span class="lg L1">剪刀＝① 骨架</span><span class="lg L2">梳子󠇡＝② 摹寫</span><span class="lg L3">吹風機＝③ 擬人</span><span class="lg L4">魔鏡＝④ 魔法</span></div>
+    <ol class="rules">
+      <li>看電視名單，坐到你的<b>專家組</b>（同一󠇡個󠇡層次的人坐一󠇢起）。</li>
+      <li>打開平板「專家任務」，寫<b>你原組主題</b>的那一󠇢層，<b>只要寫一󠇡句</b>。卡󠇡住了，點「看提示」。</li>
+      <li>寫好了，念給同組的人聽，互相給一󠇡個󠇡建議。</li>
+      <li>回到<b>原組</b>，照 ① → ② → ③ → ④ 的順序念，四句連起來就是你們這一󠇢組的小短文！</li>
+    </ol>` }
+];
+let cur = 0;
+const $ = s => document.querySelector(s);
+function render() {
+  const s = S[cur];
+  $('#slide').innerHTML = s.html;
+  $('#tabs').innerHTML = CH.map((c, i) => `<button class="tab" type="button" data-ch="${i}" aria-current="${s.ch === i}">${c}</button>`).join('');
+  $('#dots').innerHTML = S.map((x, i) => `<button class="dot ${i === cur ? 'on' : ''}" type="button" data-i="${i}" aria-label="第 ${i + 1} 頁"></button>`).join('');
+  $('#prev').disabled = cur === 0; $('#next').disabled = cur === S.length - 1;
+  const show = b => { if (b.classList.contains('on')) return; b.classList.add('on'); if (+b.dataset.k) b.insertAdjacentHTML('beforeend', `<span class="badge ${LV[+b.dataset.k][0]}">${LV[+b.dataset.k][1]}</span>`); };
+  document.querySelectorAll('.sen').forEach(b => b.onclick = () => { if (b.classList.contains('on')) { b.classList.remove('on'); b.querySelector('.badge')?.remove(); } else show(b); });
+  document.querySelectorAll('[data-all]').forEach(b => b.onclick = () => document.querySelectorAll('.sen').forEach(show));
+  document.querySelectorAll('[data-ex]').forEach(b => b.onclick = () => b.classList.toggle('hide'));
+  document.querySelectorAll('[data-th]').forEach(b => b.onclick = () => b.classList.toggle('hide'));
+  document.querySelectorAll('[data-thall]').forEach(b => b.onclick = () => document.querySelectorAll('[data-th]').forEach(x => x.classList.remove('hide')));
+  document.querySelectorAll('[data-ch]').forEach(b => b.onclick = () => { cur = S.findIndex(x => x.ch === +b.dataset.ch); render(); });
+  document.querySelectorAll('[data-i]').forEach(b => b.onclick = () => { cur = +b.dataset.i; render(); });
+  try { history.replaceState(null, '', '#' + (cur + 1)); } catch (e) {}
+}
+$('#prev').onclick = () => { if (cur > 0) { cur--; render(); } };
+$('#next').onclick = () => { if (cur < S.length - 1) { cur++; render(); } };
+$('#fs').onclick = () => { try { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen(); } catch (e) {} };
+document.addEventListener('keydown', e => { if (e.key === 'ArrowRight' || e.key === 'PageDown') $('#next').click(); if (e.key === 'ArrowLeft' || e.key === 'PageUp') $('#prev').click(); });
+const h = parseInt(location.hash.slice(1)); if (h >= 1 && h <= S.length) cur = h - 1;
+render();
+</script>
+</body>
+</html>
