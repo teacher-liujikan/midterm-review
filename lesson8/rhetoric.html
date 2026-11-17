@@ -52,7 +52,7 @@ header h1{font-size:clamp(20px,min(2.4vw,4.6vh),36px);margin:0}
 .flip .back{font-size:clamp(18px,min(1.9vw,3.6vh),32px);line-height:1.6;color:var(--ink)}
 .flip .back[hidden]{display:none}
 .flip .tap{color:var(--muted);font-size:clamp(14px,min(1.3vw,2.4vh),22px);margin-top:auto}
-.flip.open{background:#fffbea}
+.flip.open{background:#fffbea}.flip-img{display:block;max-height:22vh;max-width:100%;border-radius:12px;margin:0 0 1vh}
 .lv{display:grid;grid-template-columns:auto 1fr;gap:1.4vh 1.6vw;align-items:center}
 .lv .pill{border-radius:999px;padding:.15em .8em;font-size:clamp(18px,min(2vw,3.8vh),34px);white-space:nowrap}
 .lv .txt{font-size:clamp(18px,min(2vw,3.8vh),34px);line-height:1.5}
@@ -125,7 +125,7 @@ S.push({ ch: 1, html: `
 S.push({ ch: 1, html: `
   <p class="kicker">諧音小教室　猜猜看：這些字原本是哪一󠇡個󠇡字？</p>
   <div class="cards">
-    ${flip('🦆 臺南市場的吉祥物：「菜奇鴨」', '「菜奇鴨」念起來很像臺語的「菜市仔」（菜市場）：<br>牠是一󠇢隻鴨子󠇡，又告訴你牠是菜市場的吉祥物。')}
+    ${flip('🦆 臺南市場的吉祥物：「菜奇鴨」', '<img class="flip-img" src="img/caiqiya.jpg" alt="菜奇鴨的布偶照片">「菜奇鴨」念起來很像臺語的「菜市仔」（菜市場）：<br>牠是一󠇢隻鴨子󠇡，又告訴你牠是菜市場的吉祥物。')}
     ${flip('✂️ 理髮店的名字：「剪」單理髮', '「剪」和「簡」念起來一󠇡樣：<br>「簡」單理髮，又告訴你這裡是「剪」頭髮的店。')}
     ${flip('💇 理髮店的名字：「髮」國沙龍', '「髮」和「法」念起來一󠇡樣：<br>好像從「法」國來的，又是做頭「髮」的店。')}
   </div>
