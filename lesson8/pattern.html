@@ -120,33 +120,34 @@ nav.bar .dot.on{background:var(--ink)}
 // 四個󠇡層次：1 骨架（核心主題）→ 2 摹寫（加聲音）→ 3 擬人（變成人）→ 4 魔法（有什麼作用）
 const LV = [['L0', ''], ['L1', '① 骨架'], ['L2', '② 摹寫：加聲音'], ['L3', '③ 擬人：變成人'], ['L4', '④ 魔法：有什麼作用']];
 const legend = `<div class="legend">${LV.slice(1).map(l => `<span class="lg ${l[0]}">${l[1]}</span>`).join('')}</div>`;
-// 範例短文：把課文〈魔「髮」哥哥󠇡〉濃縮成四個󠇡層次
+// 範例短文：把課文〈魔「髮」哥哥󠇡〉濃縮成四句，主角是「剪刀」
 const EX = [
-  [1, '理髮師的笑聲好響亮。', '用「＿的＿好＿」說出主題。（課文第一段）'],
-  [2, '剪刀「ㄎㄚ ㄘㄚ ㄎㄚ ㄘㄚ」的聲音好清脆。', '加上聽到的聲音。（課文第七段）'],
-  [3, '一󠇡定是那顆球有近視眼，它的眼睛好模糊，所以總是對不準籃框。', '把東西󠇡當󠇡成人，再接上「它的＿好＿」。（課文第四段）'],
-  [4, '哥哥󠇡把不愉快全數剪掉，倒進垃圾桶，小飛的心情就變好了！', '用「把＿全數＿」說出它有什麼魔法、作用。（課文第六段）']
+  [1, '哥哥󠇡的剪刀好神奇。', '第 1 句：用「＿的＿好＿」介紹主角。'],
+  [2, '剪刀「ㄎㄚ ㄘㄚ ㄎㄚ ㄘㄚ」的響。', '第 2 句：寫出主角發出的聲音。'],
+  [3, '剪刀好像在說：「不開心，走開！」', '第 3 句：把主角當󠇡成人，它好像在做什麼、說什麼？'],
+  [4, '剪刀把我的不愉快全數剪掉，我笑著走出店門。', '第 4 句：用「把＿全數＿」寫出主角的魔法，最後結果怎麼樣？']
 ];
-const THEMES = [['第 1 組', '🌧️', '下雨天', '#d8443a'], ['第 2 組', '🏀', '打籃球', '#2f6fb5'], ['第 3 組', '🎨', '畫畫', '#2e9a5c'], ['第 4 組', '🏃', '運動會', '#9b59b6']];
-const CH = ['範例短文', '一󠇢層一層看', '各組主題', '任務規則'];
+const THEMES = [['第 1 組', '🌧️', '雨', '#d8443a'], ['第 2 組', '🏀', '籃球', '#2f6fb5'], ['第 3 組', '⏰', '鬧鐘', '#2e9a5c'], ['第 4 組', '🧨', '鞭炮', '#9b59b6']];
+const CH = ['範例短文', '一󠇢層一層看', '各組主角', '任務規則'];
 const S = [
-  { ch: 0, html: `<p class="kicker">範例短文　把課文濃縮成四句，點一󠇡句，看看它是哪一󠇡個󠇡層次</p>${legend}
+  { ch: 0, html: `<p class="kicker">範例短文　把課文濃縮成四句，主角是「剪刀」。點一󠇡句，看看它是哪一󠇡個󠇡層次</p>${legend}
     <div class="text" style="font-size:clamp(22px,min(2.5vw,4.6vh),44px);line-height:1.8;background:#fff;border:3px solid var(--ink);border-radius:18px;padding:2vh 2.4vw">
-      <p style="text-align:center;font-weight:700">魔「髮」哥哥󠇡</p>
+      <p style="text-align:center;font-weight:700">哥哥󠇡的剪刀</p>
       <p>${EX.map(([k, s]) => `<button type="button" class="sen k${k}" data-k="${k}">${s}</button>`).join('')}</p></div>
     <div class="tools"><button class="btn ghost" type="button" data-all>全部顯示</button></div>` },
-  { ch: 1, html: `<p class="kicker">一󠇢層一層看　每升一󠇢層，就多一󠇢種魔法</p>
+  { ch: 1, html: `<p class="kicker">一󠇢層一層看　四句都在寫同一󠇡個󠇡主角：剪刀</p>
     <div class="essay">${EX.map(([k, s, a]) => `<div class="row"><span class="lg L${k}">${LV[k][1]}</span><div><div class="s">${s}</div><p class="ask">💡 ${a}</p></div></div>`).join('')}</div>` },
-  { ch: 2, html: `<p class="kicker">各組主題　每一󠇢組仿照範例，寫一󠇢篇自己主題的小短文，每個人負責一󠇡個󠇡層次</p>
+  { ch: 2, html: `<p class="kicker">各組主角　每一󠇢組仿照範例，寫一󠇢篇四句小短文，每個人負責一󠇡句</p>
     <div class="themes">${THEMES.map(([n, e, t, c]) => `<button type="button" class="th hide" data-th style="border-color:${c}"><span class="n" style="color:${c}">${n}</span><span class="e">${e}</span><span class="t">${t}</span></button>`).join('')}</div>
     <div class="tools"><button class="btn" type="button" data-thall>全部揭曉</button></div>` },
   { ch: 3, html: `<p class="kicker">任務規則</p>
     <div class="legend"><span class="lg L1">剪刀＝① 骨架</span><span class="lg L2">梳子󠇡＝② 摹寫</span><span class="lg L3">吹風機＝③ 擬人</span><span class="lg L4">魔鏡＝④ 魔法</span></div>
     <ol class="rules">
-      <li>看電視名單，坐到你的<b>專家組</b>（同一󠇡個󠇡層次的人坐一󠇢起）。</li>
-      <li>打開平板「專家任務」，寫<b>你原組主題</b>的那一󠇢層，<b>只要寫一󠇡句</b>。卡󠇡住了，點「看提示」。</li>
+      <li>看電視名單，坐到你的<b>專家組</b>。</li>
+      <li>打開平板「專家任務」，寫<b>你原組的主角</b>，<b>只要寫一󠇡句</b>，句子󠇡裡要寫出主角。卡󠇡住了，點「看提示」。</li>
       <li>寫好了，念給同組的人聽，互相給一󠇡個󠇡建議。</li>
-      <li>回到<b>原組</b>，照 ① → ② → ③ → ④ 的順序念，四句連起來就是你們這一󠇢組的小短文！</li>
+      <li>回到<b>原組</b>，照 ① → ② → ③ → ④ 的順序念，四句連起來就是一󠇢篇小短文！</li>
+      <li>一󠇢起想一想：重󠇡複的主角，哪幾個󠇡可以換成「它」？</li>
     </ol>` }
 ];
 let cur = 0;
