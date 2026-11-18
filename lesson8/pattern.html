@@ -99,6 +99,34 @@ nav.bar .dot.on{background:var(--ink)}
 .th .t{font-size:clamp(34px,7vh,80px)}
 .th.hide .e,.th.hide .t{visibility:hidden}
 @media (max-width:800px){.themes{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.rm{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:2vw}
+.rm-map{position:relative;background:#f3ead9;border:3px solid var(--ink);border-radius:20px;min-height:52vh;overflow:hidden}
+.rm-board{position:absolute;left:28%;right:28%;top:2%;height:7%;background:#2f5d50;color:#fff;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--sans);font-size:clamp(12px,1.8vh,20px)}
+.rm-desk{position:absolute;left:3%;top:3%;width:16%;height:9%;background:#d9d2c5;border:2px solid #9b9080;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--sans);font-size:clamp(11px,1.6vh,18px);color:#5d5348}
+.rm-table{position:absolute;width:30%;height:26%;background:#3f8f6b;border:4px solid #b98a4a;border-radius:12px;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;transition:background .6s}
+.rm-table.t0{left:28%;top:36%}.rm-table.t1{left:72%;top:36%}.rm-table.t2{left:28%;top:76%}.rm-table.t3{left:72%;top:76%}
+.rm-tl{font-family:var(--sans);font-weight:800;color:#fff;font-size:clamp(14px,2.6vh,30px);text-align:center;line-height:1.2;text-shadow:0 1px 3px rgba(0,0,0,.4)}
+.rm-dot{position:absolute;width:clamp(40px,8.4vh,86px);height:clamp(40px,8.4vh,86px);border-radius:50%;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;border:3px solid #fff;box-shadow:0 3px 8px rgba(0,0,0,.3);transition:left 1.6s cubic-bezier(.5,0,.3,1),top 1.6s cubic-bezier(.5,0,.3,1),transform .3s;font-family:var(--sans);color:#fff;z-index:2}
+.rm-dot b{font-size:clamp(18px,3.8vh,40px)}
+.rm-dot i{position:absolute;right:-6px;bottom:-6px;font-style:normal;font-size:clamp(11px,1.8vh,18px);font-weight:800;background:#fff;color:#2d2420;border-radius:50%;width:1.7em;height:1.7em;display:flex;align-items:center;justify-content:center;border:2px solid #2d2420}
+.rm-dot.r0{background:#c94b6d}.rm-dot.r1{background:#c4870f}.rm-dot.r2{background:#2a9d96}.rm-dot.r3{background:#5468c9}
+.rm-bub{position:absolute;left:50%;bottom:105%;transform:translateX(-50%) scale(0);background:#fff;color:#2d2420;border:2px solid #2d2420;border-radius:12px;padding:.1em .5em;font-size:clamp(12px,2vh,22px);white-space:nowrap;transition:transform .35s;transform-origin:50% 100%;font-weight:700}
+.rm-dot.bub .rm-bub{transform:translateX(-50%) scale(1)}
+.rm-dot.bub{z-index:3}
+.rm-dot.pop{animation:rmPop .9s both}
+@keyframes rmPop{0%,100%{transform:translate(-50%,-50%) scale(1)}40%{transform:translate(-50%,-50%) scale(1.35)}}
+.rm-side{display:flex;flex-direction:column;gap:1.6vh;min-width:0}
+.rm-n{margin:0;font-family:var(--sans);font-weight:800;color:var(--muted);font-size:clamp(16px,2.6vh,28px)}
+.rm-h{margin:0;font-size:clamp(28px,5.6vh,60px);line-height:1.3}
+.rm-p{margin:0;font-size:clamp(20px,3.4vh,38px);line-height:1.6}
+.rm-x{font-size:clamp(20px,3.2vh,36px);line-height:1.7;background:#fff;border:3px dashed #d8c8b4;border-radius:16px;padding:.5em .8em}
+.rm-x:empty{display:none}
+.rm-x .me{background:#fff3c4;border-radius:6px;padding:0 .1em}
+.rm-x .it{display:none;background:#d5f2df;border-radius:6px;padding:0 .1em}
+.rm-x.sw .me.c{display:none}.rm-x.sw .it{display:inline}
+.rm-ctl{display:flex;gap:12px;margin-top:auto;align-items:center}
+.rm-time{display:inline-block;background:#2d2420;color:#fff;border-radius:999px;padding:.05em .7em;font-family:var(--sans);font-size:.75em;vertical-align:middle}
+@media (max-width:900px){.rm{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -140,16 +168,44 @@ const S = [
   { ch: 2, html: `<p class="kicker">各組主角　每一󠇢組仿照範例，寫一󠇢篇四句小短文，每個人負責一󠇡句</p>
     <div class="themes">${THEMES.map(([n, e, t, c]) => `<button type="button" class="th hide" data-th style="border-color:${c}"><span class="n" style="color:${c}">${n}</span><span class="e">${e}</span><span class="t">${t}</span></button>`).join('')}</div>
     <div class="tools"><button class="btn" type="button" data-thall>全部揭曉</button></div>` },
-  { ch: 3, html: `<p class="kicker">任務規則</p>
-    <div class="legend"><span class="lg L1">剪刀＝① 骨架</span><span class="lg L2">梳子󠇡＝② 摹寫</span><span class="lg L3">吹風機＝③ 擬人</span><span class="lg L4">魔鏡＝④ 魔法</span></div>
-    <ol class="rules">
-      <li>看電視名單，坐到你的<b>專家組</b>。</li>
-      <li>打開平板「專家任務」，寫<b>你原組的主角</b>，<b>只要寫一󠇡句</b>，句子󠇡裡要寫出主角。卡󠇡住了，點「看提示」。</li>
-      <li>寫好了，念給同組的人聽，互相給一󠇡個󠇡建議。</li>
-      <li>回到<b>原組</b>，照 ① → ② → ③ → ④ 的順序念，四句連起來就是一󠇢篇小短文！</li>
-      <li>一󠇢起想一想：重󠇡複的主角，哪幾個󠇡可以換成「它」？</li>
-    </ol>` }
+  { ch: 3, html: `<div class="rm" id="rm"><div class="rm-map"><div class="rm-board">黑板・電視</div><div class="rm-desk">老師桌</div>
+      ${[0, 1, 2, 3].map(t => `<div class="rm-table t${t}"><span class="rm-tl"></span></div>`).join('')}
+      ${[0, 1, 2, 3].map(g => [0, 1, 2, 3].map(r => `<div class="rm-dot r${r}" data-g="${g}" data-r="${r}"><b>${'剪梳吹魔'[r]}</b><i>${g + 1}</i><span class="rm-bub"></span></div>`).join('')).join('')}
+    </div>
+    <div class="rm-side"><p class="rm-n"></p><h2 class="rm-h"></h2><p class="rm-p"></p><div class="rm-x"></div>
+      <div class="rm-ctl"><button type="button" class="nav" id="rmPrev">← 上一󠇡步</button><button type="button" class="btn" id="rmNext">下一󠇡步 →</button></div></div></div>` }
 ];
+// ===== 任務規則動畫：教室裡四張大桌子󠇡，16 個󠇡圓點照步驟移動 =====
+const RM_T = [[28, 36], [72, 36], [28, 76], [72, 76]]; // 左前、右前、左後、右後
+const RM_S = [[-8, -8], [8, -8], [-8, 8], [8, 8]];
+const RM_ROLE = ['剪刀', '梳子󠇡', '吹風機', '魔鏡'];
+const RM_STEPS = [
+  { h: '現在：原組', p: '每一󠇢組都有剪刀、梳子󠇡、吹風機、魔鏡。圓點右下角的數字是你的原組。', mode: 'home', tl: g => `第 ${g + 1} 組` },
+  { h: '① 專家出發！', p: '看電視名單，同一󠇢種專家坐在一󠇢起。剪刀、梳子󠇡坐前面兩桌，吹風機、魔鏡坐後面兩桌。', mode: 'exp', tl: g => RM_ROLE[g] + '<br>專家組' },
+  { h: '② 只要寫一󠇡句', p: '打開平板「專家任務」，寫你原組的主角。句子󠇡裡要寫出主角；卡󠇡住了，點「看提示」。<br><span class="rm-time">⏱ 10 分鐘</span>', mode: 'exp', tl: g => RM_ROLE[g] + '<br>專家組', bub: () => '✏️ 寫一󠇡句' },
+  { h: '③ 念給同組聽', p: '寫好了，念給同一󠇢桌的專家聽，互相給一󠇡個󠇡建議，再修改。', mode: 'exp', tl: g => RM_ROLE[g] + '<br>專家組', bub: (g, r) => ['我念給你聽', '這裡可以加…', '好聽！', '再改一󠇡下'][g] },
+  { h: '④ 專家回家！', p: '回到原組，照 剪刀 → 梳子󠇡 → 吹風機 → 魔鏡 的順序念，四句連起來就是一󠇢篇小短文！', mode: 'home', tl: g => `第 ${g + 1} 組`, seq: true },
+  { h: '⑤ 一󠇢起修一修', p: '連起來念念看，哪裡怪怪的？重󠇡複的主角，哪幾個󠇡可以換成「它」？<br><span class="rm-time">⏱ 5 分鐘</span>', mode: 'home', tl: g => `第 ${g + 1} 組`,
+    x: '哥哥󠇡的<span class="me">剪刀</span>好神奇。<span class="me c">剪刀</span><span class="it">它</span>「ㄎㄚ ㄘㄚ」的響。<span class="me c">剪刀</span><span class="it">它</span>好像在說：「不開心，走開！」<span class="me c">剪刀</span><span class="it">它</span>把我的不愉快全數剪掉，我笑著走出店門。' }
+];
+let rmStep = 0, rmTimers = [];
+function rmInit() { rmStep = 0; rmShow(true); $('#rmPrev').onclick = () => { if (rmStep > 0) { rmStep--; rmShow(); } }; $('#rmNext').onclick = () => { if (rmStep < RM_STEPS.length - 1) { rmStep++; rmShow(); } else { rmStep = 0; rmShow(); } }; }
+function rmShow(first) {
+  rmTimers.forEach(clearTimeout); rmTimers = [];
+  const st = RM_STEPS[rmStep];
+  document.querySelectorAll('.rm-dot').forEach(d => { const g = +d.dataset.g, r = +d.dataset.r;
+    const t = st.mode === 'home' ? g : r, seat = st.mode === 'home' ? r : g;
+    if (first) d.style.transition = 'none';
+    d.style.left = (RM_T[t][0] + RM_S[seat][0]) + '%'; d.style.top = (RM_T[t][1] + RM_S[seat][1] * 1.25) + '%';
+    if (first) { d.offsetWidth; d.style.transition = ''; }
+    d.classList.remove('pop', 'bub'); const bu = d.querySelector('.rm-bub'); bu.textContent = st.bub ? st.bub(g, r) : '';
+    if (st.bub) rmTimers.push(setTimeout(() => d.classList.add('bub'), 500 + (g * 4 + r) * 90));
+    if (st.seq) rmTimers.push(setTimeout(() => { bu.textContent = '①②③④'[r]; d.classList.add('pop', 'bub'); }, 2000 + r * 900)); });
+  document.querySelectorAll('.rm-table').forEach((t, i) => { t.querySelector('.rm-tl').innerHTML = st.tl(i); t.style.background = st.mode === 'exp' ? ['#c94b6d', '#c4870f', '#2a9d96', '#5468c9'][i] : '#3f8f6b'; });
+  $('.rm-n').textContent = `步驟 ${rmStep} / ${RM_STEPS.length - 1}`; $('.rm-h').textContent = st.h; $('.rm-p').innerHTML = st.p;
+  const x = $('.rm-x'); x.className = 'rm-x'; x.innerHTML = st.x || ''; if (st.x) rmTimers.push(setTimeout(() => x.classList.add('sw'), 2600));
+  $('#rmPrev').disabled = rmStep === 0; $('#rmNext').textContent = rmStep === RM_STEPS.length - 1 ? '↻ 重播' : '下一󠇡步 →';
+}
 let cur = 0;
 const $ = s => document.querySelector(s);
 function render() {
@@ -164,6 +220,7 @@ function render() {
   document.querySelectorAll('[data-ex]').forEach(b => b.onclick = () => b.classList.toggle('hide'));
   document.querySelectorAll('[data-th]').forEach(b => b.onclick = () => b.classList.toggle('hide'));
   document.querySelectorAll('[data-thall]').forEach(b => b.onclick = () => document.querySelectorAll('[data-th]').forEach(x => x.classList.remove('hide')));
+  if ($('#rm')) rmInit();
   document.querySelectorAll('[data-ch]').forEach(b => b.onclick = () => { cur = S.findIndex(x => x.ch === +b.dataset.ch); render(); });
   document.querySelectorAll('[data-i]').forEach(b => b.onclick = () => { cur = +b.dataset.i; render(); });
   try { history.replaceState(null, '', '#' + (cur + 1)); } catch (e) {}
