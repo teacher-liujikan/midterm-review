@@ -52,7 +52,7 @@ header h1{font-size:clamp(20px,min(2.4vw,4.6vh),36px);margin:0}
 .flip .back{font-size:clamp(18px,min(1.9vw,3.6vh),32px);line-height:1.6;color:var(--ink)}
 .flip .back[hidden]{display:none}
 .flip .tap{color:var(--muted);font-size:clamp(14px,min(1.3vw,2.4vh),22px);margin-top:auto}
-.flip.open{background:#fffbea}.flip-img{display:block;max-height:22vh;max-width:100%;border-radius:12px;margin:0 0 1vh}
+.flip.open{background:#fffbea}.cards.snd{grid-template-columns:repeat(4,minmax(0,1fr));gap:1.4vw}.cards.snd .flip{min-height:20vh;align-items:center;text-align:center}.cards.snd .front{font-size:clamp(26px,min(3vw,5.6vh),52px)}.flip-img{display:block;max-height:22vh;max-width:100%;border-radius:12px;margin:0 0 1vh}
 .lv{display:grid;grid-template-columns:auto 1fr;gap:1.4vh 1.6vw;align-items:center}
 .lv .pill{border-radius:999px;padding:.15em .8em;font-size:clamp(18px,min(2vw,3.8vh),34px);white-space:nowrap}
 .lv .txt{font-size:clamp(18px,min(2vw,3.8vh),34px);line-height:1.5}
@@ -106,6 +106,12 @@ const det = (n, sent, ask, tag, cls, name, why, plain) => S.push({ ch: 0, html: 
   </div>` });
 det(1, '「一󠇡定是那顆球有近視眼，所以總是對不準籃框。」', '球會近視嗎？誰才會近視？', '擬人', 't-ni', '把東西󠇡當󠇡成人來寫', '哥哥󠇡把投不󠇡進說成「球近視了」，小飛就笑出來了！', '「你投籃沒有投進。」');
 det(2, '他拿起剪刀，ㄎㄚ ㄘㄚ ㄎㄚ ㄘㄚ響。', '閉上眼睛念念看，你「聽到」什麼？', '摹寫', 't-mo', '把聽到的聲音寫出來', '寫出聲音，讀起來好像真的在理髮店裡聽到剪刀聲。', '他拿起剪刀剪頭髮。');
+// 摹寫補充：聲音猜猜看（不󠇡用四組的主角：雨、籃球、鬧鐘、鞭炮）
+const SND = [['汪汪汪', '🐶 小狗', '小狗「汪汪汪」的叫。'], ['叮咚', '🚪 門鈴', '門鈴「叮咚」的響。'], ['轟隆轟隆', '🚂 火車', '火車「轟隆轟隆」的開過去。'], ['呱呱呱', '🐸 青蛙', '青蛙「呱呱呱」的唱歌。'],
+  ['呼呼呼', '🌬️ 風', '風「呼呼呼」的吹。'], ['咕嚕咕嚕', '😋 肚子󠇡', '肚子󠇡「咕嚕咕嚕」的叫。'], ['叩叩叩', '✊ 敲門', '有人「叩叩叩」的敲門。'], ['啾啾啾', '🐦 小鳥', '小鳥「啾啾啾」的叫。']];
+const sndSlide = (ch, kick) => S.push({ ch, html: `<p class="kicker">${kick}</p>
+  <div class="cards snd">${SND.map(([w, who, s]) => `<button class="flip" type="button" data-flip><span class="front">「${w}」</span><span class="back" hidden>${who}<br>${s}</span><span class="tap">點一󠇡下看答案</span></button>`).join('')}</div>` });
+sndSlide(0, '摹寫補充　聲音猜猜看：聽到這個󠇡聲音，你想到什麼？');
 det(3, '魔「髮」哥哥󠇡', '念念看，「髮」和󠇡哪一󠇡個󠇡字念起來一󠇡樣？', '諧音', 't-xie', '念起來一󠇡樣的字，有兩種意思', '「髮」和「法」念起來一󠇡樣：哥哥󠇡會理「髮」，又像有魔「法」，讓人心情變好。', '理髮師哥哥󠇡');
 // ===== 二、諧音小教室（第一次學，多看幾個󠇡例子󠇡）=====
 S.push({ ch: 1, html: `

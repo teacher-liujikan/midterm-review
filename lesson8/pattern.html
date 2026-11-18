@@ -127,6 +127,7 @@ nav.bar .dot.on{background:var(--ink)}
 .rm-ctl{display:flex;gap:12px;margin-top:auto;align-items:center}
 .rm-time{display:inline-block;background:#2d2420;color:#fff;border-radius:999px;padding:.05em .7em;font-family:var(--sans);font-size:.75em;vertical-align:middle}
 @media (max-width:900px){.rm{grid-template-columns:1fr}}
+.more{display:flex;flex-wrap:wrap;gap:.8vh .8vw}.essay .row .more .s{font-size:clamp(17px,min(1.8vw,3.4vh),33px);line-height:1.5;padding:.2em .6em;text-align:left;font-family:inherit;cursor:pointer}
 </style>
 </head>
 <body>
@@ -155,8 +156,17 @@ const EX = [
   [3, '剪刀好像在說：「不開心，走開！」', '第 3 句：把主角當󠇡成人，它好像在做什麼、說什麼？'],
   [4, '剪刀把我的不愉快全數剪掉，我笑著走出店門。', '第 4 句：用「把＿全數＿」寫出主角的魔法，最後結果怎麼樣？']
 ];
+// 第二篇範例：主角「火車」（不󠇡是四組的主角），讓孩子󠇡更有畫面
+const EX2 = [[1, '火車的身體好長。'], [2, '火車「轟隆轟隆」的跑。'], [3, '火車好像在喊：「讓開讓開，我來了！」'], [4, '火車把旅客全數送回家，大家都好開心。']];
+const MORE = [
+  [1, ['小狗的尾巴󠇡好忙。', '月亮的臉好圓。', '冰淇淋的味道好甜。']],
+  [2, ['小狗「汪汪汪」的叫。', '門鈴「叮咚」的響。', '青蛙「呱呱呱」的唱歌。']],
+  [3, ['小狗好像在說：「歡迎回家！」', '月亮好像在對我眨眼睛。']],
+  [4, ['小狗把我的壞心情全數趕走，我笑著抱住牠。', '媽媽󠇡把髒衣服全數洗乾淨，衣櫃變得󠇡香香的。']]
+];
+const SND = ['汪汪汪（小狗）', '叮咚（門鈴）', '轟隆轟隆（火車）', '呱呱呱（青蛙）', '呼呼呼（風）', '咕嚕咕嚕（肚子󠇡）', '叩叩叩（敲門）', '啾啾啾（小鳥）'];
 const THEMES = [['第 1 組', '🌧️', '雨', '#d8443a'], ['第 2 組', '🏀', '籃球', '#2f6fb5'], ['第 3 組', '⏰', '鬧鐘', '#2e9a5c'], ['第 4 組', '🧨', '鞭炮', '#9b59b6']];
-const CH = ['範例短文', '一󠇢層一層看', '各組主角', '任務規則'];
+const CH = ['範例短文', '一󠇢層一層看', '再看一󠇢篇', '各組主角', '任務規則'];
 const S = [
   { ch: 0, html: `<p class="kicker">範例短文　把課文濃縮成四句，主角是「剪刀」。點一󠇡句，看看它是哪一󠇡個󠇡層次</p>${legend}
     <div class="text" style="font-size:clamp(22px,min(2.5vw,4.6vh),44px);line-height:1.8;background:#fff;border:3px solid var(--ink);border-radius:18px;padding:2vh 2.4vw">
@@ -165,10 +175,18 @@ const S = [
     <div class="tools"><button class="btn ghost" type="button" data-all>全部顯示</button></div>` },
   { ch: 1, html: `<p class="kicker">一󠇢層一層看　四句都在寫同一󠇡個󠇡主角：剪刀</p>
     <div class="essay">${EX.map(([k, s, a]) => `<div class="row"><span class="lg L${k}">${LV[k][1]}</span><div><div class="s">${s}</div><p class="ask">💡 ${a}</p></div></div>`).join('')}</div>` },
-  { ch: 2, html: `<p class="kicker">各組主角　每一󠇢組仿照範例，寫一󠇢篇四句小短文，每個人負責一󠇡句</p>
+  { ch: 1, html: `<p class="kicker">每一󠇢層再多看幾個󠇡例子󠇡（點一󠇡下打開）</p>
+    <div class="essay">${MORE.map(([k, ss]) => `<div class="row"><span class="lg L${k}">${LV[k][1]}</span><div class="more">${ss.map(x => `<button type="button" class="s hide" data-ex>${x}</button>`).join('')}</div></div>`).join('')}</div>
+    <p class="ask">🔊 聲音詞複習：${SND.join('、')}</p>` },
+  { ch: 2, html: `<p class="kicker">再看一󠇢篇　主角換成「火車」，四個󠇡層次還在嗎？點一󠇡句看看</p>${legend}
+    <div class="text" style="font-size:clamp(22px,min(2.5vw,4.6vh),44px);line-height:1.8;background:#fff;border:3px solid var(--ink);border-radius:18px;padding:2vh 2.4vw">
+      <p style="text-align:center;font-weight:700">🚂 火車</p>
+      <p>${EX2.map(([k, s]) => `<button type="button" class="sen k${k}" data-k="${k}">${s}</button>`).join('')}</p></div>
+    <div class="tools"><button class="btn ghost" type="button" data-all>全部顯示</button></div>` },
+  { ch: 3, html: `<p class="kicker">各組主角　每一󠇢組仿照範例，寫一󠇢篇四句小短文，每個人負責一󠇡句</p>
     <div class="themes">${THEMES.map(([n, e, t, c]) => `<button type="button" class="th hide" data-th style="border-color:${c}"><span class="n" style="color:${c}">${n}</span><span class="e">${e}</span><span class="t">${t}</span></button>`).join('')}</div>
     <div class="tools"><button class="btn" type="button" data-thall>全部揭曉</button></div>` },
-  { ch: 3, html: `<div class="rm" id="rm"><div class="rm-map"><div class="rm-board">黑板・電視</div><div class="rm-desk">老師桌</div>
+  { ch: 4, html: `<div class="rm" id="rm"><div class="rm-map"><div class="rm-board">黑板・電視</div><div class="rm-desk">老師桌</div>
       ${[0, 1, 2, 3].map(t => `<div class="rm-table t${t}"><span class="rm-tl"></span></div>`).join('')}
       ${rmDots().map(d => `<div class="rm-dot r${d.r}" data-g="${d.g}" data-r="${d.r}" data-hs="${d.hs}" data-es="${d.es}"><b>${d.label}</b><i>${d.g + 1}</i><span class="rm-bub"></span></div>`).join('')}
     </div>
