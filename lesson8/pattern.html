@@ -195,14 +195,14 @@ const S = [
 ];
 // ===== 任務規則動畫：教室裡四張大桌子󠇡，16 個󠇡圓點照步驟移動 =====
 const RM_T = [[28, 36], [72, 36], [28, 76], [72, 76]]; // 左前、右前、左後、右後
-const RM_S = [[-8, -8], [8, -8], [-8, 8], [8, 8], [0, -8.6], [0, 8.6]];
+const RM_S = [[-8, -8], [8, -8], [-8, 8], [8, 8], [0, -8.6], [0, 8.6], [-13, 0], [13, 0]];
 // 教師端「分組」排好的原組名單（同一󠇢台電腦開過教師端的分組分頁才會有）→ 圓點顯示真的座號
 function rmRoster() { try { const h = JSON.parse(localStorage.getItem('l8-home-now') || 'null'); return h && h.groups && h.groups.flat().length ? h.groups : null; } catch (e) { return null; } }
 function rmDots() {
   const R = rmRoster(); const out = [];
   if (!R) { for (let g = 0; g < 4; g++) for (let r = 0; r < 4; r++) out.push({ g, r, hs: r, es: g, label: '剪梳吹魔'[r] }); return out; }
   const ec = [0, 0, 0, 0];
-  R.forEach((grp, g) => grp.forEach((m, k) => { const r = Math.max(0, 'ABCD'.indexOf(m.lv)); out.push({ g, r, hs: Math.min(k, 5), es: Math.min(ec[r]++, 5), label: m.seat }); }));
+  R.forEach((grp, g) => grp.forEach((m, k) => { const r = Math.max(0, 'ABCD'.indexOf(m.lv)); out.push({ g, r, hs: Math.min(k, 7), es: Math.min(ec[r]++, 7), label: m.seat }); }));
   return out;
 }
 const RM_ROLE = ['剪刀', '梳子󠇡', '吹風機', '魔鏡'];
