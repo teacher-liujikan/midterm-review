@@ -170,17 +170,26 @@ const S = [
     <div class="tools"><button class="btn" type="button" data-thall>全部揭曉</button></div>` },
   { ch: 3, html: `<div class="rm" id="rm"><div class="rm-map"><div class="rm-board">黑板・電視</div><div class="rm-desk">老師桌</div>
       ${[0, 1, 2, 3].map(t => `<div class="rm-table t${t}"><span class="rm-tl"></span></div>`).join('')}
-      ${[0, 1, 2, 3].map(g => [0, 1, 2, 3].map(r => `<div class="rm-dot r${r}" data-g="${g}" data-r="${r}"><b>${'剪梳吹魔'[r]}</b><i>${g + 1}</i><span class="rm-bub"></span></div>`).join('')).join('')}
+      ${rmDots().map(d => `<div class="rm-dot r${d.r}" data-g="${d.g}" data-r="${d.r}" data-hs="${d.hs}" data-es="${d.es}"><b>${d.label}</b><i>${d.g + 1}</i><span class="rm-bub"></span></div>`).join('')}
     </div>
     <div class="rm-side"><p class="rm-n"></p><h2 class="rm-h"></h2><p class="rm-p"></p><div class="rm-x"></div>
       <div class="rm-ctl"><button type="button" class="nav" id="rmPrev">← 上一󠇡步</button><button type="button" class="btn" id="rmNext">下一󠇡步 →</button></div></div></div>` }
 ];
 // ===== 任務規則動畫：教室裡四張大桌子󠇡，16 個󠇡圓點照步驟移動 =====
 const RM_T = [[28, 36], [72, 36], [28, 76], [72, 76]]; // 左前、右前、左後、右後
-const RM_S = [[-8, -8], [8, -8], [-8, 8], [8, 8]];
+const RM_S = [[-8, -8], [8, -8], [-8, 8], [8, 8], [0, -8.6], [0, 8.6]];
+// 教師端「分組」排好的原組名單（同一󠇢台電腦開過教師端的分組分頁才會有）→ 圓點顯示真的座號
+function rmRoster() { try { const h = JSON.parse(localStorage.getItem('l8-home-now') || 'null'); return h && h.groups && h.groups.flat().length ? h.groups : null; } catch (e) { return null; } }
+function rmDots() {
+  const R = rmRoster(); const out = [];
+  if (!R) { for (let g = 0; g < 4; g++) for (let r = 0; r < 4; r++) out.push({ g, r, hs: r, es: g, label: '剪梳吹魔'[r] }); return out; }
+  const ec = [0, 0, 0, 0];
+  R.forEach((grp, g) => grp.forEach((m, k) => { const r = Math.max(0, 'ABCD'.indexOf(m.lv)); out.push({ g, r, hs: Math.min(k, 5), es: Math.min(ec[r]++, 5), label: m.seat }); }));
+  return out;
+}
 const RM_ROLE = ['剪刀', '梳子󠇡', '吹風機', '魔鏡'];
 const RM_STEPS = [
-  { h: '現在：原組', p: '每一󠇢組都有剪刀、梳子󠇡、吹風機、魔鏡。圓點右下角的數字是你的原組。', mode: 'home', tl: g => `第 ${g + 1} 組` },
+  { h: '現在：原組', p: rmRoster() ? '找到你的座號！顏色是你的身分󠇡（紅＝剪刀、黃＝梳子󠇡、綠＝吹風機、藍＝魔鏡），右下角的數字是你的原組。' : '每一󠇢組都有剪刀、梳子󠇡、吹風機、魔鏡。圓點右下角的數字是你的原組。', mode: 'home', tl: g => `第 ${g + 1} 組` },
   { h: '① 專家出發！', p: '看電視名單，同一󠇢種專家坐在一󠇢起。剪刀、梳子󠇡坐前面兩桌，吹風機、魔鏡坐後面兩桌。', mode: 'exp', tl: g => RM_ROLE[g] + '<br>專家組' },
   { h: '② 只要寫一󠇡句', p: '打開平板「專家任務」，寫你原組的主角。句子󠇡裡要寫出主角；卡󠇡住了，點「看提示」。<br><span class="rm-time">⏱ 10 分鐘</span>', mode: 'exp', tl: g => RM_ROLE[g] + '<br>專家組', bub: () => '✏️ 寫一󠇡句' },
   { h: '③ 念給同組聽', p: '寫好了，念給同一󠇢桌的專家聽，互相給一󠇡個󠇡建議，再修改。', mode: 'exp', tl: g => RM_ROLE[g] + '<br>專家組', bub: (g, r) => ['我念給你聽', '這裡可以加…', '好聽！', '再改一󠇡下'][g] },
@@ -194,7 +203,7 @@ function rmShow(first) {
   rmTimers.forEach(clearTimeout); rmTimers = [];
   const st = RM_STEPS[rmStep];
   document.querySelectorAll('.rm-dot').forEach(d => { const g = +d.dataset.g, r = +d.dataset.r;
-    const t = st.mode === 'home' ? g : r, seat = st.mode === 'home' ? r : g;
+    const t = st.mode === 'home' ? g : r, seat = st.mode === 'home' ? +d.dataset.hs : +d.dataset.es;
     if (first) d.style.transition = 'none';
     d.style.left = (RM_T[t][0] + RM_S[seat][0]) + '%'; d.style.top = (RM_T[t][1] + RM_S[seat][1] * 1.25) + '%';
     if (first) { d.offsetWidth; d.style.transition = ''; }
