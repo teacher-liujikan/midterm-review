@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>小小診所：語詞大看診</title>
+<link rel="stylesheet" href="../fonts/bpmf/bpmf.css">
+<style>
+@font-face{font-family:"EduKai";src:url("https://teacher-liujikan.github.io/idiompractice/fonts/edukai-4.0.ttf") format("truetype");font-display:swap}
+:root{
+  --bg:#fbf4ea; --paper:#fffdf8; --ink:#2d2420; --muted:#86766a; --line:#eadccb;
+  --pole-r:#d8443a; --pole-b:#2f6fb5;
+  --ok:#2e9a5c; --no:#d8443a; --gold:#e6a817;
+  --kai:"Bpmf Zihi Kai Std","EduKai","BiauKai","DFKai-SB","Kaiti TC",serif;
+  --sans:"Bpmf Zihi Kai Std","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);overflow-x:hidden}
+button{font:inherit;cursor:pointer}
+button:focus-visible{outline:4px solid var(--pole-b);outline-offset:3px}
+.app{height:100vh;min-height:560px;display:flex;flex-direction:column;gap:1.2vh;padding:1.6vh 2vw}
+/* 頂部：診所招牌 */
+.sign{display:flex;align-items:center;gap:14px;flex:0 0 auto}
+.pole{width:56px;height:56px;border-radius:14px;border:3px solid var(--ink);background:#fff linear-gradient(var(--pole-r),var(--pole-r)) center/60% 22% no-repeat;position:relative;flex:0 0 auto}.pole::after{content:"";position:absolute;inset:0;background:linear-gradient(var(--pole-r),var(--pole-r)) center/22% 60% no-repeat}
+@keyframes spin{to{background-position:0 45px}}
+.sign h1{font-family:var(--kai);font-size:clamp(24px,min(3vw,5.5vh),44px);line-height:1.2;margin:0;letter-spacing:.06em}
+.sign .prog{margin-left:auto;font-size:clamp(16px,1.6vw,22px);color:var(--muted);font-variant-numeric:tabular-nums}
+/* 題目區 */
+.qbox{background:var(--paper);border:3px solid var(--ink);border-radius:22px;padding:1.6vh 2.4vw;display:flex;flex-direction:column;gap:1.4vh;flex:0 0 auto}
+.qtag{font-size:clamp(14px,1.4vw,20px);color:var(--muted);font-weight:700;letter-spacing:.1em}
+.qtag.bonus{color:var(--gold)}
+.qtag.turn{align-self:flex-start;display:inline-flex;align-items:center;gap:.4em;background:var(--c);color:#fff;font-size:clamp(24px,min(2.8vw,5vh),44px);letter-spacing:.04em;padding:.25em .9em;border-radius:999px;box-shadow:0 4px 0 rgba(0,0,0,.15);animation:turnIn .5s ease-out}
+.qtag.turn b{font-size:1.2em;background:#fff;color:var(--c);border-radius:.4em;padding:0 .3em;margin:0 .1em}
+.qtag.turn .gi{width:1.3em;height:1.3em}
+.qtag .bn{color:#fff;opacity:.9;font-size:.8em}
+.who-line{display:flex;flex-wrap:wrap;gap:.5em 1em;font-size:clamp(20px,min(2.2vw,4vh),36px)}.who-line span{color:var(--c);font-weight:700}.who-line b{font-size:1.25em}
+@keyframes turnIn{0%{transform:scale(.8);opacity:0}60%{transform:scale(1.06)}100%{transform:none;opacity:1}}
+.sent{font-family:var(--kai);font-size:clamp(28px,3.8vw,58px);line-height:1.4}
+.blank{display:inline-block;min-width:3.4em;border-bottom:5px solid var(--ink);text-align:center;margin:0 .15em}
+.blank.fill{color:var(--ok)}
+.opts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1.4vw}
+.opt{font-family:var(--kai);font-size:clamp(28px,3.6vw,54px);background:#fff;border:3px solid var(--ink);border-radius:18px;padding:1.4vh .6vw;color:var(--ink);transition:transform .15s}
+.opt:hover:not(:disabled){transform:translateY(-3px)}
+.opt.no{background:#fde4e1;border-color:var(--no);color:var(--no);text-decoration:line-through;animation:shake .4s}
+.opt.ok{background:#dff3e7;border-color:var(--ok);color:var(--ok)}
+.opt:disabled{cursor:default}
+@keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:12px;min-height:56px}
+.msg{font-size:clamp(18px,2vw,28px);font-weight:700}
+.msg.ok{color:var(--ok)} .msg.no{color:var(--no)}
+.btn{border:3px solid var(--ink);background:var(--ink);color:var(--paper);border-radius:14px;padding:10px 20px;font-size:clamp(16px,1.6vw,22px);font-weight:700}
+.btn.ghost{background:transparent;color:var(--ink)}
+.who{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.who .btn{background:var(--c);border-color:var(--c)}
+/* 客人 */
+.shop{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:1.4vw;flex:1;min-height:0}
+.chair{background:var(--paper);border:2px solid var(--line);border-radius:20px;padding:1vh .8vw;display:flex;flex-direction:column;align-items:center;gap:.4vh;position:relative}
+.chair.lead{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold) inset}
+.chair h2{margin:0;font-size:clamp(18px,1.9vw,28px);color:var(--c)}
+.chair .sc{font-size:clamp(16px,1.6vw,22px);font-weight:700;font-variant-numeric:tabular-nums}
+.chair svg.guest{width:100%;max-width:240px;flex:1 1 0;min-height:0}
+.chair{min-height:0;overflow:hidden}
+.cover .shop{flex:0 0 auto;height:32vh}
+.strand{transition:opacity .5s,transform .5s;transform-box:fill-box;transform-origin:50% 50%}
+.strand.cut{opacity:0;transform:translateY(-50px) scale(.2) rotate(120deg)}
+.scis{position:absolute;top:18%;left:50%;width:64px;height:64px;transform:translate(-50%,0);pointer-events:none;opacity:0}
+.scis.go{animation:snip 0.9s ease-out}
+@keyframes snip{0%{opacity:1;transform:translate(-90%,0) rotate(-20deg)}50%{opacity:1;transform:translate(-30%,-10%) rotate(10deg)}100%{opacity:0;transform:translate(30%,0) rotate(-10deg)}}
+.crown{position:absolute;top:-22px;left:50%;transform:translateX(-50%);font-size:44px;display:none}
+.chair.win .crown{display:block}
+/* 開始 / 結束畫面 */
+.cover{flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;align-items:center;justify-content:safe center;gap:1.4vh;text-align:center}
+.cover>h2{font-family:var(--kai);font-size:clamp(28px,min(3.6vw,6vh),56px);margin:0;line-height:1.25}
+.cover p{font-size:clamp(16px,min(1.6vw,2.8vh),24px);color:var(--muted);margin:0;line-height:1.7;max-width:44em}
+.set{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:center;font-size:clamp(16px,min(1.6vw,2.8vh),24px)}
+.set .seg{border:2px solid var(--ink);background:#fff;color:var(--ink);border-radius:12px;padding:8px 16px;font-weight:700}
+.set .seg[aria-pressed="true"]{background:var(--ink);color:#fff}
+.foot{font-size:12px;color:var(--muted);text-align:right}
+@media (max-width:760px){.opts{grid-template-columns:repeat(2,minmax(0,1fr))}.shop{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (prefers-reduced-motion:reduce){.pole,.scis.go,.opt.no{animation:none}.strand{transition:none}}
+.gi{width:1.15em;height:1.15em;vertical-align:-.2em;display:inline-block}
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+<script>
+// ===== 題目 =====
+const WORDS = [
+  ['醫生', '弟弟󠇡發燒了，大人帶他去診所看＿＿。'],
+  ['穿著', '天氣好冷，姊姊󠇡＿＿厚厚的外套去上學。'],
+  ['白袍', '醫生伯伯󠇡披上＿＿，開始幫病人看病。'],
+  ['戴上', '感冒的時候，出門要＿＿口罩。'],
+  ['聽筒', '醫生用＿＿聽我的心跳和󠇡呼吸。'],
+  ['啄木鳥', '＿＿用尖尖的嘴敲樹，把害蟲抓出來。'],
+  ['準備', '明天要考試，我今天晚上要好好＿＿。'],
+  ['樹幹', '松鼠沿著粗粗的＿＿，一󠇡下子󠇡就爬到樹上。'],
+  ['病毒', '勤洗手，＿＿才不容易跑進身體裡。'],
+  ['蘋果', '跑完步，妹妹󠇡的臉紅得󠇡像一󠇢顆＿＿。'],
+  ['溫暖', '老師＿＿的笑容，讓我不󠇡再緊張。'],
+  ['乖乖', '打針的時候，弟弟󠇡＿＿的坐好，沒有哭。'],
+  ['吃藥', '醫生說要按時＿＿，感冒才會快點好。']
+];
+const IDIOMS = [
+  ['有備無患', '出門前帶把傘，＿＿，下雨也不󠇡怕。'],
+  ['披星戴月', '農夫伯伯󠇡＿＿，天還沒亮就下田，天黑才回家。'],
+  ['溫故知新', '哥哥󠇡把舊課本再讀一󠇡遍，＿＿，常常有新發現。'],
+  ['對症下藥', '老師＿＿，先陪他把九九乘法背熟，他的數學就進步了。']
+];
+const COLORS = ['#d8443a', '#2f6fb5', '#2e9a5c', '#9b59b6'];
+// 各組（異質分組）裡的四種同學：白雲、蘋果、啄木鳥、陽光
+const LCOLORS = ['#d2553f', '#c4870f', '#3c9a6a', '#5468c9'];
+const LNAMES = ['白雲', '蘋果', '啄木鳥', '陽光'];
+// 異質分組：每組都有白雲、蘋果、啄木鳥、陽光各一󠇡位同學
+// 教師端「分組」排好的第 1～4 組名單（同一󠇢台電腦開過教師端才會有）
+function homeNow() { try { const h = JSON.parse(localStorage.getItem('l9-home-now') || 'null'); return h && h.groups ? h.groups : null; } catch (e) { return null; } }
+function whoLine(g) {
+  const hs = homeNow(); if (!hs || g < 0) return '';
+  const role = 'ABCD'[g];
+  return `<div class="who-line">${hs.map((m, i) => { const ps = m.filter(x => x.lv === role).map(x => x.seat);
+    return `<span style="--c:${COLORS[i % COLORS.length]}">第 ${i + 1} 組 <b>${ps.length ? ps.join('、') + ' 號' : '任一󠇢人'}</b></span>`; }).join('')}</div>`;
+}
+const GNAMES = ['第 1 組', '第 2 組', '第 3 組', '第 4 組'];
+// 組別圖示用畫的（有些電腦沒有梳子󠇡、鏡子󠇡的表情符號）
+const SVGI = p => `<svg class="gi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
+const GICON = [
+  SVGI('<path d="M7 18h10a4 4 0 0 0 .6-7.96A6 6 0 0 0 6.2 11.2 3.5 3.5 0 0 0 7 18z"/>'),
+  SVGI('<path d="M12 8c-3-2.5-7-.5-7 4.2C5 16.5 8 21 12 19.5 16 21 19 16.5 19 12.2 19 7.5 15 5.5 12 8z"/><path d="M12 8c0-2 1-3.5 3-4.5"/>'),
+  SVGI('<path d="M4 20c2-6 5-10 9-11l7-2-4 5c-1 4-4 7-9 8z"/><circle cx="14.5" cy="10.5" r=".8" fill="currentColor"/><path d="M20 7l2-.5"/>'),
+  SVGI('<circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.700l1.8-1.8M16.9 7.1l1.8-1.8"/>')
+];
+// 每題由各組的哪一󠇢種同學回答（-1 = 全班搶答）。白雲最簡單、陽光最難；每種同學 4 題，最後 1 題全班搶答
+const ASSIGN = { '醫生': 0, '蘋果': 0, '吃藥': 0, '乖乖': 0,
+  '穿著': 1, '戴上': 1, '白袍': 1, '樹幹': 1,
+  '聽筒': 2, '啄木鳥': 2, '準備': 2, '病毒': 2,
+  '溫暖': 3, '有備無患': 3, '披星戴月': 3, '溫故知新': 3,
+  '對症下藥': -1 };
+const HAIR = ['#3b2a20', '#7a4a22', '#1f1f2e', '#a0522d', '#4a3426', '#2b2b2b'];
+const SKIN = ['#f6d3b3', '#efc39d', '#f8dcc4', '#e8b88f', '#f3cfae', '#eebf98'];
+const STRANDS = 5; // 小病人身上的病毒數
+
+let G = { n: 4, bonus: true, phase: 'start', qs: [], i: 0, score: [], tried: [], pick: null, solved: false };
+
+function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function buildQs() {
+  const pool = [...WORDS.map(([w, s]) => ({ w, s, bonus: false })), ...IDIOMS.map(([w, s]) => ({ w, s, bonus: true }))];
+  const all = { w: WORDS, i: IDIOMS };
+  pool.forEach(q => { const src = q.bonus ? IDIOMS : WORDS; q.o = shuffle([q.w, ...shuffle(src.filter(x => x[0] !== q.w)).slice(0, 3).map(x => x[0])]); q.g = ASSIGN[q.w] ?? -1; });
+  // 輪流：白雲 → 蘋果 → 啄木鳥 → 陽光，每組同一󠇢輪內順序打亂；最後全班搶答
+  const by = [0, 1, 2, 3].map(g => shuffle(pool.filter(q => q.g === g)));
+  const out = []; for (let r = 0; r < 4; r++) for (let g = 0; g < 4; g++) if (by[g][r]) out.push(by[g][r]);
+  return [...out, ...pool.filter(q => q.g === -1)];
+}
+const esc = t => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+// ===== 音效（剪刀聲）=====
+let AC = null;
+function ac() { try { AC = AC || new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} return AC; }
+function snipSound() {
+  const a = ac(); if (!a) return;
+  [0, 0.16].forEach(t0 => {
+    const len = 0.06, buf = a.createBuffer(1, a.sampleRate * len, a.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 3);
+    const s = a.createBufferSource(), f = a.createBiquadFilter(), g = a.createGain();
+    f.type = 'highpass'; f.frequency.value = 2500; g.gain.value = 0.6;
+    s.buffer = buf; s.connect(f); f.connect(g); g.connect(a.destination); s.start(a.currentTime + t0);
+  });
+}
+function tone(freqs, dur = 0.12) {
+  const a = ac(); if (!a) return;
+  freqs.forEach((fq, k) => { const o = a.createOscillator(), g = a.createGain(); o.type = 'triangle'; o.frequency.value = fq; g.gain.setValueAtTime(0.18, a.currentTime + k * dur); g.gain.exponentialRampToValueAtTime(0.001, a.currentTime + (k + 1) * dur); o.connect(g); g.connect(a.destination); o.start(a.currentTime + k * dur); o.stop(a.currentTime + (k + 1) * dur); });
+}
+
+// ===== 客人 =====
+// 小病人：身邊有五隻病毒，每答對一󠇢題趕走一󠇢隻
+const VPOS = [[32, 60], [168, 52], [20, 140], [182, 132], [100, 8]];
+const VCOL = ['#7b5cc4', '#3f9b6b', '#2f7fb5', '#c0568a', '#d08a1e'];
+function virus(k, x, y, cut) {
+  const c = VCOL[k % VCOL.length], r = 15;
+  const sp = Array.from({ length: 8 }, (_, i) => { const t = i * Math.PI / 4 + k; return `<line x1="${(Math.cos(t) * r).toFixed(1)}" y1="${(Math.sin(t) * r).toFixed(1)}" x2="${(Math.cos(t) * (r + 7)).toFixed(1)}" y2="${(Math.sin(t) * (r + 7)).toFixed(1)}" stroke="${c}" stroke-width="3" stroke-linecap="round"/>`; }).join('');
+  return `<g transform="translate(${x} ${y})"><g class="strand${cut ? ' cut' : ''}" data-k="${k}">${sp}<circle r="${r}" fill="${c}"/><circle cx="-5" cy="-3" r="3.2" fill="#fff"/><circle cx="6" cy="-3" r="3.2" fill="#fff"/><circle cx="-4.5" cy="-2.5" r="1.5" fill="#2d2420"/><circle cx="6.5" cy="-2.5" r="1.5" fill="#2d2420"/><path d="M-6 5 q6 6 12 0" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></g></g>`;
+}
+function guestSVG(g, score) {
+  const cut = Math.min(score, STRANDS);
+  const extra = Math.max(0, score - STRANDS);
+  const hair = HAIR[g % HAIR.length], skin = SKIN[g % SKIN.length], c = COLORS[g % COLORS.length];
+  const well = cut >= STRANDS;
+  const smile = score >= 4 ? 'M84 148 Q100 168 116 148' : score >= 2 ? 'M88 154 Q100 162 112 154' : 'M88 158 Q100 150 112 158';
+  const fever = Math.max(0, .85 - cut * .13);
+  return `<svg class="guest" viewBox="-10 -24 220 260" role="img" aria-label="${GNAMES[g]}的小病人，趕走 ${cut} 隻病毒">
+    <path d="M30 236 C34 196 62 180 100 180 C138 180 166 196 170 236Z" fill="${c}" opacity=".9"/>
+    <path d="M84 182 L100 200 L116 182" fill="#fff" opacity=".8"/>
+    <rect x="88" y="160" width="24" height="24" fill="${skin}"/>
+    <ellipse cx="52" cy="122" rx="10" ry="14" fill="${skin}"/><ellipse cx="148" cy="122" rx="10" ry="14" fill="${skin}"/>
+    <ellipse cx="100" cy="120" rx="48" ry="54" fill="${skin}"/>
+    <path d="M52 112 C50 70 72 52 100 52 C128 52 150 70 148 112 C140 92 124 82 100 82 C76 82 60 92 52 112Z" fill="${hair}"/>
+    ${well ? '' : `<rect x="70" y="62" width="60" height="20" rx="9" fill="#bfe3f5" stroke="#6aa9c9" stroke-width="3"/>`}
+    <ellipse cx="82" cy="122" rx="5" ry="${score >= 1 ? 5 : 2.5}" fill="#2d2420"/><ellipse cx="118" cy="122" rx="5" ry="${score >= 1 ? 5 : 2.5}" fill="#2d2420"/>
+    <ellipse cx="70" cy="140" rx="11" ry="8" fill="#f0736a" opacity="${(well ? .45 : fever).toFixed(2)}"/><ellipse cx="130" cy="140" rx="11" ry="8" fill="#f0736a" opacity="${(well ? .45 : fever).toFixed(2)}"/>
+    <path d="${smile}" stroke="#2d2420" stroke-width="4" fill="none" stroke-linecap="round"/>
+    ${cut < 3 ? `<g transform="rotate(-20 118 158)"><rect x="110" y="153" width="44" height="8" rx="4" fill="#fff" stroke="#888" stroke-width="2"/><rect x="128" y="155.2" width="22" height="3.6" rx="1.8" fill="#e0443a"/></g>` : ''}
+    ${VPOS.map((p, k) => virus(k, p[0], p[1], k < cut)).join('')}
+    ${extra >= 1 ? `<g fill="#e6a817"><path d="M30 40 l4 10 l10 4 l-10 4 l-4 10 l-4 -10 l-10 -4 l10 -4z"/><path d="M172 30 l3 8 l8 3 l-8 3 l-3 8 l-3 -8 l-8 -3 l8 -3z"/></g>` : ''}
+    ${extra >= 2 ? `<path d="M100 196 l5 10 l11 1.5 l-8 8 l2 11 l-10 -5.5 l-10 5.5 l2 -11 l-8 -8 l11 -1.5z" fill="#f6c343" stroke="#c98a00" stroke-width="2"/>` : ''}
+    ${extra >= 3 ? `<path d="M84 44 q16 -22 32 0 l-4 10 h-24z" fill="#f6c343" stroke="#c98a00" stroke-width="2"/>` : ''}
+  </svg>`;
+}
+const SCIS = `<svg class="scis" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="8" width="18" height="8" rx="4" fill="#fff" stroke="#2d2420" stroke-width="2"/><path d="M12 8v8" stroke="#2d2420" stroke-width="2"/><rect x="3" y="8" width="9" height="8" rx="4" fill="#ef6b75" stroke="#2d2420" stroke-width="2"/></svg>`;
+
+// ===== 畫面 =====
+function render() {
+  const app = document.getElementById('app');
+  if (G.phase === 'start') {
+    app.innerHTML = `${sign('')}
+    <section class="cover">
+      <h2>今天診所來了 ${G.n} 位被病毒纏上的小病人！</h2>
+      <p>每一󠇢題選出正確的語詞。答對的組，就可以幫自己的小病人趕走一󠇢隻病毒。<br>題目做完，看看哪一󠇢組的小病人最健康！</p>
+      <p>每一󠇢組都有白雲、蘋果、啄木鳥、陽光四位同學。每一󠇢題會指定由哪一󠇢種同學搶答，最後一󠇢題全班搶答！</p>
+      <div class="shop" style="--n:${G.n};width:100%;max-width:1200px">${Array.from({ length: G.n }, (_, g) => chair(g, 0)).join('')}</div>
+      <button class="btn" id="go">開始看診！</button>
+    </section>${foot()}`;
+    return;
+  }
+  if (G.phase === 'end') {
+    const max = Math.max(...G.score);
+    app.innerHTML = `${sign('')}
+    <section class="cover">
+      <h2>看診完成！</h2>
+      <p>${G.score.filter(s => s === max).length > 1 ? '好幾組並列第一，小病人都好健康！' : `${GNAMES[G.score.indexOf(max)]}的小病人最健康！`}　大家都會用這 ${WORDS.length} 個󠇡語詞了嗎？</p>
+      <div class="shop" style="--n:${G.n};width:100%">${G.score.map((s, g) => chair(g, s, s === max)).join('')}</div>
+      <button class="btn ghost" id="again">再玩一󠇡次</button>
+    </section>${foot()}`;
+    return;
+  }
+  const q = G.qs[G.i];
+  const lead = Math.max(...G.score);
+  app.innerHTML = `${sign(`第 ${G.i + 1} / ${G.qs.length} 題`)}
+  <section class="qbox">
+    <div class="qtag turn" style="--c:${q.g >= 0 ? LCOLORS[q.g] : 'var(--ink)'}">${q.g >= 0 ? `${GICON[q.g]} 輪到各組的 <b>${LNAMES[q.g]}</b> 同學搶答` : '全班搶答！'}${q.bonus ? '　<span class="bn">★ 成語題</span>' : ''}</div>${whoLine(q.g)}
+    <div class="sent">${esc(q.s).replace('＿＿', `<span class="blank ${G.solved ? 'fill' : ''}">${G.solved ? esc(q.w) : '　'}</span>`)}</div>
+    <div class="opts">${q.o.map(w => `<button class="opt ${G.tried.includes(w) ? 'no' : ''} ${G.solved && w === q.w ? 'ok' : ''}" data-w="${esc(w)}" ${G.solved || G.tried.includes(w) ? 'disabled' : ''}>${esc(w)}</button>`).join('')}</div>
+    <div class="bar">${barHTML(q)}</div>
+  </section>
+  <div class="shop" style="--n:${G.n}">${G.score.map((s, g) => chair(g, s, false, lead > 0 && s === lead)).join('')}</div>${foot()}`;
+}
+function barHTML(q) {
+  if (G.solved && G.pick === null) return `<span class="msg ok">答對了！是哪一󠇢組答對的？</span>
+    <div class="who">${G.score.map((_, g) => `<button class="btn" style="--c:${COLORS[g % COLORS.length]}" data-g="${g}">${GNAMES[g]}</button>`).join('')}
+    <button class="btn ghost" data-g="-1">都沒有</button></div>`;
+  if (G.solved) return `<span class="msg ok">${G.pick >= 0 ? `${GNAMES[G.pick]}趕走一󠇢隻病毒！` : '答案是「' + esc(q.w) + '」'}</span>
+    <button class="btn" id="next">${G.i + 1 < G.qs.length ? '下一󠇢題 →' : '看看診結果！'}</button>`;
+  return `${G.tried.length ? (q.g >= 0 ? `<span class="msg no">不󠇡對喔！其他組的${LNAMES[q.g]}同學可以舉手搶答。</span>` : '<span class="msg no">不󠇡對喔！其他組可以舉手搶答。</span>') : (q.g >= 0 ? `<span class="msg">各組的${LNAMES[q.g]}同學先舉手的先回答，老師點選他說的語詞。</span>` : '<span class="msg">先舉手的組回答，老師點選他們說的語詞。</span>')}
+    <button class="btn ghost" id="reveal">公布答案</button>`;
+}
+function chair(g, s, win = false, lead = false) {
+  return `<div class="chair ${win ? 'win' : ''} ${lead ? 'lead' : ''}" style="--c:${COLORS[g % COLORS.length]}" data-chair="${g}">
+    <span class="crown" aria-hidden="true">👑</span>
+    <h2>${GNAMES[g]}</h2>${guestSVG(g, s)}${SCIS}<span class="sc">答對 ${s} 題</span></div>`;
+}
+const sign = prog => `<header class="sign"><span class="pole" aria-hidden="true"></span><h1>小小診所：語詞大看診</h1><span class="prog">${prog}</span></header>`;
+const foot = () => `<div class="foot">第九課〈穿白袍的醫生伯伯󠇡〉語詞遊戲・© 范范老師（老師媽咪）設計</div>`;
+
+// ===== 操作 =====
+function award(g) {
+  G.pick = g;
+  if (g >= 0) {
+      const before = G.score[g]; G.score[g]++;
+      render();
+      const ch = document.querySelector(`[data-chair="${g}"]`);
+      // 先畫出還沒剪的樣子󠇡，再剪掉
+      if (before < STRANDS) { const st = ch.querySelector(`.strand[data-k="${before}"]`); st && st.classList.remove('cut'); requestAnimationFrame(() => requestAnimationFrame(() => st && st.classList.add('cut'))); }
+      const sc = ch.querySelector('.scis'); sc.classList.add('go'); snipSound();
+    } else render();
+}
+document.addEventListener('click', e => {
+  const t = e.target.closest('button'); if (!t) return;
+  ac();
+  if (t.dataset.n) { G.n = +t.dataset.n; render(); return; }
+  if (t.dataset.b) { G.bonus = t.dataset.b === '1'; render(); return; }
+  if (t.id === 'go' || t.id === 'again') { G.qs = buildQs(); G.i = 0; G.score = Array(G.n).fill(0); G.tried = []; G.pick = null; G.solved = false; G.phase = 'play'; render(); return; }
+  if (t.classList.contains('opt')) {
+    const q = G.qs[G.i]; const w = t.dataset.w;
+    if (w === q.w) { G.solved = true; tone([523, 659, 784]); } else { G.tried.push(w); tone([220, 180], 0.15); }
+    render(); return;
+  }
+  if (t.id === 'reveal') { G.solved = true; G.pick = -1; render(); return; }
+  if (t.dataset.g !== undefined) { award(+t.dataset.g); return; }
+  if (t.id === 'next') {
+    if (G.i + 1 < G.qs.length) { G.i++; G.tried = []; G.pick = null; G.solved = false; } else { G.phase = 'end'; tone([523, 659, 784, 1046], 0.16); }
+    render(); return;
+  }
+});
+render();
+</script>
+</body>
+</html>

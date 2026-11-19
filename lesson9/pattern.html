@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>小詩導學</title>
+<link rel="stylesheet" href="../fonts/bpmf/bpmf.css">
+<style>
+:root{
+  --bg:#fbf4ea; --paper:#fffdf8; --ink:#2d2420; --muted:#86766a; --soft:#eadccb;
+  --red:#c8372d; --blue:#2f6fb5; --green:#2e8a56; --gold:#c4870f; --purple:#5468c9;
+  --rose:#c94b6d; --rose-s:#fbe4ea; --gold-s:#fbefd2; --teal:#2a9d96; --teal-s:#dcf2f0; --blue-s:#e2e7fb;
+  --zy:"Bpmf Zihi Kai Std";
+  --sans:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--zy),var(--sans)}
+button{font:inherit;cursor:pointer;color:inherit}
+button:focus-visible{outline:4px solid var(--blue);outline-offset:3px}
+.app{height:100vh;min-height:540px;display:flex;flex-direction:column;gap:1.4vh;padding:1.6vh 2vw}
+header{display:flex;align-items:center;gap:12px;flex-wrap:wrap;flex:0 0 auto}
+header h1{font-size:clamp(20px,min(2.4vw,4.6vh),36px);margin:0}
+.tabs{display:flex;gap:8px;margin-left:auto;flex-wrap:wrap}
+.tab{border:2px solid var(--ink);background:#fff;border-radius:12px;padding:5px 14px;font-size:clamp(16px,min(1.6vw,3vh),26px)}
+.tab[aria-current="true"]{background:var(--ink);color:#fff}
+.slide{flex:1;min-height:0;background:var(--paper);border:3px solid var(--ink);border-radius:22px;padding:2.4vh 2.6vw;display:flex;flex-direction:column;gap:1.6vh;overflow:auto;position:relative}
+.kicker{font-size:clamp(16px,min(1.6vw,3vh),26px);color:var(--muted);margin:0}
+.big{font-size:clamp(26px,min(3.2vw,6vh),56px);line-height:1.5;margin:0}
+.mid{font-size:clamp(20px,min(2.3vw,4.4vh),40px);line-height:1.5;margin:0}
+.q{font-size:clamp(24px,min(2.8vw,5.4vh),48px);margin:0;color:var(--blue)}
+.zy-plain{font-family:var(--sans)}
+.reveal{border:3px dashed var(--soft);border-radius:18px;padding:2vh 2vw;display:flex;flex-direction:column;gap:1.2vh}
+.reveal[hidden]{display:none}
+.tag{display:inline-block;border-radius:999px;padding:.05em .7em;color:#fff;font-size:.9em}
+.t-ni{background:var(--green)}.t-mo{background:var(--gold)}.t-xie{background:var(--purple)}
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:2vw}
+.vs > div{border-radius:16px;padding:1.2vh 1.2vw;font-size:clamp(18px,min(1.9vw,3.6vh),32px);line-height:1.5}
+.vs .plain{background:#eee8e0;color:#6b5f56}
+.vs .magic{background:#fff3c4}
+.vs b{display:block;font-size:.7em;color:var(--muted);font-weight:normal}
+.btn{border:3px solid var(--ink);background:var(--ink);color:#fff;border-radius:16px;padding:.35em 1.2em;font-size:clamp(20px,min(2.2vw,4vh),36px);align-self:flex-start}
+.btn.ghost{background:#fff;color:var(--ink)}
+.hl{border-radius:8px;padding:0 .12em}
+.who{background:#ffd9d2}.what{background:#d6e8ff}.how{background:#d5f2df}
+.skel{display:flex;gap:1vw;flex-wrap:wrap;font-size:clamp(26px,min(3.2vw,6vh),56px)}
+.skel span{border:3px solid var(--ink);border-radius:14px;padding:.1em .5em;background:#fff}
+.skel small{display:block;font-size:.45em;color:var(--muted);text-align:center;font-family:var(--sans)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:2vw}
+.flip{border:3px solid var(--ink);border-radius:18px;background:#fff;padding:2vh 1.4vw;text-align:left;display:flex;flex-direction:column;gap:1vh;min-height:24vh}
+.flip .front{font-size:clamp(24px,min(2.6vw,5vh),44px)}
+.flip .back{font-size:clamp(18px,min(1.9vw,3.6vh),32px);line-height:1.6;color:var(--ink)}
+.flip .back[hidden]{display:none}
+.flip .tap{color:var(--muted);font-size:clamp(14px,min(1.3vw,2.4vh),22px);margin-top:auto}
+.flip.open{background:#fffbea}.flip-img{display:block;max-height:22vh;max-width:100%;border-radius:12px;margin:0 0 1vh}
+.lv{display:grid;grid-template-columns:auto 1fr;gap:1.4vh 1.6vw;align-items:center}
+.lv .pill{border-radius:999px;padding:.15em .8em;font-size:clamp(18px,min(2vw,3.8vh),34px);white-space:nowrap}
+.lv .txt{font-size:clamp(18px,min(2vw,3.8vh),34px);line-height:1.5}
+.p-rose{background:var(--rose-s);color:var(--rose)}.p-gold{background:var(--gold-s);color:var(--gold)}.p-teal{background:var(--teal-s);color:var(--teal)}.p-blue{background:var(--blue-s);color:var(--purple)}
+.lvhead{display:flex;align-items:center;gap:1.4vw;flex-wrap:wrap}
+.lvhead .pill{font-size:clamp(28px,min(3.4vw,6.4vh),58px);border-radius:999px;padding:.05em .7em}
+.box{border-radius:16px;padding:1.6vh 1.4vw;background:#f6efe5;font-size:clamp(20px,min(2.2vw,4.2vh),38px);line-height:1.6}
+.box b{display:block;font-size:.65em;color:var(--muted);font-weight:normal;font-family:var(--sans)}
+.box.ex{background:#fff3c4}
+.rules{margin:0;padding-left:1.2em;font-size:clamp(22px,min(2.5vw,4.8vh),42px);line-height:1.9}
+nav.bar{display:flex;align-items:center;gap:12px;flex:0 0 auto}
+nav.bar .dots{display:flex;gap:6px;flex-wrap:wrap;margin:0 auto}
+nav.bar .dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--ink);background:#fff;padding:0}
+nav.bar .dot.on{background:var(--ink)}
+.nav{border:3px solid var(--ink);background:#fff;border-radius:14px;padding:.2em 1em;font-size:clamp(18px,min(1.8vw,3.4vh),30px)}
+.nav:disabled{opacity:.35;cursor:default}
+.foot{font-size:12px;color:var(--muted);text-align:right;font-family:var(--sans)}
+@media (max-width:700px){.vs{grid-template-columns:1fr}}
+</style>
+
+<style>
+.legend{display:flex;gap:1vw;flex-wrap:wrap;align-items:center}
+.lg{border-radius:999px;padding:.1em .8em;font-size:clamp(16px,min(1.6vw,3vh),28px);border:3px solid transparent}
+.L1{background:#fbe4ea;color:#c94b6d}.L2{background:#fbefd2;color:#9a6a08}.L3{background:#dcf2f0;color:#1f7f79}.L4{background:#e2e7fb;color:#4258b8}.L0{background:#eee8e0;color:#6b5f56}
+.text{display:flex;flex-direction:column;gap:1vh;font-size:clamp(18px,min(1.9vw,3.6vh),32px);line-height:1.75}
+.text p{margin:0}
+.pno{display:inline-block;min-width:2.2em;color:var(--muted);font-size:.6em;font-family:var(--sans)}
+.sen{display:block;width:fit-content;max-width:100%;margin:.15em 0;border:0;background:none;padding:0 .05em;border-radius:8px;font:inherit;line-height:inherit;text-align:left;cursor:pointer;border-bottom:3px dotted #c9b8a6}
+.sen:hover{background:#f6efe5}
+.sen.on{border-bottom-color:transparent}
+.sen.on.k1{background:#fbe4ea}.sen.on.k2{background:#fbefd2}.sen.on.k3{background:#dcf2f0}.sen.on.k4{background:#e2e7fb}.sen.on.k0{color:#8d8178}
+.badge{display:inline-block;font-size:.55em;border-radius:999px;padding:.05em .6em;margin:0 .3em;vertical-align:middle;font-family:var(--sans);white-space:nowrap}
+.tools{display:flex;gap:1vw;flex-wrap:wrap}
+.essay{display:flex;flex-direction:column;gap:1.4vh}
+.essay .row{display:grid;grid-template-columns:auto 1fr;gap:1.4vw;align-items:center}
+.essay .row .lg{min-width:7.5em;text-align:center}
+.essay .row .s{font-size:clamp(22px,min(2.4vw,4.6vh),42px);line-height:1.5;background:#fff;border:2px dashed #d8c8b4;border-radius:14px;padding:.4em .7em}
+.essay .row .s.hide{color:transparent;background:repeating-linear-gradient(45deg,#f6efe5,#f6efe5 10px,#efe5d6 10px,#efe5d6 20px)}
+.ask{font-size:clamp(16px,min(1.6vw,3vh),28px);color:var(--blue);margin:.2em 0 0}
+.themes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1.6vw;flex:1}
+.th{border:5px solid;border-radius:24px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2vh;padding:2vh 1vw;background:#fff}
+.th .n{font-size:clamp(26px,5vh,54px);font-weight:700}
+.th .e{font-size:clamp(60px,14vh,160px);line-height:1}
+.th .t{font-size:clamp(34px,7vh,80px)}
+.th.hide .e,.th.hide .t{visibility:hidden}
+@media (max-width:800px){.themes{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.rm{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:2vw}
+.rm-map{position:relative;background:#f3ead9;border:3px solid var(--ink);border-radius:20px;min-height:52vh;overflow:hidden}
+.rm-board{position:absolute;left:28%;right:28%;top:2%;height:7%;background:#2f5d50;color:#fff;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--sans);font-size:clamp(12px,1.8vh,20px)}
+.rm-desk{position:absolute;left:3%;top:3%;width:16%;height:9%;background:#d9d2c5;border:2px solid #9b9080;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--sans);font-size:clamp(11px,1.6vh,18px);color:#5d5348}
+.rm-table{position:absolute;width:30%;height:26%;background:#3f8f6b;border:4px solid #b98a4a;border-radius:12px;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;transition:background .6s}
+.rm-table.t0{left:28%;top:36%}.rm-table.t1{left:72%;top:36%}.rm-table.t2{left:28%;top:76%}.rm-table.t3{left:72%;top:76%}
+.rm-tl{font-family:var(--sans);font-weight:800;color:#fff;font-size:clamp(14px,2.6vh,30px);text-align:center;line-height:1.2;text-shadow:0 1px 3px rgba(0,0,0,.4)}
+.rm-dot{position:absolute;width:clamp(40px,8.4vh,86px);height:clamp(40px,8.4vh,86px);border-radius:50%;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;border:3px solid #fff;box-shadow:0 3px 8px rgba(0,0,0,.3);transition:left 1.6s cubic-bezier(.5,0,.3,1),top 1.6s cubic-bezier(.5,0,.3,1),transform .3s;font-family:var(--sans);color:#fff;z-index:2}
+.rm-dot b{font-size:clamp(18px,3.8vh,40px)}
+.rm-dot i{position:absolute;right:-6px;bottom:-6px;font-style:normal;font-size:clamp(11px,1.8vh,18px);font-weight:800;background:#fff;color:#2d2420;border-radius:50%;width:1.7em;height:1.7em;display:flex;align-items:center;justify-content:center;border:2px solid #2d2420}
+.rm-dot.r0{background:#c94b6d}.rm-dot.r1{background:#c4870f}.rm-dot.r2{background:#2a9d96}.rm-dot.r3{background:#5468c9}
+.rm-bub{position:absolute;left:50%;bottom:105%;transform:translateX(-50%) scale(0);background:#fff;color:#2d2420;border:2px solid #2d2420;border-radius:12px;padding:.1em .5em;font-size:clamp(12px,2vh,22px);white-space:nowrap;transition:transform .35s;transform-origin:50% 100%;font-weight:700}
+.rm-dot.bub .rm-bub{transform:translateX(-50%) scale(1)}
+.rm-dot.bub{z-index:3}
+.rm-dot.pop{animation:rmPop .9s both}
+@keyframes rmPop{0%,100%{transform:translate(-50%,-50%) scale(1)}40%{transform:translate(-50%,-50%) scale(1.35)}}
+.rm-side{display:flex;flex-direction:column;gap:1.6vh;min-width:0}
+.rm-n{margin:0;font-family:var(--sans);font-weight:800;color:var(--muted);font-size:clamp(16px,2.6vh,28px)}
+.rm-h{margin:0;font-size:clamp(28px,5.6vh,60px);line-height:1.3}
+.rm-p{margin:0;font-size:clamp(20px,3.4vh,38px);line-height:1.6}
+.rm-x{font-size:clamp(20px,3.2vh,36px);line-height:1.7;background:#fff;border:3px dashed #d8c8b4;border-radius:16px;padding:.5em .8em}
+.rm-x:empty{display:none}
+.rm-x .me{background:#fff3c4;border-radius:6px;padding:0 .1em}
+.rm-x .it{display:none;background:#d5f2df;border-radius:6px;padding:0 .1em}
+.rm-x.sw .me.c{display:none}.rm-x.sw .it{display:inline}
+.rm-ctl{display:flex;gap:12px;margin-top:auto;align-items:center}
+.rm-time{display:inline-block;background:#2d2420;color:#fff;border-radius:999px;padding:.05em .7em;font-family:var(--sans);font-size:.75em;vertical-align:middle}
+@media (max-width:900px){.rm{grid-template-columns:1fr}}
+.more{display:flex;flex-wrap:wrap;gap:.8vh .8vw}.essay .row .more .s{font-size:clamp(17px,min(1.8vw,3.4vh),33px);line-height:1.5;padding:.2em .6em;text-align:left;font-family:inherit;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>第九課　小詩導學</h1>
+    <div class="tabs" id="tabs"></div>
+    <button class="tab" id="fs" type="button">全螢幕</button>
+  </header>
+  <main class="slide" id="slide" aria-live="polite"></main>
+  <nav class="bar">
+    <button class="nav" id="prev" type="button">← 上一󠇡頁</button>
+    <div class="dots" id="dots"></div>
+    <button class="nav" id="next" type="button">下一󠇡頁 →</button>
+  </nav>
+  <p class="foot">© 范范老師（老師媽咪）設計｜方向鍵可以換頁</p>
+</div>
+<script>
+// 四個󠇡層次：1 穿戴（樣子󠇡）→ 2 譬喻（像什麼）→ 3 摹寫（加聲音）→ 4 說的話
+const LV = [['L0', ''], ['L1', '① 穿戴：他的樣子󠇡'], ['L2', '② 譬喻：像什麼'], ['L3', '③ 摹寫：加聲音'], ['L4', '④ 表情和󠇡說的話']];
+const legend = `<div class="legend">${LV.slice(1).map(l => `<span class="lg ${l[0]}">${l[1]}</span>`).join('')}</div>`;
+// 範例小詩：把課文〈穿白袍的醫生伯伯󠇡〉濃縮成四句，主角是「醫生伯伯󠇡」
+const EX = [
+  [1, '醫生伯伯󠇡，穿著白袍，戴上聽筒。', '第 1 句：用「＿，穿著＿，戴上＿。」寫出主角的樣子󠇡。'],
+  [2, '醫生伯伯󠇡的白袍，像雲那麼白。', '第 2 句：用「誰的＿，像＿那麼＿。」寫一󠇡個󠇡比喻。'],
+  [3, '醫生伯伯󠇡輕輕敲我的背，ㄎㄡˋ ㄎㄡˋ ㄎㄡˋ！', '第 3 句：寫出主角工作時的動作和󠇡聲音。'],
+  [4, '醫生伯伯󠇡露󠇡出陽光般溫暖的微笑，說：「乖乖的吃藥，身體很快就會好！」', '第 4 句：用「＿般＿的＿」寫表情或動作，再寫他說的一󠇡句話。']
+];
+// 第二篇範例：主角「老師」（不󠇡是四組的主角），讓孩子󠇡更有畫面
+const EX2 = [[1, '老師，穿著整齊的衣服，戴上眼鏡。'], [2, '老師的眼睛，像星星那麼亮。'], [3, '老師拿起粉筆寫字，ㄉㄚ ㄉㄚ ㄉㄚ！'], [4, '老師露󠇡出春風般溫柔的微笑，說：「慢慢來，你一󠇡定做得󠇡到！」']];
+const MORE = [
+  [1, ['護理師，穿著白衣，戴上口罩。', '農夫，穿著雨鞋，戴上斗笠。', '棒球選手，穿著球衣，戴上手套。']],
+  [2, ['姐姐的頭髮，像絲綢那麼滑順。', '哥哥󠇡的牙齒，像石頭那麼堅硬。', '妹妹󠇡的皮膚，像豆腐那麼軟嫩。']],
+  [3, ['農夫揮著鋤頭，咚！咚！咚！', '司機按下喇叭，叭叭叭！']],
+  [4, ['農夫露󠇡出太陽般燦爛的笑容，說：「今年的稻子󠇡長󠇡得󠇡真好！」', '司機眨著星星般明亮的眼睛，說：「坐穩囉󠇢，要出發了！」']]
+];
+const SND = ['汪汪汪（小狗）', '叩叩叩（敲門）', '撲通撲通（心跳）', '呱呱呱（青蛙）', '呼呼呼（風）', '咕嚕咕嚕（肚子󠇡）', '滴答󠇡滴答󠇡（雨）', '啾啾啾（小鳥）'];
+const THEMES = [['第 1 組', '🧑‍🍳', '廚師', '#d8443a'], ['第 2 組', '👮', '警察', '#2f6fb5'], ['第 3 組', '📮', '郵差', '#2e9a5c'], ['第 4 組', '🧑‍🚒', '消防員', '#9b59b6']];
+const CH = ['範例小詩', '一󠇢層一層看', '再看一󠇢首', '各組主角', '任務規則'];
+const S = [
+  { ch: 0, html: `<p class="kicker">範例小詩　把課文濃縮成四句，主角是「醫生伯伯󠇡」。點一󠇡句，看看它是哪一󠇡個󠇡層次</p>${legend}
+    <div class="text" style="font-size:clamp(22px,min(2.5vw,4.6vh),44px);line-height:1.8;background:#fff;border:3px solid var(--ink);border-radius:18px;padding:2vh 2.4vw">
+      <p style="text-align:center;font-weight:700">醫生伯伯󠇡</p>
+      <p>${EX.map(([k, s]) => `<button type="button" class="sen k${k}" data-k="${k}">${s}</button>`).join('')}</p></div>
+    <div class="tools"><button class="btn ghost" type="button" data-all>全部顯示</button></div>` },
+  { ch: 1, html: `<p class="kicker">一󠇢層一層看　四句都在寫同一󠇡位主角：醫生伯伯󠇡</p>
+    <div class="essay">${EX.map(([k, s, a]) => `<div class="row"><span class="lg L${k}">${LV[k][1]}</span><div><div class="s">${s}</div><p class="ask">💡 ${a}</p></div></div>`).join('')}</div>` },
+  { ch: 1, html: `<p class="kicker">每一󠇢層再多看幾個󠇡例子󠇡（點一󠇡下打開）</p>
+    <div class="essay">${MORE.map(([k, ss]) => `<div class="row"><span class="lg L${k}">${LV[k][1]}</span><div class="more">${ss.map(x => `<button type="button" class="s hide" data-ex>${x}</button>`).join('')}</div></div>`).join('')}</div>
+    <p class="ask">🔊 聲音詞複習：${SND.join('、')}</p>` },
+  { ch: 2, html: `<p class="kicker">再看一󠇢首　主角換成「老師」，四個󠇡層次還在嗎？點一󠇡句看看</p>${legend}
+    <div class="text" style="font-size:clamp(22px,min(2.5vw,4.6vh),44px);line-height:1.8;background:#fff;border:3px solid var(--ink);border-radius:18px;padding:2vh 2.4vw">
+      <p style="text-align:center;font-weight:700">🧑‍🏫 老師</p>
+      <p>${EX2.map(([k, s]) => `<button type="button" class="sen k${k}" data-k="${k}">${s}</button>`).join('')}</p></div>
+    <div class="tools"><button class="btn ghost" type="button" data-all>全部顯示</button></div>` },
+  { ch: 3, html: `<p class="kicker">各組主角　每一󠇢組仿照範例，寫一󠇢首四句小詩，每個人負責一󠇡句</p>
+    <div class="themes">${THEMES.map(([n, e, t, c]) => `<button type="button" class="th hide" data-th style="border-color:${c}"><span class="n" style="color:${c}">${n}</span><span class="e">${e}</span><span class="t">${t}</span></button>`).join('')}</div>
+    <div class="tools"><button class="btn" type="button" data-thall>全部揭曉</button></div>` },
+  { ch: 4, html: `<div class="rm" id="rm"><div class="rm-map"><div class="rm-board">黑板・電視</div><div class="rm-desk">老師桌</div>
+      ${[0, 1, 2, 3].map(t => `<div class="rm-table t${t}"><span class="rm-tl"></span></div>`).join('')}
+      ${rmDots().map(d => `<div class="rm-dot r${d.r}" data-g="${d.g}" data-r="${d.r}" data-hs="${d.hs}" data-es="${d.es}"><b>${d.label}</b><i>${d.g + 1}</i><span class="rm-bub"></span></div>`).join('')}
+    </div>
+    <div class="rm-side"><p class="rm-n"></p><h2 class="rm-h"></h2><p class="rm-p"></p><div class="rm-x"></div>
+      <div class="rm-ctl"><button type="button" class="nav" id="rmPrev">← 上一󠇡步</button><button type="button" class="btn" id="rmNext">下一󠇡步 →</button></div></div></div>` }
+];
+// ===== 任務規則動畫：教室裡四張大桌子󠇡，16 個󠇡圓點照步驟移動 =====
+const RM_T = [[28, 36], [72, 36], [28, 76], [72, 76]]; // 左前、右前、左後、右後
+const RM_S = [[-8, -8], [8, -8], [-8, 8], [8, 8], [0, -8.6], [0, 8.6], [-13, 0], [13, 0]];
+// 教師端「分組」排好的原組名單（同一󠇢台電腦開過教師端的分組分頁才會有）→ 圓點顯示真的座號
+function rmRoster() { try { const h = JSON.parse(localStorage.getItem('l9-home-now') || 'null'); return h && h.groups && h.groups.flat().length ? h.groups : null; } catch (e) { return null; } }
+function rmDots() {
+  const R = rmRoster(); const out = [];
+  if (!R) { for (let g = 0; g < 4; g++) for (let r = 0; r < 4; r++) out.push({ g, r, hs: r, es: g, label: '雲蘋啄陽'[r] }); return out; }
+  const ec = [0, 0, 0, 0];
+  R.forEach((grp, g) => grp.forEach((m, k) => { const r = Math.max(0, 'ABCD'.indexOf(m.lv)); out.push({ g, r, hs: Math.min(k, 7), es: Math.min(ec[r]++, 7), label: m.seat }); }));
+  return out;
+}
+const RM_ROLE = ['白雲', '蘋果', '啄木鳥', '陽光'];
+const RM_STEPS = [
+  { h: '現在：原組', p: rmRoster() ? '找到你的座號！顏色是你的身分󠇡（紅＝白雲、黃＝蘋果、綠＝啄木鳥、藍＝陽光），右下角的數字是你的原組。' : '每一󠇢組都有白雲、蘋果、啄木鳥、陽光。圓點右下角的數字是你的原組。', mode: 'home', tl: g => `第 ${g + 1} 組` },
+  { h: '① 專家出發！', p: '看電視名單，同一󠇢種專家坐在一󠇢起。白雲、蘋果坐前面兩桌，啄木鳥、陽光坐後面兩桌。<b>只帶平板</b>，椅子󠇡不󠇡用搬。', mode: 'exp', tl: g => RM_ROLE[g] + '<br>專家組' },
+  { h: '② 只要寫一󠇡句', p: '打開平板「專家任務」，寫你原組的主角。句子󠇡裡要寫出主角；卡󠇡住了，點「看提示」。<br><span class="rm-time">⏱ 10 分鐘</span>', mode: 'exp', tl: g => RM_ROLE[g] + '<br>專家組', bub: () => '✏️ 寫一󠇡句' },
+  { h: '③ 念給同組聽', p: '寫好了，念給同一󠇢桌的專家聽，互相󠇡給一󠇡個󠇡建議，再修改。', mode: 'exp', tl: g => RM_ROLE[g] + '<br>專家組', bub: (g, r) => ['我念給你聽', '這裡可以加…', '好聽！', '再改一󠇡下'][g] },
+  { h: '④ 專家回家！', p: '回到原組，照 白雲 → 蘋果 → 啄木鳥 → 陽光 的順序念，四句連起來就是一󠇢首小詩！', mode: 'home', tl: g => `第 ${g + 1} 組`, seq: true },
+  { h: '⑤ 一󠇢起修一修', p: '連起來念念看，哪裡怪怪的？重󠇡複的主角，哪幾個󠇡可以換成「他」？<br><span class="rm-time">⏱ 5 分鐘</span>', mode: 'home', tl: g => `第 ${g + 1} 組`,
+    x: '<span class="me">醫生伯伯󠇡</span>，穿著白袍，戴上聽筒。<br><span class="me c">醫生伯伯󠇡</span><span class="it">他</span>的白袍，像雲那麼白。<br><span class="me c">醫生伯伯󠇡</span><span class="it">他</span>輕輕敲我的背，ㄎㄡˋ ㄎㄡˋ ㄎㄡˋ！<br><span class="me c">醫生伯伯󠇡</span><span class="it">他</span>露󠇡出陽光般溫暖的微笑，說：「乖乖的吃藥，身體很快就會好！」' },
+  { h: '⑥ 上臺念小詩，別組當評審', p: '一󠇢組上臺念，其他組打開平板「小組互評」：給星星，再選一󠇡句好話送給他們。自己這一󠇢組不󠇡用評。', mode: 'home', tl: g => g === 0 ? '第 1 組<br>上臺！' : `第 ${g + 1} 組<br>評審`, bub: (g) => g === 0 ? '🎤' : '★★★' }
+];
+let rmStep = 0, rmTimers = [];
+function rmInit() { rmStep = 0; rmShow(true); $('#rmPrev').onclick = () => { if (rmStep > 0) { rmStep--; rmShow(); } }; $('#rmNext').onclick = () => { if (rmStep < RM_STEPS.length - 1) { rmStep++; rmShow(); } else { rmStep = 0; rmShow(); } }; }
+function rmShow(first) {
+  rmTimers.forEach(clearTimeout); rmTimers = [];
+  const st = RM_STEPS[rmStep];
+  document.querySelectorAll('.rm-dot').forEach(d => { const g = +d.dataset.g, r = +d.dataset.r;
+    const t = st.mode === 'home' ? g : r, seat = st.mode === 'home' ? +d.dataset.hs : +d.dataset.es;
+    if (first) d.style.transition = 'none';
+    d.style.left = (RM_T[t][0] + RM_S[seat][0]) + '%'; d.style.top = (RM_T[t][1] + RM_S[seat][1] * 1.25) + '%';
+    if (first) { d.offsetWidth; d.style.transition = ''; }
+    d.classList.remove('pop', 'bub'); const bu = d.querySelector('.rm-bub'); bu.textContent = st.bub ? st.bub(g, r) : '';
+    if (st.bub) rmTimers.push(setTimeout(() => d.classList.add('bub'), 500 + (g * 4 + r) * 90));
+    if (st.seq) rmTimers.push(setTimeout(() => { bu.textContent = '①②③④'[r]; d.classList.add('pop', 'bub'); }, 2000 + r * 900)); });
+  document.querySelectorAll('.rm-table').forEach((t, i) => { t.querySelector('.rm-tl').innerHTML = st.tl(i); t.style.background = st.mode === 'exp' ? ['#c94b6d', '#c4870f', '#2a9d96', '#5468c9'][i] : '#3f8f6b'; });
+  $('.rm-n').textContent = `步驟 ${rmStep} / ${RM_STEPS.length - 1}`; $('.rm-h').textContent = st.h; $('.rm-p').innerHTML = st.p;
+  const x = $('.rm-x'); x.className = 'rm-x'; x.innerHTML = st.x || ''; if (st.x) rmTimers.push(setTimeout(() => x.classList.add('sw'), 2600));
+  $('#rmPrev').disabled = rmStep === 0; $('#rmNext').textContent = rmStep === RM_STEPS.length - 1 ? '↻ 重󠇡播' : '下一󠇡步 →';
+}
+let cur = 0;
+const $ = s => document.querySelector(s);
+function render() {
+  const s = S[cur];
+  $('#slide').innerHTML = s.html;
+  $('#tabs').innerHTML = CH.map((c, i) => `<button class="tab" type="button" data-ch="${i}" aria-current="${s.ch === i}">${c}</button>`).join('');
+  $('#dots').innerHTML = S.map((x, i) => `<button class="dot ${i === cur ? 'on' : ''}" type="button" data-i="${i}" aria-label="第 ${i + 1} 頁"></button>`).join('');
+  $('#prev').disabled = cur === 0; $('#next').disabled = cur === S.length - 1;
+  const show = b => { if (b.classList.contains('on')) return; b.classList.add('on'); if (+b.dataset.k) b.insertAdjacentHTML('beforeend', `<span class="badge ${LV[+b.dataset.k][0]}">${LV[+b.dataset.k][1]}</span>`); };
+  document.querySelectorAll('.sen').forEach(b => b.onclick = () => { if (b.classList.contains('on')) { b.classList.remove('on'); b.querySelector('.badge')?.remove(); } else show(b); });
+  document.querySelectorAll('[data-all]').forEach(b => b.onclick = () => document.querySelectorAll('.sen').forEach(show));
+  document.querySelectorAll('[data-ex]').forEach(b => b.onclick = () => b.classList.toggle('hide'));
+  document.querySelectorAll('[data-th]').forEach(b => b.onclick = () => b.classList.toggle('hide'));
+  document.querySelectorAll('[data-thall]').forEach(b => b.onclick = () => document.querySelectorAll('[data-th]').forEach(x => x.classList.remove('hide')));
+  if ($('#rm')) rmInit();
+  document.querySelectorAll('[data-ch]').forEach(b => b.onclick = () => { cur = S.findIndex(x => x.ch === +b.dataset.ch); render(); });
+  document.querySelectorAll('[data-i]').forEach(b => b.onclick = () => { cur = +b.dataset.i; render(); });
+  try { history.replaceState(null, '', '#' + (cur + 1)); } catch (e) {}
+}
+$('#prev').onclick = () => { if (cur > 0) { cur--; render(); } };
+$('#next').onclick = () => { if (cur < S.length - 1) { cur++; render(); } };
+$('#fs').onclick = () => { try { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen(); } catch (e) {} };
+document.addEventListener('keydown', e => { if (e.key === 'ArrowRight' || e.key === 'PageDown') $('#next').click(); if (e.key === 'ArrowLeft' || e.key === 'PageUp') $('#prev').click(); });
+const h = parseInt(location.hash.slice(1)); if (h >= 1 && h <= S.length) cur = h - 1;
+render();
+</script>
+</body>
+</html>

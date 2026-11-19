@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>修辭導學</title>
+<link rel="stylesheet" href="../fonts/bpmf/bpmf.css">
+<style>
+:root{
+  --bg:#fbf4ea; --paper:#fffdf8; --ink:#2d2420; --muted:#86766a; --soft:#eadccb;
+  --red:#c8372d; --blue:#2f6fb5; --green:#2e8a56; --gold:#c4870f; --purple:#5468c9;
+  --rose:#c94b6d; --rose-s:#fbe4ea; --gold-s:#fbefd2; --teal:#2a9d96; --teal-s:#dcf2f0; --blue-s:#e2e7fb;
+  --zy:"Bpmf Zihi Kai Std";
+  --sans:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--zy),var(--sans)}
+button{font:inherit;cursor:pointer;color:inherit}
+button:focus-visible{outline:4px solid var(--blue);outline-offset:3px}
+.app{height:100vh;min-height:540px;display:flex;flex-direction:column;gap:1.4vh;padding:1.6vh 2vw}
+header{display:flex;align-items:center;gap:12px;flex-wrap:wrap;flex:0 0 auto}
+header h1{font-size:clamp(20px,min(2.4vw,4.6vh),36px);margin:0}
+.tabs{display:flex;gap:8px;margin-left:auto;flex-wrap:wrap}
+.tab{border:2px solid var(--ink);background:#fff;border-radius:12px;padding:5px 14px;font-size:clamp(16px,min(1.6vw,3vh),26px)}
+.tab[aria-current="true"]{background:var(--ink);color:#fff}
+.slide{flex:1;min-height:0;background:var(--paper);border:3px solid var(--ink);border-radius:22px;padding:2.4vh 2.6vw;display:flex;flex-direction:column;gap:1.6vh;overflow:auto;position:relative}
+.kicker{font-size:clamp(16px,min(1.6vw,3vh),26px);color:var(--muted);margin:0}
+.big{font-size:clamp(26px,min(3.2vw,6vh),56px);line-height:1.5;margin:0}
+.mid{font-size:clamp(20px,min(2.3vw,4.4vh),40px);line-height:1.5;margin:0}
+.q{font-size:clamp(24px,min(2.8vw,5.4vh),48px);margin:0;color:var(--blue)}
+.zy-plain{font-family:var(--sans)}
+.reveal{border:3px dashed var(--soft);border-radius:18px;padding:2vh 2vw;display:flex;flex-direction:column;gap:1.2vh}
+.reveal[hidden]{display:none}
+.tag{display:inline-block;border-radius:999px;padding:.05em .7em;color:#fff;font-size:.9em}
+.t-ni{background:var(--green)}.t-mo{background:var(--gold)}.t-xie{background:var(--purple)}
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:2vw}
+.vs > div{border-radius:16px;padding:1.2vh 1.2vw;font-size:clamp(18px,min(1.9vw,3.6vh),32px);line-height:1.5}
+.vs .plain{background:#eee8e0;color:#6b5f56}
+.vs .magic{background:#fff3c4}
+.vs b{display:block;font-size:.7em;color:var(--muted);font-weight:normal}
+.btn{border:3px solid var(--ink);background:var(--ink);color:#fff;border-radius:16px;padding:.35em 1.2em;font-size:clamp(20px,min(2.2vw,4vh),36px);align-self:flex-start}
+.btn.ghost{background:#fff;color:var(--ink)}
+.hl{border-radius:8px;padding:0 .12em}
+.who{background:#ffd9d2}.what{background:#d6e8ff}.how{background:#d5f2df}
+.skel{display:flex;gap:1vw;flex-wrap:wrap;font-size:clamp(26px,min(3.2vw,6vh),56px)}
+.skel span{border:3px solid var(--ink);border-radius:14px;padding:.1em .5em;background:#fff}
+.skel small{display:block;font-size:.45em;color:var(--muted);text-align:center;font-family:var(--sans)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:2vw}
+.flip{border:3px solid var(--ink);border-radius:18px;background:#fff;padding:2vh 1.4vw;text-align:left;display:flex;flex-direction:column;gap:1vh;min-height:24vh}
+.flip .front{font-size:clamp(24px,min(2.6vw,5vh),44px)}
+.flip .back{font-size:clamp(18px,min(1.9vw,3.6vh),32px);line-height:1.6;color:var(--ink)}
+.flip .back[hidden]{display:none}
+.flip .tap{color:var(--muted);font-size:clamp(14px,min(1.3vw,2.4vh),22px);margin-top:auto}
+.flip.open{background:#fffbea}.cards.snd{grid-template-columns:repeat(4,minmax(0,1fr));gap:1.4vw}.cards.snd .flip{min-height:20vh;align-items:center;text-align:center}.cards.snd .front{font-size:clamp(26px,min(3vw,5.6vh),52px)}.flip-img{display:block;max-height:22vh;max-width:100%;border-radius:12px;margin:0 0 1vh}
+.lv{display:grid;grid-template-columns:auto 1fr;gap:1.4vh 1.6vw;align-items:center}
+.lv .pill{border-radius:999px;padding:.15em .8em;font-size:clamp(18px,min(2vw,3.8vh),34px);white-space:nowrap}
+.lv .txt{font-size:clamp(18px,min(2vw,3.8vh),34px);line-height:1.5}
+.p-rose{background:var(--rose-s);color:var(--rose)}.p-gold{background:var(--gold-s);color:var(--gold)}.p-teal{background:var(--teal-s);color:var(--teal)}.p-blue{background:var(--blue-s);color:var(--purple)}
+.lvhead{display:flex;align-items:center;gap:1.4vw;flex-wrap:wrap}
+.lvhead .pill{font-size:clamp(28px,min(3.4vw,6.4vh),58px);border-radius:999px;padding:.05em .7em}
+.box{border-radius:16px;padding:1.6vh 1.4vw;background:#f6efe5;font-size:clamp(20px,min(2.2vw,4.2vh),38px);line-height:1.6}
+.box b{display:block;font-size:.65em;color:var(--muted);font-weight:normal;font-family:var(--sans)}
+.box.ex{background:#fff3c4}
+.rules{margin:0;padding-left:1.2em;font-size:clamp(22px,min(2.5vw,4.8vh),42px);line-height:1.9}
+nav.bar{display:flex;align-items:center;gap:12px;flex:0 0 auto}
+nav.bar .dots{display:flex;gap:6px;flex-wrap:wrap;margin:0 auto}
+nav.bar .dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--ink);background:#fff;padding:0}
+nav.bar .dot.on{background:var(--ink)}
+.nav{border:3px solid var(--ink);background:#fff;border-radius:14px;padding:.2em 1em;font-size:clamp(18px,min(1.8vw,3.4vh),30px)}
+.nav:disabled{opacity:.35;cursor:default}
+.foot{font-size:12px;color:var(--muted);text-align:right;font-family:var(--sans)}
+@media (max-width:700px){.vs{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>第九課　修辭導學</h1>
+    <div class="tabs" id="tabs"></div>
+    <button class="tab" id="fs" type="button">全螢幕</button>
+  </header>
+  <main class="slide" id="slide" aria-live="polite"></main>
+  <nav class="bar">
+    <button class="nav" id="prev" type="button">← 上一󠇡頁</button>
+    <div class="dots" id="dots"></div>
+    <button class="nav" id="next" type="button">下一󠇡頁 →</button>
+  </nav>
+  <p class="foot">© 范范老師（老師媽咪）設計｜方向鍵可以換頁</p>
+</div>
+<script>
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+// 每一󠇡頁：{ ch: 章節, html: 內容（可含 data-show 揭曉按鈕） }
+const CH = ['修辭偵探', '譬喻小教室', '聲音猜猜看'];
+const S = [];
+// ===== 一、修辭偵探：先讓孩子󠇡找，再揭曉 =====
+const det = (n, sent, ask, tag, cls, name, why, plain) => S.push({ ch: 0, html: `
+  <p class="kicker">修辭偵探 ${n} / 4　課文裡的句子󠇡</p>
+  <p class="big">${sent}</p>
+  <p class="q">🔍 ${ask}</p>
+  <button class="btn" type="button" data-show>揭曉答案</button>
+  <div class="reveal" hidden>
+    <p class="mid"><span class="tag ${cls}">${tag}</span>　${name}</p>
+    <div class="vs"><div class="plain"><b>平平的句子󠇡</b>${plain}</div><div class="magic"><b>課文的句子󠇡</b>${sent}</div></div>
+    <p class="mid">${why}</p>
+  </div>` });
+det(1, '醫生伯伯󠇡，穿著白袍，像雲一󠇡樣白。', '白袍和󠇡雲，哪裡一󠇡樣？', '譬喻', 't-xie', '用「像」把一󠇡樣東西󠇡比成另一󠇡樣東西󠇡', '白袍和󠇡雲都很白。說「像雲一󠇡樣白」，我們馬上就看到那件又白又乾淨的袍子󠇡。', '醫生伯伯󠇡穿著很白的白袍。');
+det(2, '醫生伯伯󠇡，戴上聽筒，像啄木鳥，準備抓蟲。', '醫生和󠇡啄木鳥，哪裡一󠇡樣？', '譬喻', 't-xie', '兩個󠇡「動作」很像，也可以比', '啄木鳥敲樹幹、仔細聽，把害蟲找出來；醫生輕輕敲、仔細聽，把毛病找出來。', '醫生伯伯󠇡戴上聽筒，準備幫我檢查。');
+det(3, '仔細聽，輕輕敲：ㄎㄡˋ ㄎㄡˋ ㄎㄡˋ！ㄎㄡˋ ㄎㄡˋ ㄎㄡˋ！', '閉上眼睛念念看，你「聽到」什麼？', '摹寫', 't-mo', '把聽到的聲音寫出來', '寫出聲音，讀起來好像真的坐在診所裡，聽到醫生輕輕敲的聲音。後面的「ㄆㄨ ㄊㄨㄥ！ㄆㄨ ㄊㄨㄥ！」也是。', '醫生伯伯󠇡仔細聽，輕輕敲。');
+det(4, '病毒在我的身體裡辦運動會，開心的手舞足蹈，又跑又跳。', '病毒會辦運動會嗎？誰才會？', '擬人', 't-ni', '把東西󠇡當󠇡成人來寫', '病毒在身體裡作怪，說成「辦運動會、又跑又跳」，生病這件事變得󠇡好有畫面、好有趣。', '病毒在我的身體裡，讓我生病了。');
+// ===== 二、譬喻小教室 =====
+S.push({ ch: 1, html: `
+  <p class="kicker">譬喻小教室　課文裡一󠇡共有四個󠇡譬喻</p>
+  <p class="big">譬喻：兩樣東西󠇡有<span class="hl how">一󠇡樣的地方</span>，</p>
+  <p class="big">就用<span class="hl what">「像」「一󠇡樣」「般」</span>把它們連起來。</p>
+  <div class="skel"><span>我的臉蛋<small>主角</small></span><span>像<small>連起來</small></span><span>蘋果<small>像什麼</small></span><span>那麼紅<small>一󠇡樣的地方</small></span></div>` });
+const flip = (front, back) => `<button class="flip" type="button" data-flip><span class="front">${front}</span><span class="back" hidden>${back}</span><span class="tap">點一󠇡下看答案</span></button>`;
+S.push({ ch: 1, html: `
+  <p class="kicker">譬喻小教室　課文的四個󠇡譬喻：誰像什麼？哪裡一󠇡樣？</p>
+  <div class="cards">
+    ${flip('🥼 白袍，像雲一󠇡樣白', '主角：白袍<br>像什麼：雲<br>一󠇡樣的地方：都很<b>白</b>')}
+    ${flip('🩺 戴上聽筒的醫生，像啄木鳥', '主角：醫生<br>像什麼：啄木鳥<br>一󠇡樣的地方：都會<b>仔細聽、輕輕敲</b>，找出毛病')}
+    ${flip('🍎 我的臉蛋，像蘋果那麼紅', '主角：我的臉蛋<br>像什麼：蘋果<br>一󠇡樣的地方：都很<b>紅</b>')}
+    ${flip('☀️ 露󠇡出陽光般溫暖的微笑', '主角：醫生的微笑<br>像什麼：陽光<br>一󠇡樣的地方：都很<b>溫暖</b>')}
+  </div>` });
+S.push({ ch: 1, html: `
+  <p class="kicker">譬喻小教室　你來比比看：它像什麼？（先說說看，再點開）</p>
+  <div class="cards">
+    ${flip('姐姐的頭髮，像＿＿那麼滑順。', '絲綢、溜滑梯、瀑布……<br>只要也很「滑順」，就可以！')}
+    ${flip('哥哥󠇡的牙齒，像＿＿那麼堅硬。', '石頭、鐵、鑽石……<br>只要也很「堅硬」，就可以！')}
+    ${flip('妹妹󠇡的皮膚，像＿＿那麼軟嫩。', '豆腐、麻糬、棉花糖……<br>只要也很「軟嫩」，就可以！')}
+    ${flip('眨著＿＿般明亮的眼睛', '星星、燈泡、寶石……<br>「般」和「像……一󠇡樣」是同樣的意思。')}
+  </div>
+  <p class="mid">想一想：兩樣東西󠇡「哪裡一󠇡樣」？說得󠇡出來，就是好譬喻。</p>` });
+S.push({ ch: 1, html: `
+  <p class="kicker">譬喻小教室　句子󠇡醫生：這個󠇡句子󠇡哪裡生病了？</p>
+  <p class="big">妹妹󠇡像蘋果那麼紅。</p>
+  <p class="q">🔍 整個󠇡妹妹󠇡都紅紅的嗎？是妹妹󠇡的「什麼」像蘋果？</p>
+  <button class="btn" type="button" data-show>幫它治病</button>
+  <div class="reveal" hidden>
+    <div class="vs"><div class="plain"><b>生病的句子󠇡</b>妹妹󠇡像蘋果那麼紅。</div><div class="magic"><b>治好的句子󠇡</b>妹妹󠇡的<span class="hl who">臉</span>像蘋果那麼紅。</div></div>
+    <p class="mid">要說清楚是「誰的什麼」：我的<b>臉蛋</b>、姐姐的<b>頭髮</b>、哥哥󠇡的<b>牙齒</b>。</p>
+  </div>` });
+// ===== 三、摹寫補充：聲音猜猜看（不󠇡用四組主角會用到的聲音） =====
+const SND = [['汪汪汪', '🐶 小狗', '小狗「汪汪汪」的叫。'], ['叩叩叩', '✊ 敲門', '有人「叩叩叩」的敲門。'], ['撲通撲通', '💓 心跳', '我的心「撲通撲通」的跳。'], ['呱呱呱', '🐸 青蛙', '青蛙「呱呱呱」的唱歌。'],
+  ['呼呼呼', '🌬️ 風', '風「呼呼呼」的吹。'], ['咕嚕咕嚕', '😋 肚子󠇡', '肚子󠇡「咕嚕咕嚕」的叫。'], ['滴答󠇡滴答󠇡', '🌧️ 雨、時鐘', '雨「滴答󠇡滴答󠇡」的下。'], ['啾啾啾', '🐦 小鳥', '小鳥「啾啾啾」的叫。']];
+S.push({ ch: 2, html: `<p class="kicker">摹寫補充　聲音猜猜看：聽到這個󠇡聲音，你想到什麼？</p>
+  <div class="cards snd">${SND.map(([w, who, s]) => `<button class="flip" type="button" data-flip><span class="front">「${w}」</span><span class="back" hidden>${who}<br>${s}</span><span class="tap">點一󠇡下看答案</span></button>`).join('')}</div>` });
+let cur = 0;
+const $ = s => document.querySelector(s);
+function render() {
+  const s = S[cur];
+  $('#slide').innerHTML = s.html;
+  $('#tabs').innerHTML = CH.map((c, i) => `<button class="tab" type="button" data-ch="${i}" aria-current="${s.ch === i}">${c}</button>`).join('');
+  $('#dots').innerHTML = S.map((x, i) => `<button class="dot ${i === cur ? 'on' : ''}" type="button" data-i="${i}" aria-label="第 ${i + 1} 頁"></button>`).join('');
+  $('#prev').disabled = cur === 0; $('#next').disabled = cur === S.length - 1;
+  document.querySelectorAll('[data-show]').forEach(b => b.onclick = () => { const r = b.nextElementSibling; r.hidden = !r.hidden; b.textContent = r.hidden ? b.dataset.l || b.textContent : '收起來'; });
+  document.querySelectorAll('[data-show]').forEach(b => b.dataset.l = b.textContent);
+  document.querySelectorAll('[data-flip]').forEach(b => b.onclick = () => { const bk = b.querySelector('.back'); bk.hidden = !bk.hidden; b.classList.toggle('open', !bk.hidden); b.querySelector('.tap').textContent = bk.hidden ? '點一󠇡下看答案' : '再點一󠇡下收起來'; });
+  document.querySelectorAll('[data-ch]').forEach(b => b.onclick = () => { cur = S.findIndex(x => x.ch === +b.dataset.ch); render(); });
+  document.querySelectorAll('[data-i]').forEach(b => b.onclick = () => { cur = +b.dataset.i; render(); });
+  try { history.replaceState(null, '', '#' + (cur + 1)); } catch (e) {}
+}
+$('#prev').onclick = () => { if (cur > 0) { cur--; render(); } };
+$('#next').onclick = () => { if (cur < S.length - 1) { cur++; render(); } };
+$('#fs').onclick = () => { try { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen(); } catch (e) {} };
+document.addEventListener('keydown', e => { if (e.key === 'ArrowRight' || e.key === 'PageDown') $('#next').click(); if (e.key === 'ArrowLeft' || e.key === 'PageUp') $('#prev').click(); });
+const h = parseInt(location.hash.slice(1)); if (h >= 1 && h <= S.length) cur = h - 1;
+render();
+</script>
+</body>
+</html>
