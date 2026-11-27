@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>修辭導學</title>
+<link rel="stylesheet" href="../fonts/bpmf/bpmf.css">
+<style>
+:root{
+  --bg:#fbf4ea; --paper:#fffdf8; --ink:#2d2420; --muted:#86766a; --soft:#eadccb;
+  --red:#c8372d; --blue:#2f6fb5; --green:#2e8a56; --gold:#c4870f; --purple:#5468c9;
+  --rose:#c94b6d; --rose-s:#fbe4ea; --gold-s:#fbefd2; --teal:#2a9d96; --teal-s:#dcf2f0; --blue-s:#e2e7fb;
+  --zy:"Bpmf Zihi Kai Std";
+  --sans:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--zy),var(--sans)}
+button{font:inherit;cursor:pointer;color:inherit}
+button:focus-visible{outline:4px solid var(--blue);outline-offset:3px}
+.app{height:100vh;min-height:540px;display:flex;flex-direction:column;gap:1.4vh;padding:1.6vh 2vw}
+header{display:flex;align-items:center;gap:12px;flex-wrap:wrap;flex:0 0 auto}
+header h1{font-size:clamp(20px,min(2.4vw,4.6vh),36px);margin:0}
+.tabs{display:flex;gap:8px;margin-left:auto;flex-wrap:wrap}
+.tab{border:2px solid var(--ink);background:#fff;border-radius:12px;padding:5px 14px;font-size:clamp(16px,min(1.6vw,3vh),26px)}
+.tab[aria-current="true"]{background:var(--ink);color:#fff}
+.slide{flex:1;min-height:0;background:var(--paper);border:3px solid var(--ink);border-radius:22px;padding:2.4vh 2.6vw;display:flex;flex-direction:column;gap:1.6vh;overflow:auto;position:relative}
+.kicker{font-size:clamp(16px,min(1.6vw,3vh),26px);color:var(--muted);margin:0}
+.big{font-size:clamp(26px,min(3.2vw,6vh),56px);line-height:1.5;margin:0}
+.mid{font-size:clamp(20px,min(2.3vw,4.4vh),40px);line-height:1.5;margin:0}
+.q{font-size:clamp(24px,min(2.8vw,5.4vh),48px);margin:0;color:var(--blue)}
+.zy-plain{font-family:var(--sans)}
+.reveal{border:3px dashed var(--soft);border-radius:18px;padding:2vh 2vw;display:flex;flex-direction:column;gap:1.2vh}
+.reveal[hidden]{display:none}
+.tag{display:inline-block;border-radius:999px;padding:.05em .7em;color:#fff;font-size:.9em}
+.t-ni{background:var(--green)}.t-she{background:#2f6fb5}.t-tan{background:#d8443a}.t-mo{background:var(--gold)}.t-xie{background:var(--purple)}
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:2vw}
+.vs > div{border-radius:16px;padding:1.2vh 1.2vw;font-size:clamp(18px,min(1.9vw,3.6vh),32px);line-height:1.5}
+.vs .plain{background:#eee8e0;color:#6b5f56}
+.vs .magic{background:#fff3c4}
+.vs b{display:block;font-size:.7em;color:var(--muted);font-weight:normal}
+.btn{border:3px solid var(--ink);background:var(--ink);color:#fff;border-radius:16px;padding:.35em 1.2em;font-size:clamp(20px,min(2.2vw,4vh),36px);align-self:flex-start}
+.btn.ghost{background:#fff;color:var(--ink)}
+.hl{border-radius:8px;padding:0 .12em}
+.who{background:#ffd9d2}.what{background:#d6e8ff}.how{background:#d5f2df}
+.skel{display:flex;gap:1vw;flex-wrap:wrap;font-size:clamp(26px,min(3.2vw,6vh),56px)}
+.skel span{border:3px solid var(--ink);border-radius:14px;padding:.1em .5em;background:#fff}
+.skel small{display:block;font-size:.45em;color:var(--muted);text-align:center;font-family:var(--sans)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:2vw}
+.flip{border:3px solid var(--ink);border-radius:18px;background:#fff;padding:2vh 1.4vw;text-align:left;display:flex;flex-direction:column;gap:1vh;min-height:24vh}
+.flip .front{font-size:clamp(24px,min(2.6vw,5vh),44px)}
+.flip .back{font-size:clamp(18px,min(1.9vw,3.6vh),32px);line-height:1.6;color:var(--ink)}
+.flip .back[hidden]{display:none}
+.flip .tap{color:var(--muted);font-size:clamp(14px,min(1.3vw,2.4vh),22px);margin-top:auto}
+.flip.open{background:#fffbea}.cards.snd{grid-template-columns:repeat(4,minmax(0,1fr));gap:1.4vw}.cards.snd .flip{min-height:20vh;align-items:center;text-align:center}.cards.snd .front{font-size:clamp(26px,min(3vw,5.6vh),52px)}.flip-img{display:block;max-height:22vh;max-width:100%;border-radius:12px;margin:0 0 1vh}
+.lv{display:grid;grid-template-columns:auto 1fr;gap:1.4vh 1.6vw;align-items:center}
+.lv .pill{border-radius:999px;padding:.15em .8em;font-size:clamp(18px,min(2vw,3.8vh),34px);white-space:nowrap}
+.lv .txt{font-size:clamp(18px,min(2vw,3.8vh),34px);line-height:1.5}
+.p-rose{background:var(--rose-s);color:var(--rose)}.p-gold{background:var(--gold-s);color:var(--gold)}.p-teal{background:var(--teal-s);color:var(--teal)}.p-blue{background:var(--blue-s);color:var(--purple)}
+.lvhead{display:flex;align-items:center;gap:1.4vw;flex-wrap:wrap}
+.lvhead .pill{font-size:clamp(28px,min(3.4vw,6.4vh),58px);border-radius:999px;padding:.05em .7em}
+.box{border-radius:16px;padding:1.6vh 1.4vw;background:#f6efe5;font-size:clamp(20px,min(2.2vw,4.2vh),38px);line-height:1.6}
+.box b{display:block;font-size:.65em;color:var(--muted);font-weight:normal;font-family:var(--sans)}
+.box.ex{background:#fff3c4}
+.rules{margin:0;padding-left:1.2em;font-size:clamp(22px,min(2.5vw,4.8vh),42px);line-height:1.9}
+nav.bar{display:flex;align-items:center;gap:12px;flex:0 0 auto}
+nav.bar .dots{display:flex;gap:6px;flex-wrap:wrap;margin:0 auto}
+nav.bar .dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--ink);background:#fff;padding:0}
+nav.bar .dot.on{background:var(--ink)}
+.nav{border:3px solid var(--ink);background:#fff;border-radius:14px;padding:.2em 1em;font-size:clamp(18px,min(1.8vw,3.4vh),30px)}
+.nav:disabled{opacity:.35;cursor:default}
+.foot{font-size:12px;color:var(--muted);text-align:right;font-family:var(--sans)}
+@media (max-width:700px){.vs{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>第十課　修辭導學</h1>
+    <div class="tabs" id="tabs"></div>
+    <button class="tab" id="fs" type="button">全螢幕</button>
+  </header>
+  <main class="slide" id="slide" aria-live="polite"></main>
+  <nav class="bar">
+    <button class="nav" id="prev" type="button">← 上一󠇡頁</button>
+    <div class="dots" id="dots"></div>
+    <button class="nav" id="next" type="button">下一󠇡頁 →</button>
+  </nav>
+  <p class="foot">© 范范老師（老師媽咪）設計｜方向鍵可以換頁</p>
+</div>
+<script>
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+// 每一󠇡頁：{ ch: 章節, html: 內容（可含 data-show 揭曉按鈕） }
+const CH = ['修辭偵探', '設問小教室', '感嘆小舞臺'];
+const S = [];
+// ===== 一、修辭偵探：先讓孩子󠇡找，再揭曉 =====
+const det = (n, sent, ask, tag, cls, name, why, plain) => S.push({ ch: 0, html: `
+  <p class="kicker">修辭偵探 ${n} / 4　課文裡的句子󠇡</p>
+  <p class="big">${sent}</p>
+  <p class="q">🔍 ${ask}</p>
+  <button class="btn" type="button" data-show>揭曉答案</button>
+  <div class="reveal" hidden>
+    <p class="mid"><span class="tag ${cls}">${tag}</span>　${name}</p>
+    <div class="vs"><div class="plain"><b>平平的句子󠇡</b>${plain}</div><div class="magic"><b>課文的句子󠇡</b>${sent}</div></div>
+    <p class="mid">${why}</p>
+  </div>` });
+det(1, '如果北極熊脫下那身「白大衣」，你會發現牠的皮膚就像牠的眼珠子󠇡一󠇡樣黑呵！', '北極熊真的會穿衣服、脫衣服嗎？誰才會？', '擬人', 't-ni', '把動物當󠇡成人來寫', '人才會穿大衣、脫大衣。把北極熊的白毛說成「白大衣」，我們馬上想像得󠇡到：毛脫掉以後，裡面的皮膚是黑的。', '如果看看北極熊白毛底下，你會發現牠的皮膚是黑色的。');
+det(2, '說到北極熊，你會想到什麼？', '作者為󠇡什麼不直接說，要先「問」我們？', '設問', 't-she', '故意用問句，讓讀者先想一想', '先問一󠇡句，讀的人就會停下來想：「嗯……白白的毛？」接著再告訴你真相，就會覺得󠇡「哇，原來不󠇡是！」', '很多人覺得󠇡北極熊的毛是白色的。');
+det(3, '你是不󠇡是也曾經誤會了這些動物呢？', '這一󠇡句作者有回答嗎？是要誰來回答？', '設問', 't-she', '問了不回答，讓你自己想', '作者把問題留給讀者：「我以前是不󠇡是也誤會過牠們？」讀完以後，你會一󠇢直想著這個󠇡問題。', '我們也常常誤會這些動物。');
+det(4, '唉呀󠇡！真是誤會大了！', '念念看，「唉呀󠇡！」是什麼樣的心情？', '感嘆', 't-tan', '用「唉呀󠇡、哇、啊」說出心裡的感覺', '「唉呀󠇡！」把作者發現真相時又驚訝、又覺得󠇡不好意思的心情喊出來了。題目〈唉呀󠇡！誤會大了〉也用了感嘆。', '原來我們對動物有很大的誤會。');
+const flip = (front, back) => `<button class="flip" type="button" data-flip><span class="front">${front}</span><span class="back" hidden>${back}</span><span class="tap">點一󠇡下看答案</span></button>`;
+// ===== 二、設問小教室 =====
+S.push({ ch: 1, html: `
+  <p class="kicker">設問小教室　課文裡有好多問句</p>
+  <p class="big">設問：明明可以直接說，</p>
+  <p class="big">卻故意<span class="hl what">先問一󠇡句</span>，讓讀者<span class="hl how">停下來想一想</span>。</p>
+  <div class="skel"><span>說到北極熊<small>說到誰</small></span><span>你會想到什麼？<small>問讀者</small></span></div>
+  <p class="mid">課文找一找：一󠇡共有 <b>5</b> 個󠇡問句，你找到幾個󠇡？</p>` });
+S.push({ ch: 1, html: `
+  <p class="kicker">設問小教室　課文的 5 個󠇡問句（點開看在第幾段）</p>
+  <div class="cards">
+    ${flip('你曾經被人誤會嗎？', '第 1 段：開頭先問，吸引你讀下去。')}
+    ${flip('說到北極熊，你會想到什麼？', '第 2 段：先問，下一󠇡段才說出真相。')}
+    ${flip('說到豬，你會想到什麼？', '第 5 段：和󠇡北極熊那一󠇡句長󠇡得󠇡一󠇡樣，換了主角。')}
+    ${flip('你是不󠇡是也曾經誤會了這些動物呢？', '第 8 段：問了不回答，讓你自己想。')}
+    ${flip('你知道該怎麼做了嗎？', '第 9 段：最後一󠇡句，請你自己去查清楚真相！')}
+  </div>` });
+S.push({ ch: 1, html: `
+  <p class="kicker">設問小教室　換你當󠇡作者：把平平的句子󠇡改成問句</p>
+  <div class="cards">
+    ${flip('很多人覺得󠇡金魚的記憶力不好。', '說到<b>金魚</b>，你會想到什麼？')}
+    ${flip('很多人覺得󠇡駱駝的駝峰裡裝著水。', '說到<b>駱駝</b>，你會想到什麼？')}
+    ${flip('很多人覺得󠇡兔子󠇡的眼睛都是紅色的。', '兔子󠇡的眼睛<b>真的</b>都是紅色的嗎？')}
+    ${flip('我以前也誤會過蝙蝠。', '你是不󠇡是也曾經誤會過<b>蝙蝠</b>呢？')}
+  </div>
+  <p class="mid">寫小短文時，第一句就用問句開頭，讀的人會更想看下去！</p>` });
+// ===== 三、感嘆小舞臺 =====
+S.push({ ch: 2, html: `
+  <p class="kicker">感嘆小舞臺　發生了什麼事？用一󠇡句「感嘆」喊出來</p>
+  <div class="cards">
+    ${flip('發現北極熊的皮膚是黑色的', '<b>哇！</b>原來北極熊的皮膚是黑的！')}
+    ${flip('不小心踩到同學的腳', '<b>哎喲！</b>對不起，我不󠇡是故意的！')}
+    ${flip('冤枉了弟弟󠇡，才知道不󠇡是他', '<b>唉呀󠇡！</b>真是誤會大了！')}
+    ${flip('看到天空出現好大的彩虹', '<b>啊！</b>好美的彩虹呀󠇡！')}
+  </div>
+  <p class="mid">感嘆句常用「唉呀󠇡、哇、啊、哎喲」開頭，後面加上「！」，念的時候要有表情喔！</p>` });
+let cur = 0;
+const $ = s => document.querySelector(s);
+function render() {
+  const s = S[cur];
+  $('#slide').innerHTML = s.html;
+  $('#tabs').innerHTML = CH.map((c, i) => `<button class="tab" type="button" data-ch="${i}" aria-current="${s.ch === i}">${c}</button>`).join('');
+  $('#dots').innerHTML = S.map((x, i) => `<button class="dot ${i === cur ? 'on' : ''}" type="button" data-i="${i}" aria-label="第 ${i + 1} 頁"></button>`).join('');
+  $('#prev').disabled = cur === 0; $('#next').disabled = cur === S.length - 1;
+  document.querySelectorAll('[data-show]').forEach(b => b.onclick = () => { const r = b.nextElementSibling; r.hidden = !r.hidden; b.textContent = r.hidden ? b.dataset.l || b.textContent : '收起來'; });
+  document.querySelectorAll('[data-show]').forEach(b => b.dataset.l = b.textContent);
+  document.querySelectorAll('[data-flip]').forEach(b => b.onclick = () => { const bk = b.querySelector('.back'); bk.hidden = !bk.hidden; b.classList.toggle('open', !bk.hidden); b.querySelector('.tap').textContent = bk.hidden ? '點一󠇡下看答案' : '再點一󠇡下收起來'; });
+  document.querySelectorAll('[data-ch]').forEach(b => b.onclick = () => { cur = S.findIndex(x => x.ch === +b.dataset.ch); render(); });
+  document.querySelectorAll('[data-i]').forEach(b => b.onclick = () => { cur = +b.dataset.i; render(); });
+  try { history.replaceState(null, '', '#' + (cur + 1)); } catch (e) {}
+}
+$('#prev').onclick = () => { if (cur > 0) { cur--; render(); } };
+$('#next').onclick = () => { if (cur < S.length - 1) { cur++; render(); } };
+$('#fs').onclick = () => { try { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen(); } catch (e) {} };
+document.addEventListener('keydown', e => { if (e.key === 'ArrowRight' || e.key === 'PageDown') $('#next').click(); if (e.key === 'ArrowLeft' || e.key === 'PageUp') $('#prev').click(); });
+const h = parseInt(location.hash.slice(1)); if (h >= 1 && h <= S.length) cur = h - 1;
+render();
+</script>
+</body>
+</html>
